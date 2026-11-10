@@ -1,7 +1,8 @@
 // GameMonetize adapter (docs/TASKS.md T4.3). Run: npm run import:gm [-- --pages 3]
 // GM_FEED_URL (in .env) is the JSON feed address, for example
 //   https://gamemonetize.com/feed.php?format=0&num=50&page=1
-// --pages N downloads pages 1..N by changing the `page` value in that address.
+// Without --pages the import keeps reading pages (page=1, 2, 3 ...) until --limit games are reached or a page
+// comes back empty. --pages N caps the number of pages. MAX_PAGES is the safety cap either way.
 // --limit N keeps the first N games in the feed's order (default 500, 0 = all); paging stops once there are enough.
 // The feed has no developer, release date or mobile flag. Mobile is true only when the game's own
 // tags include "Mobile"; every other game stays false until the play test says otherwise.
@@ -92,13 +93,30 @@ export function pageAddress(address: string, page: number): string {
   return url.toString();
 }
 
+// Pause between page requests, so the feed is not asked for pages faster than a person would read them (R13).
+const PAGE_PAUSE_MS = 5000;
+// The feed sits behind Cloudflare, which answers 429 or error 1015 when one connection asks too often.
+// Going on would only make that worse, so the import keeps the pages it has and stops (R13).
+const RATE_LIMITED = /HTTP 429|error code: 1015|rate/i;
+
 export async function loadGmGames(location: string, pages: number, limit = 0): Promise<AdapterResult> {
   const result: AdapterResult = { games: [], skipped: [] };
   const seen = new Set<string>();
   const last = isWebAddress(location) ? pages : 1; // a saved file is one page
   for (let page = 1; page <= last; page++) {
     if (limit > 0 && result.games.length >= limit) break; // enough games, do not ask for more pages
-    const feed = await readJsonSource(isWebAddress(location) ? pageAddress(location, page) : location);
+    if (page > 1 && isWebAddress(location)) await new Promise((done) => setTimeout(done, PAGE_PAUSE_MS));
+    let feed: unknown;
+    try {
+      feed = await readJsonSource(isWebAddress(location) ? pageAddress(location, page) : location);
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      if (page > 1 && RATE_LIMITED.test(reason)) {
+        console.warn(`import:gm: the feed is rate-limiting after page ${page - 1} (${result.games.length} games kept). Run again later to get more.`);
+        break;
+      }
+      throw error;
+    }
     if (Array.isArray(feed) && feed.length === 0) break; // past the last page
     const parsed = parseGmFeed(feed);
     for (const game of parsed.games) {
@@ -116,8 +134,8 @@ async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
   const location = process.env.GM_FEED_URL;
   if (!location) throw new Error('GM_FEED_URL is not set. Copy .env.example to .env and fill it in.');
-  const pages = Number(args.pages ?? '1');
-  if (!Number.isInteger(pages) || pages < 1 || pages > MAX_PAGES) throw new Error(`--pages must be a whole number from 1 to ${MAX_PAGES}`);
+  const pages = args.pages === undefined ? MAX_PAGES : Number(args.pages);
+  if (!Number.isInteger(pages) || pages < 1 || pages > MAX_PAGES) throw new Error(`--pages must be a whole number from 1 to ${MAX_PAGES} (leave it out to read until --limit)`);
   const limit = parseLimit(args.limit);
   const result = applyLimit(await loadGmGames(location, pages, limit), limit);
   console.log(`import:gm: feed read, ${result.games.length} games${limit > 0 ? ` (limit ${limit}, --limit 0 = all)` : ''}, ${result.skipped.length} left out`);
