@@ -1,0 +1,476 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import GameGrid, { type GridItem } from '../../components/GameGrid.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import { getPublishedGames } from '../../lib/games';
+import { categories } from '../../lib/categories';
+import { relatedGames } from '../../lib/related';
+import { buildGameTitle, SITE_URL } from '../../lib/seo';
+
+// One page per published game. The player is static HTML here: the cover and the Play button.
+// The iframe is added by the player script (T2.5), only after the player clicks Play.
+export async function getStaticPaths() {
+  const games = await getPublishedGames();
+  return games.map((g) => ({ params: { slug: g.data.slug } }));
+}
+
+const { slug } = Astro.params;
+const games = await getPublishedGames();
+const entry = games.find((g) => g.data.slug === slug)!;
+const d = entry.data;
+
+const primary = categories.find((c) => c.slug === d.categories[0]);
+const primaryName = primary?.name ?? d.categories[0];
+const countOf = (s: string): number => games.filter((g) => g.data.categories.includes(s)).length;
+const chips = d.categories
+  .map((s) => categories.find((c) => c.slug === s))
+  .filter((c): c is NonNullable<typeof c> => c !== undefined)
+  .map((c) => ({ slug: c.slug, name: c.name, count: countOf(c.slug) }));
+
+const related = relatedGames(entry, games, 24);
+const toItem = (g: (typeof games)[number]): GridItem => ({ kind: 'game', title: g.data.title, slug: g.data.slug });
+const railLeft = related.slice(0, 6).map(toItem);
+const railRight = related.slice(6, 12).map(toItem);
+const moreItems = related.map(toItem);
+
+const { Content } = await render(entry);
+const isoDate = (date: Date): string => date.toISOString().slice(0, 10);
+const title = buildGameTitle(d.title);
+const pageUrl = `${SITE_URL}/game/${slug}`;
+
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: primaryName, path: `/${d.categories[0]}` },
+  { name: d.title, path: `/game/${slug}` },
+];
+
+const videoGameLd = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoGame',
+  name: d.title,
+  url: pageUrl,
+  image: `${SITE_URL}/thumbs/${slug}/l.webp`,
+  description: d.description,
+  genre: primaryName,
+  gamePlatform: ['Web browser'],
+  applicationCategory: 'Game',
+  operatingSystem: 'Any',
+  author: d.developer ? { '@type': 'Organization', name: d.developer } : undefined,
+  datePublished: isoDate(d.addedDate),
+  dateModified: isoDate(d.updatedDate),
+  offers: {
+    '@type': 'Offer',
+    price: 0,
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/InStock',
+  },
+};
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.name,
+    item: `${SITE_URL}${c.path}`,
+  })),
+};
+const faqLd =
+  d.faq.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: d.faq.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      }
+    : null;
+const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
+---
+<BaseLayout title={title} description={d.description} canonicalPath={`/game/${slug}`}>
+  <Header slot="header" />
+
+  <div class="game-layout">
+    <aside class="rail rail-left" aria-label="Related games">
+      <GameGrid items={railLeft} mode="uniform" uniformSize="S" label="Related games" />
+    </aside>
+
+    <div class="game-main">
+      <section class="player" aria-label={`Play ${d.title}`}>
+        <div class={`player-frame aspect-${d.aspect}`}>
+          <img class="cover-bg" src={`/thumbs/${slug}/l.webp`} alt="" width="600" height="600" aria-hidden="true" loading="eager" decoding="async" />
+          <div class="cover">
+            <img class="cover-thumb" src={`/thumbs/${slug}/m.webp`} alt={d.title} width="300" height="300" decoding="async" />
+            <p class="cover-title">{d.title}</p>
+            <button type="button" class="play-btn" data-embed={d.embedUrl}>Play</button>
+          </div>
+        </div>
+        <div class="player-bar">
+          <img class="bar-icon" src={`/thumbs/${slug}/s.webp`} alt="" width="150" height="150" decoding="async" />
+          <div class="bar-text">
+            <p class="bar-title">{d.title}</p>
+            {d.developer && <p class="bar-dev">{d.developer}</p>}
+          </div>
+        </div>
+      </section>
+
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <ol>
+          {crumbs.map((c, i) => (
+            <li>
+              {i === crumbs.length - 1 ? (
+                <span aria-current="page">{c.name}</span>
+              ) : (
+                <>
+                  <a href={c.path}>{c.name}</a>
+                  <span aria-hidden="true">›</span>
+                </>
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <h1 class="game-title">{d.title}</h1>
+      <p class="intro">{d.intro}</p>
+
+      <section class="text-card" aria-label="About this game">
+        <Content />
+      </section>
+
+      {d.faq.length > 0 && (
+        <section class="faq" aria-labelledby="game-faq">
+          <h2 id="game-faq">FAQ</h2>
+          {d.faq.map((f) => (
+            <details>
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </section>
+      )}
+
+      <section class="info" aria-labelledby="about-game">
+        <h2 id="about-game">About this game</h2>
+        <table>
+          <tbody>
+            {d.developer && (
+              <tr><th scope="row">Developer</th><td>{d.developer}</td></tr>
+            )}
+            <tr><th scope="row">Category</th><td><a href={`/${d.categories[0]}`}>{primaryName}</a></td></tr>
+            <tr><th scope="row">Platforms</th><td>{d.mobile ? 'Desktop, mobile' : 'Desktop'}</td></tr>
+            {d.releaseDate && (
+              <tr><th scope="row">Release date</th><td>{isoDate(d.releaseDate)}</td></tr>
+            )}
+            <tr><th scope="row">Added</th><td>{isoDate(d.addedDate)}</td></tr>
+            <tr><th scope="row">Last updated</th><td>{isoDate(d.updatedDate)}</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <nav class="related-categories" aria-label="Related categories">
+        <ul class="chips">
+          {chips.map((c) => (
+            <li><a class="chip" href={`/${c.slug}`}>{c.name} <span class="count">{c.count}</span></a></li>
+          ))}
+        </ul>
+      </nav>
+
+      <section class="more" aria-labelledby="more-games">
+        <h2 id="more-games" class="block-heading">More games like this</h2>
+        <GameGrid items={moreItems} mode="uniform" uniformSize="S" label="More games like this" />
+      </section>
+    </div>
+
+    <aside class="rail rail-right" aria-label="More games and advertising">
+      <GameGrid items={railRight} mode="uniform" uniformSize="S" label="More games" />
+      <AdSlot />
+    </aside>
+  </div>
+
+  <JsonLd data={jsonLd} />
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .game-layout {
+    display: block;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  .game-main {
+    min-width: 0;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .rail {
+    display: none;
+  }
+  @media (min-width: 1280px) {
+    .game-layout {
+      display: grid;
+      grid-template-columns: 136px minmax(0, 1100px) 336px;
+      justify-content: center;
+      gap: var(--s-5);
+    }
+    .rail {
+      display: block;
+    }
+    .rail-left {
+      grid-column: 1;
+    }
+    .game-main {
+      grid-column: 2;
+      margin: 0;
+    }
+    .rail-right {
+      grid-column: 3;
+    }
+  }
+
+  /* Player cover (static). Interactive player comes in T2.5. */
+  .player {
+    margin: 0 0 var(--s-3);
+  }
+  .player-frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--r-player);
+    background: var(--c-player-bg);
+    aspect-ratio: 16 / 9;
+    width: 100%;
+  }
+  .player-frame.aspect-portrait {
+    aspect-ratio: 9 / 16;
+    max-height: calc(100vh - 160px);
+    width: auto;
+    margin: 0 auto;
+  }
+  .player-frame.aspect-square {
+    aspect-ratio: 1 / 1;
+  }
+  .cover-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(18px) brightness(0.5);
+    transform: scale(1.1);
+  }
+  .cover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-3);
+    padding: var(--s-4);
+    text-align: center;
+  }
+  /* Sized from the frame height so the Play button always fits (it does not shrink). */
+  .cover > * {
+    flex-shrink: 0;
+  }
+  .cover-thumb {
+    height: 40%;
+    width: auto;
+    max-width: 60%;
+    aspect-ratio: 1 / 1;
+    border-radius: 20px;
+    object-fit: cover;
+  }
+  .cover-title {
+    margin: 0;
+    color: var(--c-primary-ink);
+    font: var(--t-h2);
+  }
+  .play-btn {
+    min-width: 180px;
+    height: 56px;
+    padding: 0 var(--s-5);
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+    font: 800 20px/1 var(--font-sans);
+    cursor: pointer;
+  }
+  .play-btn:hover {
+    background: var(--c-primary-dark);
+  }
+  .player-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    height: 56px;
+    padding: 0 var(--s-3);
+    box-sizing: border-box;
+    background: var(--c-surface);
+    border-radius: 0 0 var(--r-player) var(--r-player);
+  }
+  .bar-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  .bar-text {
+    min-width: 0;
+  }
+  .bar-title {
+    margin: 0;
+    overflow: hidden;
+    color: var(--c-ink);
+    font: 700 16px/20px var(--font-sans);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bar-dev {
+    margin: 0;
+    color: var(--c-ink-2);
+    font: var(--t-small);
+  }
+
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    list-style: none;
+    margin: var(--s-3) 0 var(--s-2);
+    padding: 0;
+    color: var(--c-ink-2);
+    font: var(--t-small);
+  }
+  .crumbs li {
+    display: inline-flex;
+    gap: var(--s-1);
+    align-items: center;
+  }
+  .crumbs a {
+    color: var(--c-ink-2);
+  }
+  .game-title {
+    margin: 0 0 var(--s-2);
+    color: var(--c-ink);
+    font: var(--t-h1);
+  }
+  .intro {
+    margin: 0 0 var(--s-4);
+    color: var(--c-ink-2);
+    max-width: 72ch;
+  }
+  .text-card,
+  .faq,
+  .info {
+    max-width: 72ch;
+    margin: 0 0 var(--s-5);
+    padding: var(--s-5);
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+    color: var(--c-ink);
+  }
+  .text-card :global(h2),
+  .faq h2,
+  .info h2,
+  .block-heading {
+    margin: 0 0 var(--s-2);
+    font: var(--t-h2);
+    color: var(--c-ink);
+  }
+  .text-card :global(h2) {
+    margin-top: var(--s-4);
+  }
+  .text-card :global(h3) {
+    margin: var(--s-3) 0 var(--s-1);
+    font: var(--t-h3);
+  }
+  .text-card :global(p),
+  .text-card :global(li) {
+    color: var(--c-ink-2);
+  }
+  .faq details {
+    border-top: 1px solid var(--c-line);
+    padding: var(--s-2) 0;
+  }
+  .faq summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    font: var(--t-h3);
+    cursor: pointer;
+  }
+  .faq p {
+    margin: 0 0 var(--s-2);
+    color: var(--c-ink-2);
+  }
+  .info table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .info th,
+  .info td {
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--c-line);
+    text-align: left;
+    vertical-align: top;
+  }
+  .info th {
+    width: 40%;
+    color: var(--c-ink-2);
+    font: var(--t-small);
+    font-weight: 600;
+  }
+  .info td {
+    color: var(--c-ink);
+    font: var(--t-body);
+  }
+  .related-categories {
+    margin: 0 0 var(--s-5);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+    height: 36px;
+    padding: 0 var(--s-3);
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    font: var(--t-small);
+    text-decoration: none;
+  }
+  .chip::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+  }
+  .chip:hover {
+    border-color: var(--c-primary);
+    color: var(--c-primary);
+    text-decoration: none;
+  }
+  .count {
+    color: var(--c-ink-2);
+  }
+  .more {
+    margin: 0 0 var(--s-5);
+  }
+</style>

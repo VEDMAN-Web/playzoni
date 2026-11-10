@@ -1,0 +1,14 @@
+---
+// Reserved 300x250 ad box. Renders nothing unless PUBLIC_ADS_ENABLED is 'true'
+// (docs/PRD.md §11). No ad code is loaded here yet (T6.1).
+const enabled = import.meta.env.PUBLIC_ADS_ENABLED === 'true';
+---
+{enabled && <div class="ad-slot" aria-hidden="true"></div>}
+
+<style>
+  .ad-slot {
+    width: 300px;
+    height: 250px;
+    margin: 0 auto;
+  }
+</style>

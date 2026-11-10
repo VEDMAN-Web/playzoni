@@ -46,7 +46,7 @@ function gameMarkdown(index: number): string {
   const aspect = ASPECTS[(index - 1) % ASPECTS.length];
   const cats = categoriesFor(index);
   const mobile = index % 4 !== 0;
-  const description = `Sample game ${n} for layout testing. Not a real game, used to check tiles, pages and search.`;
+  const description = `Sample game ${n} for layout testing. Not a real game, used to check tiles, pages, search and the player on phone and desktop.`;
   const intro = `Sample game ${n} is a placeholder used to test layouts. It is not a real game.`;
   return [
     '---',

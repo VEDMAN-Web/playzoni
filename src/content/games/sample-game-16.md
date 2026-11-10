@@ -16,7 +16,7 @@ tags: []
 developer: "Playzoni Test"
 addedDate: 2026-11-10
 updatedDate: 2026-11-10
-description: "Sample game 16 for layout testing. Not a real game, used to check tiles, pages and search."
+description: "Sample game 16 for layout testing. Not a real game, used to check tiles, pages, search and the player on phone and desktop."
 intro: "Sample game 16 is a placeholder used to test layouts. It is not a real game."
 controls:
   desktop: "Click or tap the ball to bounce it"

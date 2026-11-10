@@ -95,7 +95,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: `/car-games` renders with all parts; a < 12 category has `noindex`; page 2 exists when > 60 games (test by temporarily setting per-page to 10, then set back to 60).
 
 ### T2.4 — Game page (static parts)
-- status: todo · deps: T2.1 · model: haiku · docs: PRD §7, SEO-PLAN §Templates §Schema §Internal linking, DESIGN §Content blocks
+- status: done · deps: T2.1 · model: haiku · docs: PRD §7, SEO-PLAN §Templates §Schema §Internal linking, DESIGN §Content blocks
 - Do: `src/pages/game/[slug].astro` with everything in PRD §7 **except** player interactivity: cover state of the player as static HTML (thumbnail, title, Play button that is a `<button>` with `data-embed`), breadcrumbs, H1, intro, markdown body, FAQ (`<details>`), info table (hide empty rows), related category chips with counts, "More games like this" 24 tiles. `src/lib/related.ts`: same primary category by popularity → shared tags → overall popularity, never the game itself, no duplicates. Rails ≥1280 with related tiles + `AdSlot` (renders an empty reserved 300×250 box only when `PUBLIC_ADS_ENABLED=true`, otherwise nothing). JSON-LD VideoGame + BreadcrumbList + FAQPage.
 - Done when: a sample game page passes 4-width check; no iframe in the HTML source; JSON-LD has all fields in §Schema; related list has 24 items with samples on.
 
