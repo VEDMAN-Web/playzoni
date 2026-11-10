@@ -1,0 +1,145 @@
+---
+import GameTile from './GameTile.astro';
+import CategoryTile from './CategoryTile.astro';
+
+// Game grid (DESIGN §Grid). Two modes:
+// - mosaic: sizes repeat every 18 tiles. Positions 1 and 10 are L (3x3), 4, 7 and 14 are M (2x2),
+//   the rest are S (1x1). Featured games fill the L slots first. Below 480px, L is drawn as M (CSS).
+// - uniform: every tile is the same size (S, or M when uniformSize is 'M').
+// Category tiles are 2x1 and take one slot in order. The nav spacer goes first on pages that
+// have the floating nav box (DESIGN §Header).
+
+export interface GridGame {
+  kind: 'game';
+  title: string;
+  slug: string;
+  featured?: boolean;
+  badge?: 'New' | 'Hot';
+}
+export interface GridCategory {
+  kind: 'category';
+  slug: string;
+  shortName: string;
+  emoji: string;
+}
+export type GridItem = GridGame | GridCategory;
+
+interface Props {
+  items: GridItem[];
+  mode?: 'mosaic' | 'uniform';
+  uniformSize?: 'S' | 'M';
+  navSpacer?: boolean;
+  eagerCount?: number;
+  label?: string;
+}
+
+const { items, mode = 'mosaic', uniformSize = 'S', navSpacer = false, eagerCount = 6, label = 'Games' } = Astro.props;
+
+const LARGE_SLOTS = [1, 10];
+const MEDIUM_SLOTS = [4, 7, 14];
+const CYCLE = 18;
+
+function mosaicSize(position: number): 'S' | 'M' | 'L' {
+  const p = ((position - 1) % CYCLE) + 1;
+  if (LARGE_SLOTS.includes(p)) return 'L';
+  if (MEDIUM_SLOTS.includes(p)) return 'M';
+  return 'S';
+}
+
+const isFeatured = (item: GridItem): boolean => item.kind === 'game' && item.featured === true;
+
+// Mosaic: featured games go into L slots first, everything else keeps its order.
+const featuredQueue = mode === 'mosaic' ? items.filter(isFeatured) : [];
+const restQueue = mode === 'mosaic' ? items.filter((item) => !isFeatured(item)) : [...items];
+
+type Placed = { item: GridItem; size: 'S' | 'M' | 'L' | 'CAT' };
+const placed: Placed[] = [];
+for (let position = 1; placed.length < items.length; position++) {
+  const slot = mode === 'mosaic' ? mosaicSize(position) : uniformSize;
+  let next: GridItem | undefined;
+  if (mode === 'mosaic' && slot === 'L' && featuredQueue.length > 0) {
+    next = featuredQueue.shift();
+  } else if (restQueue.length > 0) {
+    next = restQueue.shift();
+  } else {
+    next = featuredQueue.shift();
+  }
+  if (!next) break;
+  placed.push({ item: next, size: next.kind === 'category' ? 'CAT' : slot });
+}
+---
+<div class={`grid grid-${mode}`} role="list" aria-label={label}>
+  {navSpacer && <div class="nav-spacer" aria-hidden="true"></div>}
+  {placed.map((p, i) => (
+    <div role="listitem" class={`cell cell-${p.size.toLowerCase()}`}>
+      {p.item.kind === 'category' ? (
+        <CategoryTile slug={p.item.slug} shortName={p.item.shortName} emoji={p.item.emoji} />
+      ) : (
+        <GameTile
+          title={p.item.title}
+          slug={p.item.slug}
+          size={p.size === 'CAT' ? 'S' : p.size}
+          eager={i < eagerCount}
+          priority={i === 0}
+          badge={p.item.badge}
+        />
+      )}
+    </div>
+  ))}
+</div>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, var(--cell));
+    grid-auto-rows: var(--cell);
+    grid-auto-flow: dense;
+    justify-content: center;
+    gap: var(--gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nav-spacer {
+    grid-column: span 3;
+    grid-row: span 1;
+  }
+  .cell {
+    min-width: 0;
+  }
+  .cell > :global(*) {
+    height: 100%;
+  }
+  .cell-s {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+  .cell-m {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  .cell-l {
+    grid-column: span 3;
+    grid-row: span 3;
+  }
+  /* Below 480px, L is drawn as M so it does not fill the full width. */
+  @media (max-width: 479px) {
+    .cell-l {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+  }
+  .cell-cat {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+  .grid-uniform .cell-m {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  @media (max-width: 479px) {
+    .nav-spacer {
+      display: none;
+    }
+  }
+</style>

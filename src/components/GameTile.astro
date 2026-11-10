@@ -1,0 +1,120 @@
+---
+// One game tile (DESIGN §Game tile). The whole tile is one link to the game page.
+// Size S = 1x1 cell, M = 2x2, L = 3x3 (the grid sets the span).
+interface Props {
+  title: string;
+  slug: string;
+  size: 'S' | 'M' | 'L';
+  eager?: boolean;
+  priority?: boolean;
+  badge?: 'New' | 'Hot';
+  rowTitle?: boolean;
+}
+
+const { title, slug, size, eager = false, priority = false, badge, rowTitle = false } = Astro.props;
+
+// S uses the 150px thumb with the 300px one for 2x screens; M and L use their own file.
+const file = size === 'S' ? 's' : size === 'M' ? 'm' : 'l';
+const px = size === 'S' ? 150 : size === 'M' ? 300 : 600;
+const srcset = size === 'S' ? `/thumbs/${slug}/s.webp 1x, /thumbs/${slug}/m.webp 2x` : undefined;
+---
+<a class={`tile tile-${size.toLowerCase()}`} href={`/game/${slug}`} aria-label={title}>
+  <img
+    src={`/thumbs/${slug}/${file}.webp`}
+    srcset={srcset}
+    width={px}
+    height={px}
+    alt={title}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding="async"
+    fetchpriority={priority ? 'high' : undefined}
+  />
+  {badge && <span class={`badge badge-${badge.toLowerCase()}`}>{badge}</span>}
+  <span class="overlay" aria-hidden="true">{title}</span>
+  {rowTitle && <span class="row-title">{title}</span>}
+</a>
+
+<style>
+  .tile {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--r-tile);
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    color: var(--c-ink);
+    text-decoration: none;
+    transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+  }
+  .tile:hover,
+  .tile:focus-visible {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: var(--sh-tile-hover);
+    color: var(--c-ink);
+    text-decoration: none;
+  }
+  .tile img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+  .badge {
+    position: absolute;
+    top: var(--s-2);
+    left: var(--s-2);
+    padding: 0 var(--s-2);
+    border-radius: var(--r-pill);
+    background: var(--c-accent);
+    color: var(--c-ink);
+    font: var(--t-small);
+  }
+  .badge-hot {
+    background: var(--c-accent-2);
+  }
+  /* Title overlay: desktop hover and keyboard focus only. Touch devices get no overlay. */
+  .overlay {
+    display: none;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .overlay {
+      display: block;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: var(--s-6) var(--s-2) var(--s-2);
+      background: linear-gradient(transparent, color-mix(in srgb, var(--c-ink) 85%, transparent));
+      color: var(--c-primary-ink);
+      font: var(--t-tile);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      transform: translateY(100%);
+      opacity: 0;
+      transition: transform 150ms ease-out, opacity 150ms ease-out;
+    }
+    .tile:hover .overlay,
+    .tile:focus-visible .overlay {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  .row-title {
+    display: block;
+    margin-top: var(--s-1);
+    overflow: hidden;
+    color: var(--c-ink);
+    font: var(--t-small);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tile:hover,
+    .tile:focus-visible {
+      transform: none;
+    }
+  }
+</style>

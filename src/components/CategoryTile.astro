@@ -1,0 +1,60 @@
+---
+// Category tile (DESIGN §Category tile). 2 cells wide, 1 cell tall. Whole tile is a link.
+interface Props {
+  slug: string;
+  shortName: string;
+  emoji: string;
+}
+
+const { slug, shortName, emoji } = Astro.props;
+---
+<a class="cat-tile" href={`/${slug}`}>
+  <span class="emoji" aria-hidden="true">{emoji}</span>
+  <span class="name">{shortName} Games</span>
+</a>
+
+<style>
+  .cat-tile {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    box-sizing: border-box;
+    height: 100%;
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r-tile);
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    color: var(--c-ink);
+    text-decoration: none;
+    transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+  }
+  .cat-tile:hover,
+  .cat-tile:focus-visible {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: var(--sh-tile-hover);
+    color: var(--c-ink);
+    text-decoration: none;
+  }
+  .emoji {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--c-bg);
+    font: var(--t-h2);
+  }
+  .name {
+    overflow: hidden;
+    font: var(--t-h3);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cat-tile:hover,
+    .cat-tile:focus-visible {
+      transform: none;
+    }
+  }
+</style>

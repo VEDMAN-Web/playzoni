@@ -1,0 +1,137 @@
+---
+import GameTile from './GameTile.astro';
+
+// Horizontal game row (DESIGN §Rows). Scroll-snap track, one-line titles under tiles.
+// Desktop (1024px+) gets arrow buttons; a small script shows them and scrolls. Without JS it
+// is a plain swipe/scroll row (the arrows stay hidden).
+interface Props {
+  title: string;
+  seeAllHref?: string;
+  games: { title: string; slug: string }[];
+  eagerCount?: number;
+}
+
+const { title, seeAllHref, games, eagerCount = 0 } = Astro.props;
+const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+---
+<section class="row" aria-labelledby={headingId}>
+  <div class="row-head">
+    <h2 id={headingId} class="row-heading">{title}</h2>
+    {seeAllHref && <a class="see-all" href={seeAllHref}>See all ›</a>}
+  </div>
+  <div class="row-wrap">
+    <button class="arrow arrow-prev" type="button" aria-label="Scroll left" hidden data-row-prev>‹</button>
+    <div class="row-track" data-row-track>
+      {games.map((g, i) => (
+        <div class="row-item">
+          <GameTile title={g.title} slug={g.slug} size="M" eager={i < eagerCount} rowTitle />
+        </div>
+      ))}
+    </div>
+    <button class="arrow arrow-next" type="button" aria-label="Scroll right" hidden data-row-next>›</button>
+  </div>
+</section>
+
+<style>
+  .row {
+    margin: var(--s-6) 0;
+  }
+  .row-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-bottom: var(--s-2);
+  }
+  .row-heading {
+    margin: 0;
+    color: var(--c-ink);
+    font: var(--t-h3);
+  }
+  .see-all {
+    color: var(--c-primary);
+    font: var(--t-small);
+    text-decoration: none;
+  }
+  .row-wrap {
+    position: relative;
+  }
+  .row-track {
+    display: flex;
+    gap: var(--gap);
+    overflow-x: auto;
+    padding: var(--s-1) 0 var(--s-2);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .row-track::-webkit-scrollbar {
+    display: none;
+  }
+  .row-item {
+    flex: 0 0 auto;
+    /* Desktop: a 2x2 tile. Phone: a 1x1 tile. */
+    width: var(--cell);
+    scroll-snap-align: start;
+  }
+  @media (min-width: 1024px) {
+    .row-item {
+      width: calc(2 * var(--cell) + var(--gap));
+    }
+  }
+  .arrow {
+    position: absolute;
+    top: 40%;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    color: var(--c-ink);
+    font: var(--t-h2);
+    cursor: pointer;
+  }
+  .arrow[hidden] {
+    display: none;
+  }
+  .arrow-prev {
+    left: calc(-1 * var(--s-2));
+  }
+  .arrow-next {
+    right: calc(-1 * var(--s-2));
+  }
+</style>
+
+<script>
+  // Shows the desktop arrows (1024px and up) and scrolls the row by most of its width.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const desktop = window.matchMedia('(min-width: 1024px)');
+
+  document.querySelectorAll<HTMLElement>('.row').forEach((row) => {
+    const track = row.querySelector<HTMLElement>('[data-row-track]');
+    const prev = row.querySelector<HTMLButtonElement>('[data-row-prev]');
+    const next = row.querySelector<HTMLButtonElement>('[data-row-next]');
+    if (!track || !prev || !next) return;
+
+    const sync = (): void => {
+      const show = desktop.matches;
+      prev.hidden = !show;
+      next.hidden = !show;
+    };
+    const scrollBy = (direction: number): void => {
+      track.scrollBy({
+        left: direction * track.clientWidth * 0.8,
+        behavior: reduceMotion.matches ? 'auto' : 'smooth',
+      });
+    };
+
+    sync();
+    desktop.addEventListener('change', sync);
+    prev.addEventListener('click', () => scrollBy(-1));
+    next.addEventListener('click', () => scrollBy(1));
+  });
+</script>

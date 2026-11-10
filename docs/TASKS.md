@@ -80,7 +80,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: `npm run check` passes; 4-width check passes; nav box never covers page text at any width; search panel opens/closes with mouse, keyboard (Escape) and touch; without JS the search button goes to `/search`; no old orange colour left (`grep -ri "FF5A36\|FFF7EE" src public data` returns nothing).
 
 ### T2.1 — Tiles, grid, rows
-- status: todo · deps: T1.6 · model: haiku · docs: DESIGN §Game tile §Grid §Rows
+- status: done · deps: T1.6 · model: haiku · docs: DESIGN §Game tile §Grid §Rows
 - Do: `GameTile` (S/M/L, badges, hover, srcset), `CategoryTile` (DESIGN §Category tile), `GameGrid` (mosaic + uniform modes, exact pattern from DESIGN, nav spacer as first item, category tiles inserted where DESIGN says), `GameRow` (scroll-snap, arrows ≥1024 via tiny script, works without JS as a swipe/scroll row). First 6 tiles on a page eager, first `fetchpriority=high` (prop `eagerCount`).
 - Done when: on a temporary page `/dev-grid` (delete it at the end of the task) 24 sample tiles show the mosaic pattern; no gaps; no horizontal overflow at 4 widths; reduced-motion disables transforms.
 

@@ -10,9 +10,11 @@ interface Props {
   canonicalPath: string;
   ogImage?: string;
   noindex?: boolean;
+  /** Set "has-grid" on pages whose first grid item is the nav spacer (DESIGN §Header). */
+  mainClass?: string;
 }
 
-const { title, description, canonicalPath, ogImage, noindex } = Astro.props;
+const { title, description, canonicalPath, ogImage, noindex, mainClass } = Astro.props;
 
 // Cloudflare Web Analytics beacon only when a token is set (docs/PRD.md §2).
 const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
@@ -47,7 +49,7 @@ const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
   </head>
   <body>
     <slot name="header" />
-    <main>
+    <main class={mainClass}>
       <slot />
     </main>
     <slot name="footer" />
