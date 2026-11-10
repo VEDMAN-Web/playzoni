@@ -277,3 +277,26 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - status: blocked until owner has AdSense approval · deps: T5.5 · model: haiku · docs: PRD §11
 - Do: `AdSlot` loads AdSense only when `PUBLIC_ADS_ENABLED=true`; slots exactly per PRD §11 with reserved sizes (no CLS); `public/ads.txt` from env; consent via Google's own CMP (owner enables in AdSense). 
 - Done when: CLS still ≤ 0.05 with ads on; no ad inside or over the player.
+
+---
+## Phase 7 — Accounts (docs/ACCOUNTS.md) — after launch of the guest site
+### T7.1 — API skeleton
+- status: todo · deps: T5.5 · model: **sonnet** · docs: ACCOUNTS.md
+- Do: `api/` Fastify + TypeScript app with health route, Better Auth (MongoDB adapter, Google, Microsoft, passkeys), CORS/cookie/rate-limit rules, `.env.example` (empty values), Dockerfile, DigitalOcean App spec `api/.do/app.yaml`. Tests with an in-memory MongoDB.
+- Done when: tests pass locally; owner steps 1–4 written in plain words in `docs/DEPLOY-API.md`.
+### T7.2 — Sync and stats endpoints
+- status: todo · deps: T7.1 · model: **sonnet** · docs: ACCOUNTS.md §API
+- Done when: every endpoint in the table has tests, including merge, export and delete.
+### T7.3 — Website sign-in and sync
+- status: todo · deps: T7.2, TP.7 · model: **sonnet** · docs: ACCOUNTS.md §Website side
+- Done when: sign-in with Google works on the preview; guest data merges on first sign-in; site still works with the API switched off.
+
+---
+## Phase 8 — Languages (docs/I18N.md) — after English is indexed
+### T8.1 — i18n framework, hreflang and footer language picker
+- status: todo · deps: T5.6 · model: **sonnet** · docs: I18N.md
+### T8.2 — Country suggestion bar (`/__geo` Pages Function) and home-page language memory
+- status: todo · deps: T8.1 · model: haiku · docs: I18N.md §Choosing the language
+### T8.3 — Translate UI strings + first 100 game pages per language (batches of 20)
+- status: todo · deps: T8.1 · model: haiku · docs: I18N.md §Translation
+
