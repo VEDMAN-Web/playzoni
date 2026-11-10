@@ -79,7 +79,7 @@ const browseItems: GridItem[] = published.map((c) => ({
 
 // Popular categories list in the text block: one line each, taken from the category intro.
 const firstSentence = (text: string): string => text.split(/(?<=\.)\s/)[0];
-const popularLinks = topEight.map((c) => ({ slug: c.slug, name: c.name, line: firstSentence(c.intro) }));
+const popularLinks = topEight.map((c) => ({ slug: c.slug, name: c.name, emoji: c.emoji, line: firstSentence(c.intro) }));
 
 const website = {
   '@context': 'https://schema.org',
@@ -92,12 +92,55 @@ const website = {
     'query-input': 'required name=search_term_string',
   },
 };
+// SEO-PLAN §Schema: the site's organisation is Playzoni, published by SparkBeta Tech.
 const organization = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'SparkBeta Tech',
+  name: 'Playzoni',
   url: 'https://playzoni.com',
   logo: 'https://playzoni.com/icon-512.png',
+  parentOrganization: { '@type': 'Organization', name: 'SparkBeta Tech' },
+};
+
+// Home FAQ (DESIGN §V2.11): shown in the text card and repeated as FAQPage data. Answers are plain text.
+const faqs: { q: string; a: string }[] = [
+  {
+    q: 'Are the games on Playzoni free?',
+    a: 'Yes. Every game is free to play in your browser. Some games show a short ad now and then, and those ads pay for the site.',
+  },
+  {
+    q: 'Do I need to download or install anything?',
+    a: 'No. Pick a game and press Play. It opens inside the page in a few seconds, on any modern browser.',
+  },
+  {
+    q: 'Do I need an account to play?',
+    a: 'No account is needed. Your favourites and recently played games are saved in your browser on this device, so they are there when you come back.',
+  },
+  {
+    q: 'Can I play on my phone or tablet?',
+    a: 'Yes. Every game we publish is checked on a phone. On a phone the game opens full screen; if it asks you to turn your phone sideways, rotate it and play.',
+  },
+  {
+    q: 'Can I play with a friend?',
+    a: 'Yes. The 2 Player Games category has games for two people on one screen or one keyboard, and some games let you play online with others.',
+  },
+  {
+    q: 'How do I save a game I like?',
+    a: 'Tap the heart under the game. You will find it again on the Favourites page, which you can open from the heart button at the top.',
+  },
+  {
+    q: 'How often are new games added?',
+    a: 'We add new games regularly. The New Games page always shows the latest ones first.',
+  },
+  {
+    q: 'A game is not loading. What can I do?',
+    a: 'Reload the page and check your internet connection, or try another browser. If it still does not work, use the report button under the game and we will look at it.',
+  },
+];
+const faqPage = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
 };
 ---
 <BaseLayout title={title} description={description} canonicalPath="/" mainClass="has-grid">
@@ -118,73 +161,92 @@ const organization = {
     <GameGrid items={browseItems} mode="uniform" uniformSize="S" label="All categories" />
   </section>
 
-  <SeoCard label="About Playzoni">
-    <h1>Free Online Games on Playzoni</h1>
+  <SeoCard label="About Playzoni" wide>
+    <div class="about-intro">
+      <h1>Free Online Games on Playzoni</h1>
+      <p class="lead">
+        Play <strong>free online games</strong> in your browser. Pick a game, press Play, and it starts straight away,
+        with <strong>nothing to download</strong> and <strong>no account</strong> to make.
+      </p>
+      <ul class="perks" aria-label="Why play on Playzoni">
+        <li><span aria-hidden="true">✓</span> Free to play</li>
+        <li><span aria-hidden="true">✓</span> No download</li>
+        <li><span aria-hidden="true">✓</span> Phone, tablet and computer</li>
+      </ul>
+    </div>
 
-    <h2>Play instantly on any device</h2>
-    <p>
-      Playzoni is a place to play <strong>free online games</strong> in your browser. Pick a game, press Play, and it starts
-      straight away. There is <strong>nothing to download</strong> and <strong>no account</strong> to make, so you can move
-      from one game to the next in seconds.
-    </p>
-    <p>
-      Every game runs on phones, tablets, laptops and desktop computers. On a phone you tap the screen to play. On a
-      computer you use the mouse and keyboard, as the game asks. Games open inside the page, and you can switch to full
-      screen when you want more room.
-    </p>
+    <div class="about-cols">
+      <div class="about-text">
+        <h2>Play instantly on any device</h2>
+        <p>
+          Every game runs on phones, tablets, laptops and desktop computers. On a phone you tap the screen to play. On a
+          computer you use the mouse and keyboard, as the game asks. Games open inside the page, and you can switch to full
+          screen when you want more room.
+        </p>
+        <p>
+          Start with the easy games at the top of this page: <strong>one tap or one swipe</strong> is all you need. When
+          you want more, every category has deeper games to try.
+        </p>
 
-    <h2>Popular categories</h2>
-    <p>Browse the main categories below, or use the search button to find a game by name.</p>
-    <ul>
-      {popularLinks.map((c) => (
-        <li>
-          <a href={`/${c.slug}`}>{c.name}</a>: {c.line}
-        </li>
-      ))}
-    </ul>
+        <h2>How we pick games</h2>
+        <p>
+          We choose games that <strong>load quickly</strong>, work well with touch screens and keyboards, and stay fun for
+          more than a few seconds. Each game is played and checked on a phone and on a desktop computer before it goes
+          live, and we write our own description, controls and tips for it.
+        </p>
+        <p>
+          If a game does not work well on the devices we test, we do not publish it. The Popular row is sorted by
+          popularity, the New row shows the latest games, and each category row shows its most popular games first.
+        </p>
+      </div>
 
-    {topGames.length > 0 && (
-      <>
-        <h2>Top games</h2>
-        <ul>
-          {topGames.map((g) => (
-            <li><a href={`/game/${g.slug}`}>{g.title}</a></li>
+      <div class="about-side">
+        <h2>Popular categories</h2>
+        <ul class="cat-list">
+          {popularLinks.map((c) => (
+            <li>
+              <a href={`/${c.slug}`}>
+                <span class="cat-icon" aria-hidden="true">{c.emoji}</span>
+                <span class="cat-text">
+                  <span class="cat-name">{c.name}</span>
+                  <span class="cat-line">{c.line}</span>
+                </span>
+              </a>
+            </li>
           ))}
         </ul>
-      </>
-    )}
 
-    <h2>How we pick games</h2>
-    <p>
-      We choose games that <strong>load quickly</strong>, work well with touch screens and keyboards, and stay fun for more
-      than a few seconds. Each game is played and checked on a phone and on a desktop computer before it goes live. We write
-      our own description, controls and tips for every game, so the text you read on Playzoni is ours.
-    </p>
-    <p>
-      If a game does not work well on the devices we test, we do not publish it. Games that have not been checked are not
-      shown, even when they are popular elsewhere.
-    </p>
-    <p>
-      The Popular games row is sorted by popularity, and the New games row shows the games added most recently. Each
-      category row shows its most popular games first, so you can start with the games other players pick most often.
-    </p>
+        {topGames.length > 0 && (
+          <>
+            <h2>Top games</h2>
+            <ol class="top-list">
+              {topGames.map((g, i) => (
+                <li>
+                  <a href={`/game/${g.slug}`}>
+                    <span class="top-rank" aria-hidden="true">{i + 1}</span>
+                    <img src={`/thumbs/${g.slug}/s.webp`} alt="" width="40" height="40" loading="lazy" decoding="async" />
+                    <span class="top-name">{g.title}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </>
+        )}
+      </div>
+    </div>
 
-    <h2>Questions and answers</h2>
-    <details>
-      <summary>Are the games free?</summary>
-      <p>Yes. Every game is free to play in your browser, with nothing to download and no account to make.</p>
-    </details>
-    <details>
-      <summary>Do I need to install anything?</summary>
-      <p>No. Pick a game and press Play. It opens inside the page.</p>
-    </details>
-    <details>
-      <summary>How are the games chosen?</summary>
-      <p>Each game is played and checked on a phone and on a desktop computer before it goes live, and we write our own text for it.</p>
-    </details>
+    <h2 class="faq-heading">Questions and answers</h2>
+    <div class="faq">
+      {faqs.map((f) => (
+        <details>
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
   </SeoCard>
 
-  <JsonLd data={[website, organization]} />
+  <JsonLd data={[website, organization, faqPage]} />
   <Footer slot="footer" />
 </BaseLayout>
 
@@ -196,5 +258,165 @@ const organization = {
     margin: 0 0 var(--s-3);
     color: var(--c-ink);
     font: var(--t-h2);
+  }
+
+  /* Text card layout (DESIGN §V2.11): centred intro, then two columns from 1024px, then the FAQ. */
+  .about-intro {
+    text-align: center;
+    padding-bottom: var(--s-5);
+    border-bottom: 1px solid var(--c-line);
+  }
+  .about-intro .lead {
+    max-width: 640px;
+    margin: 0 auto var(--s-4);
+    font: 400 18px/28px var(--font-sans);
+  }
+  .about-intro .perks {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .about-intro .perks li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    padding: 6px 14px;
+    border-radius: var(--r-pill);
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font: var(--t-small);
+  }
+  .perks span {
+    color: var(--c-primary-dark);
+    font-weight: 800;
+  }
+  .about-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0 var(--s-7);
+  }
+  @media (min-width: 1024px) {
+    .about-cols {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    }
+  }
+  .about-side .cat-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  @media (min-width: 600px) {
+    .about-side .cat-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .about-side .cat-list li {
+    margin: 0;
+  }
+  .cat-list a {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    height: 100%;
+    min-height: 56px;
+    box-sizing: border-box;
+    padding: var(--s-2) var(--s-3);
+    border-radius: 14px;
+    background: var(--c-bg);
+    text-decoration: none;
+    transition: background-color 120ms ease-out, box-shadow 120ms ease-out;
+  }
+  .cat-list a:hover,
+  .cat-list a:focus-visible {
+    background: var(--c-surface);
+    box-shadow: 0 0 0 2px var(--c-primary);
+    text-decoration: none;
+  }
+  .cat-icon {
+    display: flex;
+    flex: 0 0 40px;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--c-surface);
+    font-size: 20px;
+  }
+  .cat-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .cat-name {
+    color: var(--c-ink);
+    font: 800 15px/20px var(--font-sans);
+  }
+  .cat-line {
+    overflow: hidden;
+    color: var(--c-ink-2);
+    font: 400 13px/18px var(--font-sans);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .about-side .top-list {
+    display: grid;
+    gap: var(--s-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .about-side .top-list li {
+    margin: 0;
+  }
+  .top-list a {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 52px;
+    padding: 6px var(--s-3) 6px 6px;
+    border-radius: 14px;
+    text-decoration: none;
+    transition: background-color 120ms ease-out;
+  }
+  .top-list a:hover,
+  .top-list a:focus-visible {
+    background: var(--c-bg);
+    text-decoration: none;
+  }
+  .top-rank {
+    display: flex;
+    flex: 0 0 28px;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+    font: 800 14px/1 var(--font-sans);
+  }
+  .top-list img {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  .top-name {
+    color: var(--c-ink);
+    font: 800 15px/20px var(--font-sans);
+  }
+  .faq-heading {
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--c-line);
   }
 </style>

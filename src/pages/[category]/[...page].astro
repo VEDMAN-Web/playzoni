@@ -73,6 +73,14 @@ const gameItems: GridItem[] = pageGames.map((g) => ({
   featured: g.data.featured,
   ...previewFields(g.data),
 }));
+// Desktop: the related-category chips sit beside the title tile and take only the cells they need (about 8px per
+// letter plus padding per chip, in 110px grid steps), so no empty strip is left in the first row (owner, 11 Nov).
+const chipCells = Math.max(
+  1,
+  Math.ceil(
+    [...(parent ? [parent] : []), ...children].reduce((sum, c) => sum + c.name.length * 8 + 56, 0) / 110,
+  ),
+);
 const relatedCategoryItems: GridItem[] = [...(parent ? [parent] : []), ...children].map((c) => ({
   kind: 'category',
   slug: c.slug,
@@ -154,7 +162,7 @@ const jsonLd = [collectionLd, itemListLd, breadcrumbLd, ...(faqLd && isFirst ? [
     <TitleTile slot="lead" crumbs={crumbs} h1={`${cat.h1}${isFirst ? '' : ` — Page ${pageNumber}`}`} />
 
     {(parent || children.length > 0) && (
-      <nav slot="lead" class="related" aria-label="Related categories">
+      <nav slot="lead" class="related" aria-label="Related categories" style={`--chip-cells: ${chipCells}`}>
         <ul class="chips">
           {parent && (
             <li><a class="chip" href={`/${parent.slug}`}>{parent.name} <span class="count">{countOf(parent.slug)}</span></a></li>
@@ -209,17 +217,20 @@ const jsonLd = [collectionLd, itemListLd, breadcrumbLd, ...(faqLd && isFirst ? [
 </BaseLayout>
 
 <style>
-  /* Related categories: a full-width row above the tiles on small screens; from 1024px a strip in the first row, beside the nav box. */
+  /* Related categories: a full-width row above the tiles on small screens; from 1024px a strip right after the title
+     tile, only as wide as its chips (--chip-cells), so the tiles fill the rest of the first row. */
   .related {
     grid-column: 1 / -1;
     margin: 0 0 var(--s-2);
   }
   @media (min-width: 1024px) {
     .related {
-      grid-column: 6 / -1;
-      grid-row: 1;
+      grid-column: span var(--chip-cells);
       align-self: center;
       margin: 0;
+    }
+    .related .chips {
+      justify-content: center;
     }
   }
   .chips {

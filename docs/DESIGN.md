@@ -174,3 +174,15 @@ Owner feedback: everything on desktop looks too big (nav box, category tiles, ti
 - **Game page player (≥1024):** 7×4 cells (754×424, exactly 16:9) from 1024 to 1599px wide; **9×5 cells (974×534)** at 1600px and wider. Ad block 3×3 (314×314, holds a 300×250 ad), ad strip under the player 7×1 / 9×1. Everything else in V2.4 stays (no empty gaps, nav box column 1, related tiles around).
 - **Phones and tablets (<1024):** only the cell size changes (94px); the top bar, player cover and overlay stay as they are.
 - Badges stay 22px below 480px and 26px from 480px (they are now relatively larger on 94px tiles — that is intended, same as Poki).
+
+### V2.11 Polish pass (R31, 11 Nov 2026 — done by the planner; keep it, overrides earlier sections where they differ)
+Owner feedback on the R28 build. Implemented directly in the code by the planner:
+- **Nav box (2×1):** logo centred on the top line (28px); under it a row of three equal soft-blue buttons (36px tall, radius 12, icon 20px): Search, Favourites, Categories. Hover = primary blue with white icon. TP.7 adds Profile as a 4th button in the same row.
+- **Rows:** header = title left; right side = white "See all ›" pill (36px, tile shadow, hover primary) + two round 36px arrow buttons (desktop ≥1024, JS on, only when the row overflows; disabled at the ends). Arrows never sit on the tiles.
+- **Tile hover name:** 2 lines max with "…" (clamp on an inner span).
+- **Category tile:** icon square fills the tile height on the left (70px), name centred in the rest, 13px 800 uppercase, max 2 lines, no mid-word breaks.
+- **Title tile:** compact — 2×1 for titles ≤ 18 characters, 3×1 up to 40, 4×1 beyond. Breadcrumbs grey 12px on one line.
+- **Category page chips (desktop):** sit right after the title tile and take only the cells they need (`--chip-cells`), not the rest of row 1.
+- **Text card:** content column centred (860px; 1200px on the home page with `wide`). Home: centred H1 + lead + 3 perk pills; then two columns (text left; category cards + numbered top-5 games with thumbnails right); then 8 FAQs as soft-blue boxes with +/−, two columns from 1024px, plus FAQPage JSON-LD.
+- **Footer:** centred (max 1240px). Brand block (logo, tagline, one-line blurb, socials) + columns Popular categories (two short columns), Explore (New, Popular, All Categories, All Games A–Z), Help and support, Playzoni (About us, For developers). Bottom bar: "© year Playzoni. All rights reserved." and a "Back to top" pill.
+- **Organization JSON-LD:** name Playzoni, parentOrganization SparkBeta Tech (as SEO-PLAN §Schema says).

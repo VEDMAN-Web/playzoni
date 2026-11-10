@@ -1,9 +1,10 @@
 ---
 import GameTile from './GameTile.astro';
 
-// Horizontal game row (DESIGN §Rows). Scroll-snap track of plain S tiles; the name shows on hover and focus only (R27).
-// Desktop (1024px+) gets arrow buttons; a small script shows them and scrolls. Without JS it
-// is a plain swipe/scroll row (the arrows stay hidden).
+// Horizontal game row (DESIGN §Rows, header from §V2.11). Scroll-snap track of plain S tiles; the name shows on hover
+// and focus only (R27). The header holds the title on the left and, on the right, a "See all" pill plus (desktop
+// 1024px+, JS on) two round arrow buttons. The arrows never sit on top of the tiles. They fade out at the start and end
+// of the row. Without JS it is a plain swipe/scroll row (the arrows stay hidden).
 interface Props {
   title: string;
   seeAllHref?: string;
@@ -17,18 +18,27 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 <section class="row" aria-labelledby={headingId}>
   <div class="row-head">
     <h2 id={headingId} class="row-heading">{title}</h2>
-    {seeAllHref && <a class="see-all" href={seeAllHref}>See all ›</a>}
-  </div>
-  <div class="row-wrap">
-    <button class="arrow arrow-prev" type="button" aria-label="Scroll left" hidden data-row-prev>‹</button>
-    <div class="row-track" data-row-track>
-      {games.map((g, i) => (
-        <div class="row-item">
-          <GameTile title={g.title} slug={g.slug} size="S" eager={i < eagerCount} />
-        </div>
-      ))}
+    <div class="row-tools">
+      {seeAllHref && (
+        <a class="see-all" href={seeAllHref} aria-label={`See all ${title.toLowerCase()}`}>
+          <span>See all</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+        </a>
+      )}
+      <button class="arrow" type="button" aria-label="Scroll left" hidden data-row-prev>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
+      </button>
+      <button class="arrow" type="button" aria-label="Scroll right" hidden data-row-next>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+      </button>
     </div>
-    <button class="arrow arrow-next" type="button" aria-label="Scroll right" hidden data-row-next>›</button>
+  </div>
+  <div class="row-track" data-row-track>
+    {games.map((g, i) => (
+      <div class="row-item">
+        <GameTile title={g.title} slug={g.slug} size="S" eager={i < eagerCount} />
+      </div>
+    ))}
   </div>
 </section>
 
@@ -38,7 +48,7 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
   }
   .row-head {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: space-between;
     gap: var(--s-3);
     margin-bottom: var(--s-2);
@@ -48,13 +58,80 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
     color: var(--c-ink);
     font: var(--t-h3);
   }
+  .row-tools {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--s-2);
+  }
+  /* White pill like a small tile; 36px tall, tap area widened to 44px with ::after. */
   .see-all {
-    color: var(--c-primary-dark);
-    font: var(--t-small);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    height: 36px;
+    padding: 0 10px 0 16px;
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    color: var(--c-ink);
+    font: 800 14px/1 var(--font-sans);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 120ms ease-out, color 120ms ease-out, transform 120ms ease-out;
+  }
+  .see-all::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+  }
+  .see-all svg {
+    transition: transform 120ms ease-out;
+  }
+  .see-all:hover,
+  .see-all:focus-visible {
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
     text-decoration: none;
   }
-  .row-wrap {
+  .see-all:hover svg,
+  .see-all:focus-visible svg {
+    transform: translateX(2px);
+  }
+  .arrow {
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    color: var(--c-ink);
+    cursor: pointer;
+    transition: background-color 120ms ease-out, color 120ms ease-out, opacity 120ms ease-out;
+  }
+  .arrow::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+  }
+  .arrow[hidden] {
+    display: none;
+  }
+  .arrow:hover:not(:disabled),
+  .arrow:focus-visible:not(:disabled) {
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+  }
+  .arrow:disabled {
+    opacity: 0.45;
+    cursor: default;
+    box-shadow: none;
   }
   .row-track {
     display: flex;
@@ -73,36 +150,21 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
     width: var(--cell);
     scroll-snap-align: start;
   }
-  .arrow {
-    position: absolute;
-    top: 40%;
-    z-index: 2;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border: 0;
-    border-radius: var(--r-pill);
-    background: var(--c-surface);
-    box-shadow: var(--sh-tile);
-    color: var(--c-ink);
-    font: var(--t-h2);
-    cursor: pointer;
-  }
-  .arrow[hidden] {
-    display: none;
-  }
-  .arrow-prev {
-    left: calc(-1 * var(--s-2));
-  }
-  .arrow-next {
-    right: calc(-1 * var(--s-2));
+  @media (prefers-reduced-motion: reduce) {
+    .see-all,
+    .see-all svg {
+      transition: none;
+    }
+    .see-all:hover svg,
+    .see-all:focus-visible svg {
+      transform: none;
+    }
   }
 </style>
 
 <script>
-  // Shows the desktop arrows (1024px and up) and scrolls the row by most of its width.
+  // Shows the arrows on desktop (1024px and up), scrolls the row by most of its width, and disables an arrow at the
+  // start or end of the row. Rows that fit on screen get no arrows.
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const desktop = window.matchMedia('(min-width: 1024px)');
 
@@ -113,9 +175,12 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
     if (!track || !prev || !next) return;
 
     const sync = (): void => {
-      const show = desktop.matches;
+      const overflows = track.scrollWidth > track.clientWidth + 1;
+      const show = desktop.matches && overflows;
       prev.hidden = !show;
       next.hidden = !show;
+      prev.disabled = track.scrollLeft <= 1;
+      next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 1;
     };
     const scrollBy = (direction: number): void => {
       track.scrollBy({
@@ -126,6 +191,8 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
     sync();
     desktop.addEventListener('change', sync);
+    window.addEventListener('resize', sync, { passive: true });
+    track.addEventListener('scroll', sync, { passive: true });
     prev.addEventListener('click', () => scrollBy(-1));
     next.addEventListener('click', () => scrollBy(1));
   });

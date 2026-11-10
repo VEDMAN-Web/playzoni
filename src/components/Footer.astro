@@ -2,8 +2,10 @@
 import brand from '../../data/brand.json';
 import { getPublishedCategories } from '../lib/published';
 
-// Site footer (docs/DESIGN.md §V2.6): white, with a slanted top edge. Left: logo, tagline and social buttons (only for
-// addresses filled in data/brand.json). Right: three link columns. Bottom: the copyright line.
+// Site footer (docs/DESIGN.md §V2.6, layout from §V2.11): white, with a slanted top edge, content centred (max 1240px).
+// Left: logo, tagline, one line about the site and social buttons (only for addresses filled in data/brand.json).
+// Right: link columns (popular categories in two short columns, Explore, Help and support, Playzoni).
+// Bottom bar: "© year Playzoni" and a back-to-top link.
 // Only published categories are linked (at least 12 games).
 const popular = (await getPublishedCategories())
   .filter((c) => c.navOrder !== null)
@@ -23,10 +25,9 @@ const year = new Date().getFullYear();
 <footer class="site-footer">
   <div class="inner">
     <div class="brand">
-      <p class="tagline">
-        <img src="/logo.svg" alt="Playzoni" width="90" height="28" />
-        <span>Play free games instantly.</span>
-      </p>
+      <a class="logo" href="/" aria-label="Playzoni home"><img src="/logo.svg" alt="Playzoni" width="112" height="35" /></a>
+      <p class="tagline">Play free games instantly.</p>
+      <p class="blurb">Free browser games, checked on phones and computers before they go live. No download, no account.</p>
       {socialLinks.length > 0 && (
         <ul class="social" aria-label="Playzoni on social media">
           {socialLinks.map((s) => (
@@ -57,13 +58,21 @@ const year = new Date().getFullYear();
       )}
     </div>
 
-    <nav class="col" aria-labelledby="footer-popular">
-      <h2 id="footer-popular">Popular</h2>
+    <nav class="col col-popular" aria-labelledby="footer-popular">
+      <h2 id="footer-popular">Popular categories</h2>
       <ul>
         {popular.map((c) => (
           <li><a href={`/${c.slug}`}>{c.name}</a></li>
         ))}
-        <li><a href="/all-games">All Games</a></li>
+      </ul>
+    </nav>
+    <nav class="col" aria-labelledby="footer-explore">
+      <h2 id="footer-explore">Explore</h2>
+      <ul>
+        <li><a href="/new-games">New Games</a></li>
+        <li><a href="/popular-games">Popular Games</a></li>
+        <li><a href="/categories">All Categories</a></li>
+        <li><a href="/all-games">All Games A–Z</a></li>
       </ul>
     </nav>
     <nav class="col" aria-labelledby="footer-help">
@@ -76,14 +85,20 @@ const year = new Date().getFullYear();
       </ul>
     </nav>
     <nav class="col" aria-labelledby="footer-about">
-      <h2 id="footer-about">Get to know us</h2>
+      <h2 id="footer-about">Playzoni</h2>
       <ul>
-        <li><a href="/about">About</a></li>
+        <li><a href="/about">About us</a></li>
         <li><a href="/developers">For developers</a></li>
       </ul>
     </nav>
   </div>
-  <p class="copy">© {year} SparkBeta Tech</p>
+  <div class="bottom">
+    <p class="copy">© {year} Playzoni. All rights reserved.</p>
+    <a class="to-top" href="#top">
+      Back to top
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6" /></svg>
+    </a>
+  </div>
 </footer>
 
 <style>
@@ -94,42 +109,58 @@ const year = new Date().getFullYear();
     clip-path: polygon(0 48px, 100% 0, 100% 100%, 0 100%);
     color: var(--c-ink);
   }
+  .inner,
+  .bottom {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
   .inner {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s-5) var(--s-4);
-    max-width: calc(var(--content-max) - 2 * var(--gutter));
-    margin: 0 auto;
+    gap: var(--s-6) var(--s-5);
   }
-  .brand {
+  .brand,
+  .col-popular {
     grid-column: 1 / -1;
   }
   @media (min-width: 768px) {
     .inner {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+    .col-popular {
+      grid-column: 1 / 2;
+    }
   }
   @media (min-width: 1024px) {
     .inner {
-      grid-template-columns: 1.6fr repeat(3, minmax(0, 1fr));
+      grid-template-columns: 1.5fr 1.6fr repeat(3, minmax(0, 1fr));
+      gap: var(--s-5) var(--s-6);
     }
     .brand {
       grid-column: auto;
     }
+    .col-popular {
+      grid-column: auto;
+    }
+  }
+  .logo {
+    display: inline-flex;
+  }
+  .logo img {
+    display: block;
+    height: 34px;
+    width: auto;
   }
   .tagline {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s-3);
-    margin: 0 0 var(--s-4);
+    margin: var(--s-3) 0 var(--s-1);
     color: var(--c-ink);
-    font: 700 16px/24px var(--font-sans);
+    font: 800 16px/24px var(--font-sans);
   }
-  .tagline img {
-    display: block;
-    height: 28px;
-    width: auto;
+  .blurb {
+    max-width: 320px;
+    margin: 0 0 var(--s-4);
+    color: var(--c-ink-2);
+    font: 400 14px/22px var(--font-sans);
   }
   .social {
     display: flex;
@@ -159,8 +190,8 @@ const year = new Date().getFullYear();
   h2 {
     margin: 0 0 var(--s-2);
     color: var(--c-ink-2);
-    font: var(--t-small);
-    letter-spacing: 0.06em;
+    font: 700 13px/20px var(--font-sans);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
   }
   ul {
@@ -168,12 +199,19 @@ const year = new Date().getFullYear();
     margin: 0;
     padding: 0;
   }
+  /* Popular categories: two short columns side by side. */
+  .col-popular ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--s-4);
+  }
   .col a {
     position: relative;
-    display: block;
+    display: inline-block;
     color: var(--c-ink);
-    font: 700 16px/36px var(--font-sans);
+    font: 700 15px/36px var(--font-sans);
     text-decoration: none;
+    transition: color 120ms ease-out;
   }
   /* The visible line is 36px; this widens the tap area to 44px. */
   .col a::after {
@@ -186,10 +224,38 @@ const year = new Date().getFullYear();
     color: var(--c-primary);
     text-decoration: none;
   }
+  .bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-top: var(--s-6);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--c-line);
+  }
   .copy {
-    max-width: calc(var(--content-max) - 2 * var(--gutter));
-    margin: var(--s-5) auto 0;
+    margin: 0;
     color: var(--c-ink-2);
     font: var(--t-small);
+  }
+  .to-top {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 var(--s-4);
+    border-radius: var(--r-pill);
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font: 800 14px/1 var(--font-sans);
+    text-decoration: none;
+    transition: background-color 120ms ease-out, color 120ms ease-out;
+  }
+  .to-top:hover,
+  .to-top:focus-visible {
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+    text-decoration: none;
   }
 </style>

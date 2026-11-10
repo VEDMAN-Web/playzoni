@@ -1,8 +1,9 @@
 ---
-// Category tile (docs/DESIGN.md §V2.8 and §V2.10): 2 cells wide (204px), 1 cell tall, white, radius 16, padding 12px.
-// On the left a 56x56 picture with radius 12: the thumbnail of the category's most popular published game; only if the
-// category has no game picture, the emoji on a rounded square instead. The name is on the right in UPPERCASE, 13px,
-// weight 800, at most 2 lines. The whole tile is a link.
+// Category tile (docs/DESIGN.md §V2.8, §V2.10 and §V2.11): 2 cells wide (204px), 1 cell tall, white, radius 16,
+// padding 12px. On the left a square picture that fills the tile height (70px), radius 12: the thumbnail of the
+// category's most popular published game; only if the category has no game picture, the emoji on a rounded square
+// instead. The name sits centred in the space to its right (UPPERCASE, 13px, 800, at most 2 lines with "…").
+// The whole tile is a link.
 interface Props {
   slug: string;
   shortName: string;
@@ -15,7 +16,7 @@ const { slug, shortName, emoji, imageSlug } = Astro.props;
 ---
 <a class="cat-tile" href={`/${slug}`}>
   {imageSlug ? (
-    <img class="pic" src={`/thumbs/${imageSlug}/s.webp`} width="56" height="56" alt="" loading="lazy" decoding="async" />
+    <img class="pic" src={`/thumbs/${imageSlug}/s.webp`} width="70" height="70" alt="" loading="lazy" decoding="async" />
   ) : (
     <span class="pic emoji" aria-hidden="true">{emoji}</span>
   )}
@@ -26,7 +27,7 @@ const { slug, shortName, emoji, imageSlug } = Astro.props;
   .cat-tile {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     box-sizing: border-box;
     height: 100%;
     padding: 12px;
@@ -49,8 +50,9 @@ const { slug, shortName, emoji, imageSlug } = Astro.props;
   .pic {
     display: block;
     flex: 0 0 auto;
-    width: 56px;
-    height: 56px;
+    width: auto;
+    height: 100%;
+    aspect-ratio: 1 / 1;
     border-radius: 12px;
     object-fit: cover;
   }
@@ -58,19 +60,22 @@ const { slug, shortName, emoji, imageSlug } = Astro.props;
     display: grid;
     place-items: center;
     background: var(--c-bg);
-    font-size: 28px;
+    font-size: 32px;
     line-height: 1;
   }
   .name {
     display: -webkit-box;
+    flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
+    text-align: center;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     font: 800 13px/16px var(--font-sans);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
     text-transform: uppercase;
-    overflow-wrap: anywhere;
+    overflow-wrap: normal;
+    word-break: normal;
   }
   .sr-only {
     position: absolute;

@@ -24,8 +24,8 @@ intro: ""
 controls:
   desktop: ""
   mobile: ""
-featured: true
-popularity: 3099
+featured: false
+popularity: 3070
 status: "draft"
 faq: []
 ---

@@ -9,8 +9,9 @@ interface Props {
   span?: 2 | 3 | 4;
 }
 
-// A title of more than about 48 characters needs more than two lines in a 3-cell tile, so it gets 4 cells (DESIGN §V2.10).
-const { crumbs, h1, span = h1.length > 48 ? 4 : 3 } = Astro.props;
+// Compact by default (owner, 11 Nov, DESIGN §V2.11): 2 cells for short titles like "Action Games", 3 for longer ones,
+// 4 only for very long ones.
+const { crumbs, h1, span = h1.length <= 18 ? 2 : h1.length <= 40 ? 3 : 4 } = Astro.props;
 ---
 <div class={`title-tile span-${span}`}>
   <nav class="crumbs" aria-label="Breadcrumb">
@@ -66,7 +67,7 @@ const { crumbs, h1, span = h1.length > 48 ? 4 : 3 } = Astro.props;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 10px 16px;
+      padding: 10px 14px;
       box-sizing: border-box;
       border-radius: var(--r-card);
       background: var(--c-surface);
@@ -84,12 +85,19 @@ const { crumbs, h1, span = h1.length > 48 ? 4 : 3 } = Astro.props;
       overflow: hidden;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
-      font: 800 20px/24px var(--font-sans);
-      overflow-wrap: anywhere;
+      font: 800 19px/23px var(--font-sans);
+      overflow-wrap: break-word;
     }
     .crumbs ol {
-      margin: 0 0 2px;
+      margin: 0 0 4px;
+      flex-wrap: nowrap;
+      overflow: hidden;
+      color: var(--c-ink-2);
       font: 600 12px/14px var(--font-sans);
+      white-space: nowrap;
+    }
+    .crumbs a {
+      color: var(--c-ink-2);
     }
   }
 </style>

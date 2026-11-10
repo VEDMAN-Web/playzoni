@@ -13,7 +13,7 @@ Order on the home page (popularity 3100 down to 3069; the top 5 are `featured`, 
 | # | Slug | Type |
 |---|---|---|
 | 1 | `crowd-runners-3d` | crowd runner |
-| 2 | `subway-buddy-road-runner` | endless runner |
+| 2 | `race-through-traffic` | car / traffic racer (owner asked for a car game here, 11 Nov) |
 | 3 | `chill-tic-tac-toe` | tic-tac-toe |
 | 4 | `color-ball-shoot` | shoot balls |
 | 5 | `mega-crowd` | count/crowd runner |
@@ -44,5 +44,8 @@ Order on the home page (popularity 3100 down to 3069; the top 5 are `featured`, 
 | 30 | `unpuzzle-master-tap-away` | tap away |
 | 31 | `count-and-bounce` | count balls |
 | 32 | `shoot-balls` | shoot balls |
+| — | `subway-buddy-road-runner` | endless runner (moved down: popularity 3070, not featured) |
+| — | `taxi-rush` | car (popularity 3085) |
+| — | `car-io` | car .io (popularity 3075) |
 
 Source: GameMonetize feed (all 32). To swap a game: change its `popularity` in its file in `src/content/games/`, and update this list.
