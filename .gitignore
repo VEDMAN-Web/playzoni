@@ -8,3 +8,7 @@ graphify-out/*
 !graphify-out/GRAPH_REPORT.md
 .DS_Store
 .wrangler
+
+# Provider catalogs downloaded by the owner (keep out of git)
+data/playgama.json
+data/feeds/
