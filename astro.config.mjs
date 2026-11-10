@@ -7,7 +7,7 @@ import { join } from 'node:path';
 
 // Game last-modified dates for the sitemap: read from the frontmatter of each game file
 // (updatedDate). Read here, not imported, because this config runs in plain Node.
-const gamesDir = join(process.cwd(), 'src', 'content', 'games');
+const gamesDir = join(import.meta.dirname, 'src', 'content', 'games');
 /** @type {Record<string, string>} */
 const gameUpdated = {};
 for (const file of readdirSync(gamesDir)) {
@@ -33,7 +33,7 @@ export default defineConfig({
       serialize(item) {
         const match = item.url.match(/\/game\/([a-z0-9-]+)$/);
         if (match && gameUpdated[match[1]]) {
-          item.lastmod = new Date(`${gameUpdated[match[1]]}T00:00:00Z`);
+          item.lastmod = gameUpdated[match[1]];
         }
         return item;
       },
