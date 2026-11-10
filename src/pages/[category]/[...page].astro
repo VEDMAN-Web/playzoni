@@ -134,52 +134,52 @@ const faqLd =
     : null;
 const jsonLd = [collectionLd, itemListLd, breadcrumbLd, ...(faqLd && isFirst ? [faqLd] : [])];
 ---
-<BaseLayout title={pageTitle} description={pageDescription} canonicalPath={canonicalPath} noindex={!indexable}>
+<BaseLayout title={pageTitle} description={pageDescription} canonicalPath={canonicalPath} noindex={!indexable} mainClass="has-grid">
   <Header slot="header" />
 
-  <nav class="crumbs" aria-label="Breadcrumb">
-    <ol>
-      {crumbs.map((c, i) => (
-        <li>
-          {i === crumbs.length - 1 ? (
-            <span aria-current="page">{c.name}</span>
-          ) : (
-            <>
-              <a href={c.path}>{c.name}</a>
-              <span aria-hidden="true">›</span>
-            </>
+  <GameGrid
+    items={gridItems}
+    mode={isFirst ? 'mosaic' : 'uniform'}
+    uniformSize="S"
+    navSpacer={true}
+    eagerCount={6}
+    label={`${cat.name} games`}
+  >
+    <div slot="lead" class="title-tile">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <ol>
+          {crumbs.map((c, i) => (
+            <li>
+              {i === crumbs.length - 1 ? (
+                <span aria-current="page">{c.name}</span>
+              ) : (
+                <>
+                  <a href={c.path}>{c.name}</a>
+                  <span aria-hidden="true">›</span>
+                </>
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
+      <h1 class="page-title">{cat.h1}{isFirst ? '' : ` — Page ${pageNumber}`}</h1>
+    </div>
+
+    {(parent || children.length > 0) && (
+      <nav slot="lead" class="related" aria-label="Related categories">
+        <ul class="chips">
+          {parent && (
+            <li><a class="chip" href={`/${parent.slug}`}>{parent.name} <span class="count">{countOf(parent.slug)}</span></a></li>
           )}
-        </li>
-      ))}
-    </ol>
-  </nav>
+          {children.map((c) => (
+            <li><a class="chip" href={`/${c.slug}`}>{c.name} <span class="count">{countOf(c.slug)}</span></a></li>
+          ))}
+        </ul>
+      </nav>
+    )}
+  </GameGrid>
 
-  <h1 class="page-title">{cat.h1}{isFirst ? '' : ` — Page ${pageNumber}`}</h1>
-
-  {(parent || children.length > 0) && (
-    <nav class="related" aria-label="Related categories">
-      <ul class="chips">
-        {parent && (
-          <li><a class="chip" href={`/${parent.slug}`}>{parent.name} <span class="count">{countOf(parent.slug)}</span></a></li>
-        )}
-        {children.map((c) => (
-          <li><a class="chip" href={`/${c.slug}`}>{c.name} <span class="count">{countOf(c.slug)}</span></a></li>
-        ))}
-      </ul>
-    </nav>
-  )}
-
-  {pageGames.length > 0 ? (
-    <GameGrid
-      items={gridItems}
-      mode={isFirst ? 'mosaic' : 'uniform'}
-      uniformSize="S"
-      eagerCount={6}
-      label={`${cat.name} games`}
-    />
-  ) : (
-    <p class="empty">No games in this category yet.</p>
-  )}
+  {pageGames.length === 0 && <p class="empty">No games in this category yet.</p>}
 
   {pages > 1 && (
     <nav class="pager" aria-label="Pagination">
@@ -246,7 +246,32 @@ const jsonLd = [collectionLd, itemListLd, breadcrumbLd, ...(faqLd && isFirst ? [
     font: var(--t-h1);
   }
   .related {
-    margin: 0 0 var(--s-4);
+    grid-column: 1 / -1;
+    margin: 0 0 var(--s-2);
+  }
+  /* Title tile: a full-width block on phones and tablets, a white 4x1 tile next to the nav box from 1024px (R10). */
+  .title-tile {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+  @media (min-width: 1024px) {
+    .title-tile {
+      grid-column: span 4;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--s-4);
+      box-sizing: border-box;
+      border-radius: var(--r-card);
+      background: var(--c-surface);
+    }
+    .title-tile .page-title {
+      margin: 0;
+      font: var(--t-h2);
+    }
+    .title-tile .crumbs ol {
+      margin: 0 0 var(--s-1);
+    }
   }
   .chips {
     display: flex;

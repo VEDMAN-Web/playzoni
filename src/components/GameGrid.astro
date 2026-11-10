@@ -7,7 +7,8 @@ import CategoryTile from './CategoryTile.astro';
 //   the rest are S (1x1). Featured games fill the L slots first. Below 480px, L is drawn as M (CSS).
 // - uniform: every tile is the same size (S, or M when uniformSize is 'M').
 // Category tiles are 2x1 and take one slot in order. The nav spacer goes first on pages that
-// have the floating nav box (DESIGN §Header).
+// have the floating nav box (DESIGN §Header). The optional "lead" slot comes right after the
+// spacer (for example the title tile on category pages).
 
 export interface GridGame {
   kind: 'game';
@@ -68,10 +69,11 @@ for (let position = 1; placed.length < items.length; position++) {
   placed.push({ item: next, size: next.kind === 'category' ? 'CAT' : slot });
 }
 ---
-<div class={`grid grid-${mode}`} role="list" aria-label={label}>
+<div class={`grid grid-${mode}`} role="group" aria-label={label}>
   {navSpacer && <div class="nav-spacer" aria-hidden="true"></div>}
+  <slot name="lead" />
   {placed.map((p, i) => (
-    <div role="listitem" class={`cell cell-${p.size.toLowerCase()}`}>
+    <div class={`cell cell-${p.size.toLowerCase()}`}>
       {p.item.kind === 'category' ? (
         <CategoryTile slug={p.item.slug} shortName={p.item.shortName} emoji={p.item.emoji} />
       ) : (
