@@ -161,12 +161,12 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: running against `data/sample-feed.json` (create it: 20 fake entries with placeholder image URLs served from `public/` during the test) produces staging files and images.
 
 ### T4.2 — GameDistribution adapter
-- status: blocked until owner has a GameDistribution publisher account and feed URL (`GD_FEED_URL`) · deps: T4.1 · model: **sonnet**
+- status: deferred — GameDistribution rejected the publisher application on 11 Nov 2026 (low traffic). Re-apply after launch when traffic grows. Do not work on this task; start with GameMonetize (T4.3) and Playgama (T4.4) · deps: T4.1 · model: **sonnet**
 - Do: `scripts/import/gd.ts` + `npm run import:gd`. Map fields; build `embedUrl` per GameDistribution's current embed documentation (including the referrer parameter set to the game page URL); mobile flag and aspect from feed.
 - Done when: import of the real feed creates staging entries; one game embedded on a draft page plays in the preview.
 
 ### T4.3 — GameMonetize adapter
-- status: blocked until `GM_FEED_URL` · deps: T4.1 · model: haiku (copy T4.2 structure)
+- status: blocked until `GM_FEED_URL` · deps: T4.1 · model: **sonnet** (first real adapter; T4.2 is deferred, so this one sets the pattern)
 - Done when: same as T4.2 for GameMonetize.
 
 ### T4.4 — Playgama Partners adapter
