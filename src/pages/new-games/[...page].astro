@@ -1,0 +1,40 @@
+---
+import GameListPage from '../../components/GameListPage.astro';
+import { getPublishedGames } from '../../lib/games';
+import { PER_PAGE, pageCount } from '../../lib/paging';
+
+// /new-games and /new-games/2, … : newest first (addedDate).
+export async function getStaticPaths() {
+  const games = await getPublishedGames();
+  const pages = pageCount(games.length);
+  return Array.from({ length: pages }, (_, i) => ({
+    params: { page: i === 0 ? undefined : String(i + 1) },
+    props: { pageNumber: i + 1, pages },
+  }));
+}
+
+interface Props {
+  pageNumber: number;
+  pages: number;
+}
+
+const { pageNumber, pages } = Astro.props;
+const games = await getPublishedGames();
+const sorted = [...games].sort(
+  (a, b) => b.data.addedDate.valueOf() - a.data.addedDate.valueOf() || b.data.popularity - a.data.popularity,
+);
+const pageGames = sorted
+  .slice((pageNumber - 1) * PER_PAGE, pageNumber * PER_PAGE)
+  .map((g) => ({ title: g.data.title, slug: g.data.slug }));
+---
+<GameListPage
+  basePath="/new-games"
+  name="New Games"
+  firstTitle="New Games — Play the Latest Free Games | Playzoni"
+  firstDescription="See the newest free games on Playzoni. New games are added after we check them on a phone and a desktop, and each one plays in your browser."
+  intro="These are the newest games on Playzoni. We add a game after we have played it on a phone and on a desktop computer. Check back often to see what is new."
+  games={pageGames}
+  pageNumber={pageNumber}
+  pages={pages}
+  perPage={PER_PAGE}
+/>

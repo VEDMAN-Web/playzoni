@@ -1,0 +1,201 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import GameGrid from '../../components/GameGrid.astro';
+import TitleTile from '../../components/TitleTile.astro';
+import Pagination from '../../components/Pagination.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { getPublishedGames } from '../../lib/games';
+import { pageCount } from '../../lib/paging';
+import { buildCategoryPageTitle, buildPagedDescription, SITE_URL } from '../../lib/seo';
+
+// /all-games and /all-games/2, … : every published game, A to Z, 120 per page.
+// A text link and a small tile for each game gives every game a short crawl path (SEO-PLAN §Internal linking).
+const PER_PAGE_ALL = 120;
+
+const byTitle = <T extends { data: { title: string } }>(a: T, b: T): number =>
+  a.data.title.localeCompare(b.data.title, 'en', { sensitivity: 'base' });
+
+export async function getStaticPaths() {
+  const games = await getPublishedGames();
+  const pages = pageCount(games.length, 120);
+  return Array.from({ length: pages }, (_, i) => ({
+    params: { page: i === 0 ? undefined : String(i + 1) },
+    props: { pageNumber: i + 1, pages },
+  }));
+}
+
+interface Props {
+  pageNumber: number;
+  pages: number;
+}
+
+const { pageNumber, pages } = Astro.props;
+const games = await getPublishedGames();
+const pageGames = [...games].sort(byTitle).slice((pageNumber - 1) * PER_PAGE_ALL, pageNumber * PER_PAGE_ALL);
+
+// Group the page's games by first letter (A–Z, everything else under "#").
+const letterOf = (title: string): string => {
+  const first = title.trim().charAt(0).toUpperCase();
+  return first >= 'A' && first <= 'Z' ? first : '#';
+};
+const groups: { letter: string; id: string; games: typeof pageGames }[] = [];
+for (const g of pageGames) {
+  const letter = letterOf(g.data.title);
+  let group = groups.find((x) => x.letter === letter);
+  if (!group) {
+    group = { letter, id: letter === '#' ? 'letter-other' : `letter-${letter.toLowerCase()}`, games: [] };
+    groups.push(group);
+  }
+  group.games.push(g);
+}
+
+const isFirst = pageNumber === 1;
+const basePath = '/all-games';
+const canonicalPath = isFirst ? basePath : `${basePath}/${pageNumber}`;
+const title = isFirst ? 'All Games A–Z | Playzoni' : buildCategoryPageTitle('All Games', pageNumber);
+const description = isFirst
+  ? 'Browse every free game on Playzoni from A to Z. Jump to a letter, pick a title and press Play to start in your browser with no download.'
+  : buildPagedDescription('All Games', pageNumber);
+const h1 = isFirst ? 'All Games A–Z' : `All Games — Page ${pageNumber}`;
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: 'All Games', path: basePath },
+];
+const url = (path: string): string => `${SITE_URL}${path}`;
+const jsonLd = [
+  { '@context': 'https://schema.org', '@type': 'CollectionPage', name: h1, url: url(canonicalPath), description },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: pageGames.slice(0, 20).map((g, i) => ({
+      '@type': 'ListItem',
+      position: (pageNumber - 1) * PER_PAGE_ALL + i + 1,
+      url: url(`/game/${g.data.slug}`),
+      name: g.data.title,
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: url(c.path) })),
+  },
+];
+---
+<BaseLayout title={title} description={description} canonicalPath={canonicalPath} mainClass="has-grid">
+  <Header slot="header" />
+
+  <GameGrid items={[]} mode="uniform" navSpacer={true} label="All games A to Z">
+    <Fragment slot="lead">
+      <TitleTile crumbs={crumbs} h1={h1} />
+      {isFirst && (
+        <p class="intro">
+          Every game on Playzoni, listed from A to Z. Jump to a letter, or scroll down the list. Each game plays free in your browser.
+        </p>
+      )}
+      {groups.length > 0 && (
+        <nav class="letters" aria-label="Jump to a letter">
+          {groups.map((g) => (
+            <a class="letter-link" href={`#${g.id}`}>{g.letter}</a>
+          ))}
+        </nav>
+      )}
+    </Fragment>
+  </GameGrid>
+
+  {groups.length === 0 && <p class="empty">No games here yet.</p>}
+
+  {groups.map((g) => (
+    <section class="letter-block" id={g.id} aria-labelledby={`${g.id}-heading`}>
+      <h2 id={`${g.id}-heading`}>{g.letter}</h2>
+      <ul class="game-list">
+        {g.games.map((game) => (
+          <li>
+            <a class="game-link" href={`/game/${game.data.slug}`}>
+              <img src={`/thumbs/${game.data.slug}/s.webp`} width="150" height="150" alt="" loading="lazy" decoding="async" />
+              <span>{game.data.title}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+
+  <Pagination basePath={basePath} pageNumber={pageNumber} pages={pages} />
+
+  <JsonLd data={jsonLd} />
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .intro {
+    grid-column: 1 / -1;
+    max-width: 72ch;
+    margin: 0 0 var(--s-2);
+    color: var(--c-ink-2);
+  }
+  .letters {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    margin: 0 0 var(--s-2);
+  }
+  .letter-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    font: var(--t-small);
+    text-decoration: none;
+  }
+  .letter-link:hover {
+    color: var(--c-primary);
+    text-decoration: none;
+  }
+  .letter-block {
+    margin: var(--s-5) 0 0;
+    scroll-margin-top: calc(56px + 2 * var(--gap));
+  }
+  .letter-block h2 {
+    margin: 0 0 var(--s-2);
+    color: var(--c-ink);
+    font: var(--t-h2);
+  }
+  .game-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--s-1) var(--s-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .game-link {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 44px;
+    color: var(--c-ink);
+    font: var(--t-body);
+    text-decoration: none;
+  }
+  .game-link:hover {
+    color: var(--c-primary);
+    text-decoration: underline;
+  }
+  .game-link img {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  .empty {
+    color: var(--c-ink-2);
+  }
+</style>

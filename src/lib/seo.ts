@@ -60,3 +60,14 @@ export function assertDescription(description: string): void {
     );
   }
 }
+
+// Meta description for page 2 and later of a paged list (no two pages share a description).
+// Returns the first wording that fits 120–155 characters.
+export function buildPagedDescription(name: string, page: number): string {
+  const options = [
+    `Page ${page} of ${name} to play free online. Pick a game and press Play to start. No download is needed on any device.`,
+    `Page ${page} of ${name} to play free online. Pick a game and press Play to start. No download is needed, and every game is free to play in your browser.`,
+    `Page ${page} of ${name}. Pick a free game, press Play and start in your browser. No download is needed on a phone or a computer.`,
+  ];
+  return options.find((d) => d.length >= DESCRIPTION_MIN && d.length <= DESCRIPTION_MAX) ?? options[0];
+}

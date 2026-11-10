@@ -1,0 +1,38 @@
+---
+import GameListPage from '../../components/GameListPage.astro';
+import { getPublishedGames } from '../../lib/games';
+import { PER_PAGE, pageCount } from '../../lib/paging';
+
+// /popular-games and /popular-games/2, … : highest popularity first.
+export async function getStaticPaths() {
+  const games = await getPublishedGames();
+  const pages = pageCount(games.length);
+  return Array.from({ length: pages }, (_, i) => ({
+    params: { page: i === 0 ? undefined : String(i + 1) },
+    props: { pageNumber: i + 1, pages },
+  }));
+}
+
+interface Props {
+  pageNumber: number;
+  pages: number;
+}
+
+const { pageNumber, pages } = Astro.props;
+const games = await getPublishedGames();
+const sorted = [...games].sort((a, b) => b.data.popularity - a.data.popularity);
+const pageGames = sorted
+  .slice((pageNumber - 1) * PER_PAGE, pageNumber * PER_PAGE)
+  .map((g) => ({ title: g.data.title, slug: g.data.slug }));
+---
+<GameListPage
+  basePath="/popular-games"
+  name="Popular Games"
+  firstTitle="Popular Games — Most Played Free Games | Playzoni"
+  firstDescription="Browse the most popular free games on Playzoni, with the most popular first. Pick a game and press Play to start in your browser with no download."
+  intro="These are the most popular games on Playzoni, with the most popular first. Pick one that looks fun and press Play. Every game runs in your browser."
+  games={pageGames}
+  pageNumber={pageNumber}
+  pages={pages}
+  perPage={PER_PAGE}
+/>

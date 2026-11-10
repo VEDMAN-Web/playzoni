@@ -110,7 +110,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: works in a normal and a private window (private: features silently do nothing, no errors); CLS on home ≤ 0.05.
 
 ### T2.7 — List pages
-- status: todo · deps: T2.1 · model: haiku · docs: PRD §5, SEO-PLAN §Templates §Internal linking
+- status: done · deps: T2.1 · model: haiku · docs: PRD §5, SEO-PLAN §Templates §Internal linking
 - Do: `/new-games` (addedDate desc), `/popular-games` (popularity desc) — uniform M grid, 60 per page with pagination; `/all-games` A–Z, 120 per page, letter jump links, small tile + text link per game; `/categories` — tile per published category with game count. Each with short original intro (2–3 sentences) and correct title/meta/canonical.
 - Done when: all pages render, pagination self-canonical, 4-width check.
 

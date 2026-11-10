@@ -1,0 +1,79 @@
+---
+// Title tile for grid pages (docs/REVIEW.md R10, DESIGN §Header). Goes in the "lead" slot of
+// GameGrid, right after the nav spacer: a white 4x1 tile with breadcrumbs and the page's only H1
+// from 1024px, and a plain block above the tiles below that.
+interface Props {
+  crumbs: { name: string; path: string }[];
+  h1: string;
+}
+
+const { crumbs, h1 } = Astro.props;
+---
+<div class="title-tile">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <ol>
+      {crumbs.map((c, i) => (
+        <li>
+          {i === crumbs.length - 1 ? (
+            <span aria-current="page">{c.name}</span>
+          ) : (
+            <>
+              <a href={c.path}>{c.name}</a>
+              <span aria-hidden="true">›</span>
+            </>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+  <h1 class="page-title">{h1}</h1>
+</div>
+
+<style>
+  .title-tile {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    list-style: none;
+    margin: var(--s-4) 0 var(--s-2);
+    padding: 0;
+    color: var(--c-ink-2);
+    font: var(--t-small);
+  }
+  .crumbs li {
+    display: inline-flex;
+    gap: var(--s-1);
+    align-items: center;
+  }
+  .crumbs a {
+    color: var(--c-ink-2);
+  }
+  .page-title {
+    margin: 0 0 var(--s-3);
+    color: var(--c-ink);
+    font: var(--t-h1);
+  }
+  @media (min-width: 1024px) {
+    .title-tile {
+      grid-column: span 4;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--s-4);
+      box-sizing: border-box;
+      border-radius: var(--r-card);
+      background: var(--c-surface);
+    }
+    .page-title {
+      margin: 0;
+      font: var(--t-h2);
+    }
+    .crumbs ol {
+      margin: 0 0 var(--s-1);
+    }
+  }
+</style>

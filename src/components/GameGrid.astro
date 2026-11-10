@@ -22,6 +22,7 @@ export interface GridCategory {
   slug: string;
   shortName: string;
   emoji: string;
+  count?: number;
 }
 export type GridItem = GridGame | GridCategory;
 
@@ -75,7 +76,7 @@ for (let position = 1; placed.length < items.length; position++) {
   {placed.map((p, i) => (
     <div class={`cell cell-${p.size.toLowerCase()}`}>
       {p.item.kind === 'category' ? (
-        <CategoryTile slug={p.item.slug} shortName={p.item.shortName} emoji={p.item.emoji} />
+        <CategoryTile slug={p.item.slug} shortName={p.item.shortName} emoji={p.item.emoji} count={p.item.count} />
       ) : (
         <GameTile
           title={p.item.title}

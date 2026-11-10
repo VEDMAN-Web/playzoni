@@ -4,13 +4,17 @@ interface Props {
   slug: string;
   shortName: string;
   emoji: string;
+  count?: number;
 }
 
-const { slug, shortName, emoji } = Astro.props;
+const { slug, shortName, emoji, count } = Astro.props;
 ---
 <a class="cat-tile" href={`/${slug}`}>
   <span class="emoji" aria-hidden="true">{emoji}</span>
-  <span class="name">{shortName} Games</span>
+  <span class="label">
+    <span class="name">{shortName} Games</span>
+    {count !== undefined && <span class="count">{count} {count === 1 ? 'game' : 'games'}</span>}
+  </span>
 </a>
 
 <style>
@@ -45,11 +49,20 @@ const { slug, shortName, emoji } = Astro.props;
     background: var(--c-bg);
     font: var(--t-h2);
   }
+  .label {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
   .name {
     overflow: hidden;
     font: var(--t-h3);
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .count {
+    color: var(--c-ink-2);
+    font: var(--t-small);
   }
   @media (prefers-reduced-motion: reduce) {
     .cat-tile:hover,
