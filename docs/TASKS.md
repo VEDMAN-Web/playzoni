@@ -100,7 +100,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: a sample game page passes 4-width check; no iframe in the HTML source; JSON-LD has all fields in §Schema; related list has 24 items with samples on.
 
 ### T2.5 — Player
-- status: todo · deps: T2.4 · model: **sonnet** · docs: PRD §7, DESIGN §Player
+- status: done · deps: T2.4 · model: **sonnet** · docs: PRD §7, DESIGN §Player
 - Do: vanilla TS island for the player: on Play click create the iframe (attributes from PRD §10) sized by aspect; ≥768 inline; <768 full-screen overlay with close button, body scroll lock, Escape closes, focus moves to iframe and returns to Play button on close; Fullscreen button (Fullscreen API on the player container, hidden if unsupported, iOS fallback = overlay); Share (Web Share API → fallback copy link + "Link copied" toast 2s); Report = `mailto:` with subject "Problem with {Title} ({slug})". Push slug to recently played (T2.6 helper; if T2.6 not done, write the helper here in `src/lib/storage.ts` with try/catch).
 - Done when: sample game plays inline on desktop and in overlay at 360/390; close works; no console errors; Lighthouse TBT on game page ≤ 100 ms before click.
 

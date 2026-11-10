@@ -1,0 +1,408 @@
+---
+// Game player (DESIGN §Player, PRD §7). The page ships only the cover and the Play button.
+// The iframe is created by the script below, after the player clicks Play. Under 768px the game
+// opens in a full-screen overlay; from 768px it plays inline. No iframe is in the HTML.
+interface Props {
+  title: string;
+  slug: string;
+  developer?: string;
+  embedUrl: string;
+  aspect: 'landscape' | 'portrait' | 'square';
+}
+
+const { title, slug, developer, embedUrl, aspect } = Astro.props;
+const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Problem with ${title} (${slug})`)}`;
+---
+<section class="player" aria-label={`Play ${title}`} data-player data-slug={slug} data-title={title} data-embed={embedUrl}>
+  <div class={`player-frame aspect-${aspect}`} data-player-frame>
+    <img class="cover-bg" src={`/thumbs/${slug}/l.webp`} alt="" width="600" height="600" aria-hidden="true" loading="eager" decoding="async" data-player-bg />
+    <div class="cover" data-player-cover>
+      <img class="cover-thumb" src={`/thumbs/${slug}/m.webp`} alt={title} width="300" height="300" decoding="async" />
+      <p class="cover-title">{title}</p>
+      <button type="button" class="play-btn" data-play>Play</button>
+    </div>
+    <button type="button" class="close-btn" aria-label="Close game" title="Close game" hidden data-player-close>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" /></svg>
+    </button>
+  </div>
+
+  <div class="player-bar">
+    <img class="bar-icon" src={`/thumbs/${slug}/s.webp`} alt="" width="150" height="150" decoding="async" />
+    <div class="bar-text">
+      <p class="bar-title">{title}</p>
+      {developer && <p class="bar-dev">{developer}</p>}
+    </div>
+    <div class="bar-actions">
+      <button type="button" class="icon-btn" aria-label="Fullscreen" title="Fullscreen" hidden data-fullscreen>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </button>
+      <button type="button" class="icon-btn" aria-label="Share" title="Share" hidden data-share>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="6" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="2" /><circle cx="18" cy="6" r="2.5" fill="none" stroke="currentColor" stroke-width="2" /><circle cx="18" cy="18" r="2.5" fill="none" stroke="currentColor" stroke-width="2" /><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6" stroke="currentColor" stroke-width="2" /></svg>
+      </button>
+      <a class="icon-btn" href={reportHref} aria-label="Report a problem" title="Report a problem">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="toast" role="status" aria-live="polite" hidden data-toast>Link copied</div>
+</section>
+
+<style>
+  .player {
+    position: relative;
+    margin: 0 0 var(--s-3);
+  }
+  .player-frame {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--r-player);
+    background: var(--c-player-bg);
+  }
+  .player-frame.aspect-square {
+    aspect-ratio: 1 / 1;
+    width: min(100%, calc(100vh - 160px));
+    margin: 0 auto;
+  }
+  .player-frame.aspect-portrait {
+    aspect-ratio: 9 / 16;
+    width: min(100%, calc((100vh - 160px) * 9 / 16));
+    margin: 0 auto;
+  }
+
+  /* Cover state */
+  .cover-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(18px) brightness(0.5);
+    transform: scale(1.1);
+  }
+  .cover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-3);
+    padding: var(--s-4);
+    text-align: center;
+  }
+  /* Sized from the frame height so the Play button always fits (it does not shrink). */
+  .cover > * {
+    flex-shrink: 0;
+  }
+  .cover-thumb {
+    height: 40%;
+    width: auto;
+    max-width: 60%;
+    aspect-ratio: 1 / 1;
+    border-radius: 20px;
+    object-fit: cover;
+  }
+  .cover-title {
+    margin: 0;
+    color: var(--c-primary-ink);
+    font: var(--t-h2);
+  }
+  .play-btn {
+    min-width: 180px;
+    height: 56px;
+    padding: 0 var(--s-5);
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+    font: 800 20px/1 var(--font-sans);
+    cursor: pointer;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  .play-btn:hover {
+    background: var(--c-primary-dark);
+  }
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.04);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .play-btn {
+      animation: none;
+    }
+  }
+
+  /* The game itself */
+  .player-frame :global(.game-frame) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: var(--c-player-bg);
+  }
+
+  /* Full-screen overlay: used on phones, and as the iOS fullscreen fallback. */
+  .player-frame.is-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    width: 100%;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0;
+    aspect-ratio: auto;
+    border-radius: 0;
+  }
+  /* An iframe is a replaced element, so it needs explicit sizes (inset alone does not stretch it). */
+  .player-frame.is-overlay :global(.game-frame) {
+    top: env(safe-area-inset-top);
+    left: env(safe-area-inset-left);
+    width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right));
+    height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+  .close-btn {
+    position: absolute;
+    top: max(var(--s-2), env(safe-area-inset-top));
+    right: max(var(--s-2), env(safe-area-inset-right));
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: color-mix(in srgb, var(--c-player-bg) 60%, transparent);
+    color: var(--c-primary-ink);
+    cursor: pointer;
+  }
+  .close-btn[hidden] {
+    display: none;
+  }
+
+  /* Bar under the player */
+  .player-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 56px;
+    padding: 0 var(--s-3);
+    box-sizing: border-box;
+    background: var(--c-surface);
+    border-radius: 0 0 var(--r-player) var(--r-player);
+  }
+  .bar-icon {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  .bar-text {
+    flex: 1;
+    min-width: 0;
+  }
+  .bar-title {
+    margin: 0;
+    overflow: hidden;
+    color: var(--c-ink);
+    font: 700 16px/20px var(--font-sans);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bar-dev {
+    margin: 0;
+    color: var(--c-ink-2);
+    font: var(--t-small);
+  }
+  .bar-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--s-1);
+  }
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: none;
+    color: var(--c-ink);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .icon-btn[hidden] {
+    display: none;
+  }
+  .icon-btn:hover {
+    color: var(--c-primary);
+    text-decoration: none;
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: var(--s-6);
+    z-index: 1100;
+    transform: translateX(-50%);
+    padding: var(--s-2) var(--s-4);
+    border-radius: var(--r-pill);
+    background: var(--c-ink);
+    color: var(--c-primary-ink);
+    font: var(--t-small);
+  }
+  .toast[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  import { addRecentlyPlayed } from '../lib/storage';
+
+  const root = document.querySelector<HTMLElement>('[data-player]');
+  if (root) {
+    const slug = root.dataset.slug ?? '';
+    const title = root.dataset.title ?? '';
+    const embedUrl = root.dataset.embed ?? '';
+    const frame = root.querySelector<HTMLElement>('[data-player-frame]')!;
+    const cover = root.querySelector<HTMLElement>('[data-player-cover]')!;
+    const coverBg = root.querySelector<HTMLElement>('[data-player-bg]')!;
+    const playBtn = root.querySelector<HTMLButtonElement>('[data-play]')!;
+    const closeBtn = root.querySelector<HTMLButtonElement>('[data-player-close]')!;
+    const fullscreenBtn = root.querySelector<HTMLButtonElement>('[data-fullscreen]')!;
+    const shareBtn = root.querySelector<HTMLButtonElement>('[data-share]')!;
+    const toast = root.querySelector<HTMLElement>('[data-toast]')!;
+
+    const phone = window.matchMedia('(max-width: 767px)');
+    const canFullscreen = typeof frame.requestFullscreen === 'function' && document.fullscreenEnabled !== false;
+    const isIos =
+      /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    let iframe: HTMLIFrameElement | null = null;
+    let overlayOpen = false;
+    // On phones, closing the overlay ends the game. For the iOS fullscreen fallback it only leaves the overlay.
+    let closeStopsGame = false;
+
+    function openOverlay(stopsGame: boolean): void {
+      overlayOpen = true;
+      closeStopsGame = stopsGame;
+      frame.classList.add('is-overlay');
+      closeBtn.hidden = false;
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeOverlay(): void {
+      if (!overlayOpen) return;
+      overlayOpen = false;
+      frame.classList.remove('is-overlay');
+      closeBtn.hidden = true;
+      document.body.style.overflow = '';
+      if (closeStopsGame) {
+        stopGame();
+      } else {
+        iframe?.focus();
+      }
+    }
+
+    function startGame(): void {
+      if (iframe) return;
+      addRecentlyPlayed(slug);
+      iframe = document.createElement('iframe');
+      iframe.className = 'game-frame';
+      iframe.src = embedUrl;
+      iframe.title = `${title} game`;
+      iframe.setAttribute('allow', 'autoplay; fullscreen; gamepad; clipboard-write');
+      iframe.setAttribute('allowfullscreen', '');
+      frame.appendChild(iframe);
+      cover.hidden = true;
+      coverBg.hidden = true;
+      if (phone.matches) openOverlay(true);
+      iframe.focus();
+    }
+
+    function stopGame(): void {
+      iframe?.remove();
+      iframe = null;
+      cover.hidden = false;
+      coverBg.hidden = false;
+      playBtn.focus();
+    }
+
+    function showToast(message: string): void {
+      toast.textContent = message;
+      toast.hidden = false;
+      window.setTimeout(() => {
+        toast.hidden = true;
+      }, 2000);
+    }
+
+    async function share(): Promise<void> {
+      const url = `${window.location.origin}${window.location.pathname}`;
+      if (typeof navigator.share === 'function') {
+        try {
+          await navigator.share({ title, text: title, url });
+        } catch {
+          // The player closed the share sheet. Nothing to do.
+        }
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast('Link copied');
+      } catch {
+        try {
+          window.prompt('Copy this link', url);
+        } catch {
+          // No way to show the link here. Nothing more to do.
+        }
+      }
+    }
+
+    playBtn.addEventListener('click', startGame);
+    closeBtn.addEventListener('click', closeOverlay);
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeOverlay();
+    });
+
+    // Fullscreen: the Fullscreen API where it exists, the overlay on iOS, hidden elsewhere.
+    if (canFullscreen || isIos) {
+      fullscreenBtn.hidden = false;
+      fullscreenBtn.addEventListener('click', () => {
+        startGame();
+        // On a phone the game is already full screen in the overlay.
+        if (overlayOpen && closeStopsGame) return;
+        if (canFullscreen) {
+          if (document.fullscreenElement) {
+            void document.exitFullscreen();
+          } else {
+            void frame.requestFullscreen();
+          }
+        } else if (overlayOpen) {
+          closeOverlay();
+        } else {
+          openOverlay(false);
+        }
+      });
+    }
+
+    shareBtn.hidden = false;
+    shareBtn.addEventListener('click', () => {
+      void share();
+    });
+  }
+</script>

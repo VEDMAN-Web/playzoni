@@ -2,7 +2,7 @@
 // Run: npm run icons
 // Writes public/logo.svg, public/icon.svg, favicon, apple-touch-icon, 192/512 PNG, public/og/*.png.
 
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { copyFileSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import sharp, { type Sharp } from 'sharp';
 
@@ -72,6 +72,9 @@ async function main(): Promise<void> {
   for (const [name, size] of sizes) {
     await sharp(icon, { density: 300 }).resize(size, size).png().toFile(join(PUBLIC, name));
   }
+
+  // Browsers ask for /favicon.ico by default. A PNG saved under that name is accepted by every modern browser.
+  copyFileSync(join(PUBLIC, 'favicon-32.png'), join(PUBLIC, 'favicon.ico'));
 
   const og = (tagline: string): Buffer => Buffer.from(socialSvg(tagline, logo));
   const ogPng = (tagline: string): Sharp => sharp(og(tagline)).resize(1200, 630).png();
