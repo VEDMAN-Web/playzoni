@@ -156,7 +156,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 ## Phase 4 — Game import pipeline (needs provider publisher accounts — owner)
 
 ### T4.1 — Normalizer, thumbnails, og images
-- status: todo · deps: T3.3 · model: **sonnet** · docs: PRD §10, SEO-PLAN §Technical
+- status: done · deps: T3.3 · model: **sonnet** · docs: PRD §10, SEO-PLAN §Technical
 - Do: `scripts/import/normalize.ts`: slugify (unique, collision suffix `-2`), category mapping via `data/category-map.json` (unknown provider categories logged to `data/staging/unmapped.txt`, never guessed), de-duplication by normalised title across sources using `SOURCE_PRIORITY`, thumbnail download → s/m/l WebP + 1200×630 og image (square thumb on cream bg with title text) into `public/thumbs/<slug>/`, staging JSON `data/staging/<source>/<slug>.json` keeping the raw feed description in `feedText`. Download with timeout + 2 retries; skip game on failure and log it.
 - Done when: running against `data/sample-feed.json` (create it: 20 fake entries with placeholder image URLs served from `public/` during the test) produces staging files and images.
 

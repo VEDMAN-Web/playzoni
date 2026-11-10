@@ -1,0 +1,35 @@
+{
+  "gd": {
+    "Action": ["action-games"],
+    "Shooting": ["shooting-games"],
+    "Puzzle": ["puzzle-games"],
+    "Racing": ["racing-games"],
+    "Cars": ["car-games"],
+    "Sports": ["sports-games"],
+    "Adventure": ["adventure-games"],
+    "Arcade": ["arcade-games"],
+    "Cooking": ["cooking-games"]
+  },
+  "gm": {
+    "Action": ["action-games"],
+    "Shooting": ["shooting-games"],
+    "Puzzle": ["puzzle-games"],
+    "Racing": ["racing-games"],
+    "Cars": ["car-games"],
+    "Sports": ["sports-games"],
+    "Adventure": ["adventure-games"],
+    "Arcade": ["arcade-games"],
+    "Cooking": ["cooking-games"]
+  },
+  "pg": {
+    "Action": ["action-games"],
+    "Shooting": ["shooting-games"],
+    "Puzzle": ["puzzle-games"],
+    "Racing": ["racing-games"],
+    "Cars": ["car-games"],
+    "Sports": ["sports-games"],
+    "Adventure": ["adventure-games"],
+    "Arcade": ["arcade-games"],
+    "Cooking": ["cooking-games"]
+  }
+}

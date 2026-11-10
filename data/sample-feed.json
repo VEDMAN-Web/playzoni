@@ -1,0 +1,142 @@
+[
+  {
+    "source": "gd", "sourceId": "zorp-001", "title": "Zorp Blaster",
+    "description": "Fake feed text for testing only. Blast the zorps before they reach the moon base and score big points.",
+    "providerCategories": ["Action", "Shooting"], "tags": ["Space", "Shooter"],
+    "thumbnailUrl": "sample-01.png", "embedUrl": "https://example.com/embed/gd/zorp-001",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio One", "releaseDate": "2024-03-02", "popularity": 90
+  },
+  {
+    "source": "gd", "sourceId": "kiki-002", "title": "Kiki & Momo: Jump!",
+    "description": "Fake feed text for testing only. Two friends hop over clouds to reach the top of the sky.",
+    "providerCategories": ["Platformer"], "tags": [],
+    "thumbnailUrl": "sample-02.png", "embedUrl": "https://example.com/embed/gd/kiki-002",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio Two"
+  },
+  {
+    "source": "gm", "sourceId": "bumble-003", "title": "Bumble Garage",
+    "description": "Fake feed text for testing only. Tune a tiny car and race it around the garage floor.",
+    "providerCategories": ["Cars", "Racing"], "tags": ["cars"],
+    "thumbnailUrl": "sample-03.png", "embedUrl": "https://example.com/embed/gm/bumble-003",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio Three"
+  },
+  {
+    "source": "gd", "sourceId": "orbit-004", "title": "Orbit Orchard",
+    "description": "Fake feed text for testing only. Match glowing fruit as it circles the tree.",
+    "providerCategories": ["Puzzle"], "tags": ["match"],
+    "thumbnailUrl": "square-04.png", "embedUrl": "https://example.com/embed/gd/orbit-004",
+    "width": 800, "height": 800, "mobile": true, "developer": "Fake Studio One"
+  },
+  {
+    "source": "pg", "sourceId": "pixel-005", "title": "Pixel Pond Panic",
+    "description": "Fake feed text for testing only. Keep the frogs out of the pond with quick taps.",
+    "providerCategories": ["Arcade"], "tags": ["frogs", "pixel"],
+    "thumbnailUrl": "sample-05.png", "embedUrl": "https://example.com/embed/pg/pixel-005",
+    "width": 1280, "height": 720, "mobile": false, "developer": "Fake Studio Four"
+  },
+  {
+    "source": "gm", "sourceId": "snail-006", "title": "Snail Mail Sprint",
+    "description": "Fake feed text for testing only. Deliver letters on a snail before the post office closes.",
+    "providerCategories": ["Racing"], "tags": [],
+    "thumbnailUrl": "sample-06.png", "embedUrl": "https://example.com/embed/gm/snail-006",
+    "width": 720, "height": 1280, "mobile": true, "developer": "Fake Studio Three"
+  },
+  {
+    "source": "gd", "sourceId": "fish-007", "title": "Fish & Chips",
+    "description": "Fake feed text for testing only. Catch the fish, fry the chips, serve the queue.",
+    "providerCategories": ["Arcade"], "tags": [],
+    "thumbnailUrl": "sample-07.png", "embedUrl": "https://example.com/embed/gd/fish-007",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio Two"
+  },
+  {
+    "source": "gm", "sourceId": "fish-008", "title": "Fish and Chips",
+    "description": "Fake feed text for testing only. A different fake game whose title makes the same web address.",
+    "providerCategories": ["Arcade"], "tags": [],
+    "thumbnailUrl": "sample-08.png", "embedUrl": "https://example.com/embed/gm/fish-008",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio Three"
+  },
+  {
+    "source": "gd", "sourceId": "tumble-009", "title": "Tumble Tower",
+    "description": "Fake feed text for testing only. Stack blocks without letting the tower fall.",
+    "providerCategories": ["Puzzle"], "tags": ["stack"],
+    "thumbnailUrl": "sample-09.png", "embedUrl": "https://example.com/embed/gd/tumble-009",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio One"
+  },
+  {
+    "source": "gm", "sourceId": "tumble-010", "title": "Tumble Tower",
+    "description": "Fake feed text for testing only. The same title from a second provider, dropped as a duplicate.",
+    "providerCategories": ["Puzzle"], "tags": ["stack"],
+    "thumbnailUrl": "sample-10.png", "embedUrl": "https://example.com/embed/gm/tumble-010",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio Three"
+  },
+  {
+    "source": "gd", "sourceId": "kitchen-011", "title": "Cloud Kitchen Rush",
+    "description": "Fake feed text for testing only. Cook for hungry customers floating past on clouds.",
+    "providerCategories": ["Cooking"], "tags": ["food"],
+    "thumbnailUrl": "sample-11.png", "embedUrl": "https://example.com/embed/gd/kitchen-011",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio Two"
+  },
+  {
+    "source": "pg", "sourceId": "eclair-012", "title": "Éclair Escape",
+    "description": "Fake feed text for testing only. A pastry runs through a bakery full of traps.",
+    "providerCategories": ["Adventure"], "tags": [],
+    "thumbnailUrl": "sample-12.png", "embedUrl": "https://example.com/embed/pg/eclair-012",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio Four"
+  },
+  {
+    "source": "gm", "sourceId": "golf-013", "title": "Mini Golf Moon",
+    "description": "Fake feed text for testing only. Putt across craters in low gravity.",
+    "providerCategories": ["Sports"], "tags": ["golf"],
+    "thumbnailUrl": "sample-13.png", "embedUrl": "https://example.com/embed/gm/golf-013",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio Three"
+  },
+  {
+    "source": "gd", "sourceId": "dino-014", "title": "Dino Dash 2",
+    "description": "Fake feed text for testing only. Five provider categories, so only the first four are kept.",
+    "providerCategories": ["Action", "Adventure", "Arcade", "Puzzle", "Sports"], "tags": ["dinosaur"],
+    "thumbnailUrl": "sample-14.png", "embedUrl": "https://example.com/embed/gd/dino-014",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio One"
+  },
+  {
+    "source": "gd", "sourceId": "jelly-015", "title": "Jelly Jam Jr.",
+    "description": "Fake feed text for testing only. This entry has no developer, so the field is left out.",
+    "providerCategories": ["Puzzle"], "tags": [],
+    "thumbnailUrl": "sample-15.png", "embedUrl": "https://example.com/embed/gd/jelly-015",
+    "width": 1280, "height": 720, "mobile": true
+  },
+  {
+    "source": "pg", "sourceId": "robo-016", "title": "Robo Rally Lab",
+    "description": "Fake feed text for testing only. Program a robot to cross the lab.",
+    "providerCategories": ["Racing"], "tags": ["robot"],
+    "thumbnailUrl": "square-16.png", "embedUrl": "https://example.com/embed/pg/robo-016",
+    "width": 800, "height": 800, "mobile": true, "developer": "Fake Studio Four"
+  },
+  {
+    "source": "pg", "sourceId": "lava-017", "title": "Lava Lane Legends",
+    "description": "Fake feed text for testing only. Drive across a bridge of cooling lava.",
+    "providerCategories": ["Racing", "Cars"], "tags": ["lava"],
+    "thumbnailUrl": "sample-17.png", "embedUrl": "https://example.com/embed/pg/lava-017",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio Four"
+  },
+  {
+    "source": "gd", "sourceId": "broken-018", "title": "Missing Picture Game",
+    "description": "Fake feed text for testing only. Its thumbnail address answers 404, so the game is skipped and logged.",
+    "providerCategories": ["Action"], "tags": [],
+    "thumbnailUrl": "missing-18.png", "embedUrl": "https://example.com/embed/gd/broken-018",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio Two"
+  },
+  {
+    "source": "gm", "sourceId": "tiny-019", "title": "Tiny Icon Game",
+    "description": "Fake feed text for testing only. Its thumbnail is only 100 pixels wide, so the game is skipped and logged.",
+    "providerCategories": ["Puzzle"], "tags": [],
+    "thumbnailUrl": "tiny-19.png", "embedUrl": "https://example.com/embed/gm/tiny-019",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio Three"
+  },
+  {
+    "source": "gd", "sourceId": "wobble-020", "title": "Wobble Wizards",
+    "description": "Fake feed text for testing only. Strategy is not in the category map, so it is logged as unmapped.",
+    "providerCategories": ["Strategy", "Puzzle"], "tags": ["magic"],
+    "thumbnailUrl": "sample-20.png", "embedUrl": "https://example.com/embed/gd/wobble-020",
+    "width": 1280, "height": 720, "mobile": true, "developer": "Fake Studio One"
+  }
+]
