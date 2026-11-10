@@ -14,6 +14,12 @@ Answer: —
 
 ## Open
 
+### Q15 — Picture size for the 300 launch games   (T4.6, owner decision)
+Question: The 300 launch games have 111 MB of pictures in public/thumbs. Most of it is the 1200x630 social image (og.png, about 305 KB each). Converting it to WebP (about 50 to 80 KB each, the SEO plan allows WebP) would cut that to roughly 20 MB, which is much easier to keep in git and to deploy. Should we convert? Until you decide, these picture folders are not committed; the drafts are.
+Options: A) Convert og images to WebP now (small change in the import, publish and game page; the build agent recommends this). B) Keep PNG and commit the 111 MB.
+Blocking: T5.5 (deploy) needs the pictures in git.
+Answer: —
+
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later

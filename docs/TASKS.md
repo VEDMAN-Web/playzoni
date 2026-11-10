@@ -179,7 +179,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: both commands work on sample staging data.
 
 ### T4.6 — Launch list as drafts + draft preview (so the owner can see and play)
-- status: todo · deps: T4.5 · model: haiku · docs: PRD §4 §10, SEO-PLAN §Technical
+- status: done · deps: T4.5 · model: haiku · docs: PRD §4 §10, SEO-PLAN §Technical
 - Do:
   1. `npm run publish -- --file data/launch-list.csv` publishes every slug in that CSV as `status: draft` (same as `--slugs`, reading the `slug` column). Skip and log any slug not found in staging.
   2. Add a preview mode: when `PUBLIC_INCLUDE_DRAFTS=true`, draft games are built like published games, show a small "Draft" badge on the game page, and **every page** gets `noindex,nofollow`. Draft games count towards the 12-game rule in this mode only.
