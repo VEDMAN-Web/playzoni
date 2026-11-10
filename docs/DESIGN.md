@@ -98,3 +98,52 @@ Size 2 cells wide × 1 cell tall, white, radius `--r-tile`, shadow `--sh-tile`. 
 - Images have `alt` = game title; decorative images `alt=""`.
 - Skeletons are not used (static HTML is already there). Images reserve space via width/height.
 - Empty states: favourites empty → "No favourites yet. Tap the heart on any game to save it here." Recently played hidden when empty. Search no results → "No games found for "{q}"." + popular row.
+
+---
+
+## §Poki parity v2 (11 Nov 2026 — **overrides every earlier section where they differ**)
+Owner wants the site to look and behave like poki.com. Copy Poki's **layout, sizes, behaviour and motion**. Never copy Poki's logo, mascot, wording, images, icons files or code. Reference screenshots were taken from poki.com on 11 Nov 2026 (home, Master Chess game page, footer).
+
+### V2.1 Page background
+- Full-page background: `linear-gradient(160deg, #5BBFFF 0%, #8FDCFF 55%, #B6F0FF 100%)` (`--c-bg-from`, `--c-bg-mid`, `--c-bg-to`), `background-attachment: fixed`.
+- On top: an **original** low-poly pattern — a single inline SVG (`src/assets/bg-pattern.svg`, ≤ 6 KB) of large soft triangles in white at 6–14% opacity, fixed, covering the viewport, `pointer-events:none`, `z-index:-1`. Draw our own triangles; do not trace Poki's.
+- `--c-bg` (used for small surfaces like chip backgrounds) stays `#E3F1FF`.
+
+### V2.2 Grid and tiles
+- Cell size `--cell`: **94px** (<480), **110px** (480–1023), **130px** (≥1024). Gap `--gap`: **12px** (<480), **16px** (≥480).
+- The whole page content sits in one centred grid column block: `max-width: calc(10 * var(--cell) + 9 * var(--gap))` on desktop, centred with `margin: 0 auto`.
+- Tile sizes: **S = 1×1**, **L = 2×2**. Remove M from the home mosaic. One **XL = 3×3** tile is allowed only as the first featured game on the home page at ≥1024.
+- Home mosaic pattern (repeats every 24 items, after the nav box): positions 3 and 16 are L; everything else S. Featured games fill L/XL first.
+- Tile radius **16px** (S) and **20px** (L/XL). Shadow `0 4px 10px rgba(14,36,64,.18)`.
+- **Badges:** no text pills. A badge is a 28×28 white rounded square (radius 8) in the tile's top-left corner (offset 6px), holding one 18px line icon in `--c-primary`: "new" = sparkle icon, "hot" = flame icon, "updated" = circular-arrow icon. Draw our own simple SVG icons.
+  - "new" only if added ≤ 7 days ago **and** the game is in the newest 8 on the site. "hot" = top 10 by popularity. Max one badge per tile. Never more than 12 badges on one page.
+- **Hover (desktop):** tile lifts `translateY(-4px) scale(1.04)` over 180ms `cubic-bezier(.2,.8,.2,1)`, shadow deepens; the game title slides up from the bottom inside a dark gradient (2 lines max). If a game has a preview video in its data (`previewVideo`, optional, MP4 ≤ 1 MB, from the provider), play it muted/looped inside the tile on hover only; never load it before hover.
+- **Tap (mobile):** no hover state; press feedback = `scale(.96)` for 120ms.
+- **Load-in:** tiles fade and rise in (`opacity 0→1`, `translateY 8px→0`, 220ms) as they enter the viewport, staggered 15ms per tile, max 300ms total. Use one IntersectionObserver. Off with `prefers-reduced-motion`.
+
+### V2.3 Nav box (replaces §Header sizes)
+- **Desktop ≥1024, top of page:** the nav box is the **first grid item, 1×1 cell** (130×130), white, radius 20, shadow as tiles. Contents stacked: logo (width 96px) on top; under it a row of two 40×40 icon buttons: search and favourites. It scrolls with the page (not fixed).
+- **Desktop, after scrolling past 160px:** a **floating nav bar** slides down (220ms) at the top centre: fixed, `top: 12px`, white, radius 16, height 56, shadow. Contents left→right: logo (height 28) | divider | icon buttons 44×44 with tooltips: Popular (flame → `/popular-games`), New (sparkle → `/new-games`), Categories (grid icon → `/categories`), Search (opens search panel), Favourites (heart → `/favourites`). It slides up again when scrolling back above 160px.
+- **Below 1024:** a fixed top bar (height 56) with logo left and Search + Favourites right, **white, radius 0 0 16 16, width = grid width** (not full screen), so it looks like a tab hanging from the top. Page `padding-top: 68px`.
+- Remove the 3×1 nav box and the 4×1 title tile from earlier versions. On category and list pages the H1 + breadcrumbs go in a **1×4 white title tile** (radius 20, padding 16) placed right after the nav box on ≥1024, and above the grid below 1024.
+
+### V2.4 Game page (Poki layout)
+- **Desktop ≥1024:** one grid. Column 1: nav box (1×1) then related tiles stacked. Centre: the **player block spans 6×4 cells** (landscape games; portrait games: 3×5 centred), with the player bar (64px) attached below it. Right: an ad block 2×2 cells (empty, reserved, label "Advertisement" in 11px caps, only when ads are enabled; otherwise filled with tiles) then related tiles 1×1 and 2×2. Below the player: a 6×1 ad strip (same rule), then related tiles fill the rest of the grid rows. Text content (breadcrumbs, H1, intro, how to play, FAQ, info table) goes in a white card spanning the full grid width **below** the tile area.
+- **Game loads automatically on desktop:** on ≥1024, create the iframe after the `load` event plus `requestIdleCallback` (fallback 300ms). Show a loading state (player background + our spinner) until the iframe fires `load`. Keep the static cover HTML in the page for no-JS and for SEO.
+- **Phones/tablets (<1024):** keep cover + Play button → full-screen overlay (no change).
+- Player bar (desktop): left = 40px game icon + title (700) + "by {developer}"; right = like, dislike, favourite, fullscreen, share, report icons 40×40, each with a small label under it in 11px (e.g. "Like"). No counts unless we have real data.
+
+### V2.5 SEO text card (home, category, list pages)
+- A **single white card**, radius 20, padding 32 (16 on phones), spanning the full grid width, placed **directly above the footer**, after all tiles and rows. Content follows SEO-PLAN §Content: H1 (home) / H2s, short paragraphs, **bold** key phrases, bullet lists with linked category names, a "Top games" list (5 linked published games), FAQ. Links in `--c-primary-dark`, bold.
+
+### V2.6 Footer (Poki structure, our content)
+- White background with a **slanted top edge**: `clip-path: polygon(0 48px, 100% 0, 100% 100%, 0 100%)`; padding-top 96px.
+- Left block: logo + tagline "Play free games instantly." on one line; below it social icon buttons (44px dark circles with white icons) for each social URL in `brand.json` (hide any that are empty).
+- Right: three columns with **small uppercase grey headings** (`--t-small`, letter-spacing .06em, `--c-ink-2`) and **bold dark links** (16px, 700, `--c-ink`, 36px line spacing):
+  - POPULAR: up to 8 published categories + "All Games"
+  - HELP AND SUPPORT: Contact, Privacy, Terms, Cookies
+  - GET TO KNOW US: About, For developers
+- Bottom line: "© {year} SparkBeta Tech". Phones: columns stack, 2 per row.
+
+### V2.7 Motion summary
+Tile hover/press, tile load-in, floating nav bar slide, search panel slide-in (240ms), Play button gentle pulse (mobile cover), favourite heart pop (scale 1→1.25→1, 250ms). All motion off under `prefers-reduced-motion`. No other animation.

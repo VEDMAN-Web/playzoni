@@ -189,6 +189,30 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: `npm run check` passes with drafts off; with drafts on the home page shows the real games, categories with 12+ games appear, both test games play on desktop and phone width. Tell Vedant in plain words: "Open http://localhost:4321 while the preview is running."
 
 ---
+## Phase P — Poki parity redesign (owner request, 11 Nov 2026) — do this **before** Phase 5
+All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 390px and 1280px of the pages you changed and save them in `docs/screens/<task>/` (commit them, PNG ≤ 300 KB each) so the planner can compare with Poki.
+
+### TP.1 — Background, tokens, tile sizes and badges
+- status: todo · deps: T4.6 · model: **sonnet** · docs: DESIGN §V2.1 §V2.2
+- Do: new gradient + original SVG pattern; new `--cell`/`--gap` values; S/L/XL sizes and the new home pattern; icon badges with the new rules; tile hover/press/load-in motion.
+- Done when: home at 390/768/1280 shows the new look; never more than 12 badges per page; no horizontal scroll; `npm run check` passes.
+
+### TP.2 — Nav box, floating nav bar, phone top bar
+- status: todo · deps: TP.1 · model: **sonnet** · docs: DESIGN §V2.3
+- Do: 1×1 nav box in the grid on desktop, floating bar after 160px scroll, phone top bar, title tile 1×4 on category/list pages; remove the old 3×1 box and 4×1 title tile.
+- Done when: behaviour works with mouse, keyboard and touch; works without JS (box and links still there); screenshots saved.
+
+### TP.3 — Game page layout and auto-load
+- status: todo · deps: TP.2 · model: **sonnet** · docs: DESIGN §V2.4
+- Do: Poki-style grid layout around the player, desktop auto-load after idle with spinner, player bar with labelled buttons, reserved ad blocks (only when ads enabled), text card below the tiles.
+- Done when: a Playgama and a GameMonetize game auto-load on desktop and play; phones still use cover + overlay; Lighthouse (planner runs it) TBT ≤ 200 ms before the game starts.
+
+### TP.4 — SEO card and footer
+- status: todo · deps: TP.1 · model: haiku · docs: DESIGN §V2.5 §V2.6
+- Do: move home/category/list SEO text into the full-width white card just above the footer; rebuild the footer as specified; add empty `social` URLs to `data/brand.json`.
+- Done when: footer matches §V2.6 at 390 and 1280; one H1 per page still; `npm run check` passes.
+
+---
 ## Phase 5 — Content and launch
 
 ### T5.1 — QA guide for the testing team
