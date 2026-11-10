@@ -148,7 +148,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: all three pages meet every number in §Performance.
 
 ### T3.5 — Phase 3 audit
-- status: todo · deps: T3.1–T3.4 · model: haiku
+- status: done (scoped audit, see docs/seo-reports/2026-11-11-phase3.md) · deps: T3.1–T3.4 · model: haiku
 - Do: run the installed SEO skill audit on the local preview (or Cloudflare preview URL if set up); save `docs/seo-reports/<date>-phase3.md`; fix in-scope issues as separate commits `T3.5-fix: …`; run `/graphify .`.
 - Done when: report saved; no "critical" issues left open without a QUESTIONS entry.
 

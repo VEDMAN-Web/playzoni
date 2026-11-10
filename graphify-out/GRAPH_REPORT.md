@@ -1,17 +1,18 @@
-# Graph Report - playzoni-kit  (2026-11-10)
+# Graph Report - playzoni-kit  (2026-11-11)
 
 ## Corpus Check
-- 66 files · ~36,176 words
+- 77 files · ~42,243 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 18 file(s) not represented in the graph (top: (none) 13, .css 2, .example 1)
+- Unclassified: 21 file(s) not represented in the graph (top: (none) 15, .css 2, .example 1)
+- WARNING: 21 of 100 files seen (21%) have no supported extractor and are missing from this graph entirely. It may look complete while representing only part of the codebase.
 
 ## Summary
-- 414 nodes · 622 edges · 24 communities (18 shown, 6 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 17 edges (avg confidence: 0.83)
+- 512 nodes · 771 edges · 34 communities (25 shown, 9 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 19 edges (avg confidence: 0.83)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c93558c2`
+- Built from commit: `2bf9c977`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -19,7 +20,7 @@
 - devDependencies
 - [slug].astro
 - all-games/[...page].astro
-- index.astro
+- BaseLayout.astro
 - [category]/[...page].astro
 - Category taxonomy
 - Approved tech stack
@@ -33,23 +34,33 @@
 - package.json
 - Phase 0 setup and SEO research
 - README install and run guide
+- sitemap-check.ts
 - START-HERE build chat setup guide
 - Start message for the build agent
 - eslint.config.mjs
 - car-games.md
 - repository
+- content.ts
+- [category]/[...page].astro
+- index.astro
+- categories.astro
+- published.ts
+- Playzoni Phase 3 SEO audit — 11 Nov 2026
+- providers.ts
+- JsonLd.astro
+- 2026-11-11-t3.4-lighthouse.md
 
 ## God Nodes (most connected - your core abstractions)
 1. `getPublishedGames()` - 20 edges
-2. `scripts` - 10 edges
-3. `pageCount()` - 9 edges
-4. `Approved tech stack` - 8 edges
-5. `publishedCategoriesFrom()` - 7 edges
-6. `astro` - 6 edges
-7. `SITE_URL` - 6 edges
-8. `Q7 five doc conflicts` - 6 edges
-9. `Category taxonomy` - 6 edges
-10. `pad()` - 5 edges
+2. `validateContent()` - 14 edges
+3. `scripts` - 12 edges
+4. `pageCount()` - 9 edges
+5. `Approved tech stack` - 8 edges
+6. `publishedCategoriesFrom()` - 7 edges
+7. `astro` - 6 edges
+8. `parseFrontmatter()` - 6 edges
+9. `SITE_URL` - 6 edges
+10. `Category taxonomy` - 6 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Approved tech stack` --references--> `tailwindcss`  [EXTRACTED]
@@ -71,55 +82,55 @@
 - **Tasks marked model sonnet** — docs_tasks_t2_5_player, docs_tasks_t3_3_validator, docs_tasks_t4_1_normalizer, docs_tasks_t4_2_gd_adapter [EXTRACTED 1.00]
 - **Content quality gate** — docs_seo_plan_content_rules, docs_seo_plan_qa_notes, docs_seo_plan_validate_checks, docs_tasks_t3_3_validator [INFERRED 0.85]
 
-## Communities (24 total, 6 thin omitted)
+## Communities (34 total, 9 thin omitted)
 
 ### Community 0 - "devDependencies"
 Cohesion: 0.13
-Nodes (15): devDependencies, @astrojs/check@^0.9.12, eslint@^10.14.0, pagefind@^1.6.0, prettier@^3.9.10, prettier-plugin-astro@^1.1.2, sharp@^0.35.5, tsx@^4.23.15 (+7 more)
+Nodes (15): devDependencies, @astrojs/check@^0.9.12, eslint@^10.14.0, pagefind@^1.6.0, prettier@^3.9.10, prettier-plugin-astro@^1.1.2, tsx@^4.23.15, typescript@^6.0.3 (+7 more)
 
 ### Community 1 - "[slug].astro"
-Cohesion: 0.06
-Nodes (29): backdrop, closeBtn, input, openBtn, panel, published, categories, Category (+21 more)
+Cohesion: 0.10
+Nodes (17): RelatableGame, relatedGames(), breadcrumbLd, chips, countOf(), crumbs, getStaticPaths(), jsonLd (+9 more)
 
 ### Community 2 - "all-games/[...page].astro"
-Cohesion: 0.06
-Nodes (32): cat, t20, t45, t70, crumbs, items, jsonLd, Props (+24 more)
+Cohesion: 0.07
+Nodes (29): cat, t20, t45, t70, crumbs, items, jsonLd, Props (+21 more)
 
-### Community 3 - "index.astro"
-Cohesion: 0.06
-Nodes (27): popular, year, desktop, Props, reduceMotion, Props, Props, popular (+19 more)
+### Community 3 - "BaseLayout.astro"
+Cohesion: 0.07
+Nodes (15): desktop, Props, reduceMotion, backdrop, closeBtn, input, openBtn, panel (+7 more)
 
 ### Community 4 - "[category]/[...page].astro"
-Cohesion: 0.08
-Nodes (31): filterPublishedGames(), GameFlags, getPublishedGames(), pageCount(), PER_PAGE, getStaticPaths(), breadcrumbLd, children (+23 more)
+Cohesion: 0.12
+Nodes (20): astro, categories, collections, games, filterPublishedGames(), GameFlags, getPublishedGames(), pageCount() (+12 more)
 
 ### Community 5 - "Category taxonomy"
-Cohesion: 0.07
-Nodes (29): Header design, Category data model, Folder structure, Game data model, Header and footer, Game source provider adapters, Q8 keyword and search-results tool decision, Q2 game provider publisher accounts (+21 more)
+Cohesion: 0.10
+Nodes (17): Category data model, Folder structure, Game data model, Game source provider adapters, Q2 game provider publisher accounts, Q1 unblocked games target, QA notes file (data/qa), JSON-LD schema rules (+9 more)
 
 ### Community 6 - "Approved tech stack"
-Cohesion: 0.06
-Nodes (32): Playzoni project, Vedant Paliwal (owner), Brand and logo, Colour tokens, GameTile component, GameGrid mosaic and uniform modes, Player design, Space, radius and shadow scale (+24 more)
+Cohesion: 0.05
+Nodes (42): Playzoni project, Vedant Paliwal (owner), Brand and logo, Colour tokens, GameTile component, GameGrid mosaic and uniform modes, Header design, Player design (+34 more)
 
 ### Community 7 - "make-placeholders.ts"
-Cohesion: 0.12
-Nodes (21): brand, FONT_FILE, iconSvg, logoSvg(), main(), PUBLIC, ROOT, socialSvg() (+13 more)
+Cohesion: 0.11
+Nodes (23): sharp@^0.35.5, sharp, brand, FONT_FILE, iconSvg, logoSvg(), main(), PUBLIC (+15 more)
 
 ### Community 8 - "dependencies"
-Cohesion: 0.15
-Nodes (12): dependencies, astro@^7.4.8, @astrojs/sitemap@^3.7.4, @fontsource-variable/nunito@^5.3.0, @tailwindcss/vite@^4.3.5, astro, @astrojs/sitemap, @fontsource-variable/nunito (+4 more)
+Cohesion: 0.20
+Nodes (10): dependencies, astro@^7.4.8, @astrojs/sitemap@^3.7.4, @fontsource-variable/nunito@^5.3.0, tailwindcss@^4.3.5, @tailwindcss/vite@^4.3.5, @astrojs/sitemap, @fontsource-variable/nunito (+2 more)
 
 ### Community 9 - "Player.astro"
 Cohesion: 0.11
 Nodes (29): closeOverlay(), openOverlay(), paintFeedback(), Props, root, share(), showToast(), startGame() (+21 more)
 
 ### Community 10 - "scripts"
-Cohesion: 0.20
-Nodes (10): scripts, build, check, dev, icons, lint, placeholders, postbuild (+2 more)
+Cohesion: 0.17
+Nodes (12): scripts, build, check, dev, headers, headers:check, icons, lint (+4 more)
 
 ### Community 11 - "categories.astro"
-Cohesion: 0.10
-Nodes (15): Props, GridCategory, GridGame, GridItem, LARGE_SLOTS, MEDIUM_SLOTS, Placed, placed (+7 more)
+Cohesion: 0.14
+Nodes (9): Props, GridCategory, GridGame, LARGE_SLOTS, MEDIUM_SLOTS, Placed, placed, Props (+1 more)
 
 ### Community 12 - "tsconfig.json"
 Cohesion: 0.40
@@ -130,8 +141,12 @@ Cohesion: 0.50
 Nodes (4): Ads plan (Phase 4), Q4 legal page text, Phase 6 ads, T6.1 AdSense and consent
 
 ### Community 14 - "package.json"
-Cohesion: 0.15
-Nodes (12): bugs, url, description, typescript@^6.0.3, directories, doc, homepage, name (+4 more)
+Cohesion: 0.18
+Nodes (10): bugs, url, description, directories, doc, homepage, name, private (+2 more)
+
+### Community 18 - "sitemap-check.ts"
+Cohesion: 0.05
+Nodes (28): gamesDir, gameUpdated, built, check, domains, frameSrc, OUT, providers (+20 more)
 
 ### Community 21 - "eslint.config.mjs"
 Cohesion: 0.29
@@ -145,25 +160,49 @@ Nodes (6): Car Games on Playzoni, Driving games, Parking games, Playing car game
 Cohesion: 0.67
 Nodes (3): repository, type, url
 
+### Community 24 - "content.ts"
+Cohesion: 0.09
+Nodes (38): asList(), asObject(), asString(), mdFiles(), QA_KEYS, validateContent(), decode(), DIST (+30 more)
+
+### Community 25 - "[category]/[...page].astro"
+Cohesion: 0.11
+Nodes (14): breadcrumbLd, children, collectionLd, crumbs, entry, gameItems, itemListLd, jsonLd (+6 more)
+
+### Community 26 - "index.astro"
+Cohesion: 0.12
+Nodes (18): badgeFor(), browseItems, byNew, byPopularity, categoryRows, firstSentence(), gameItem(), hotSlugs (+10 more)
+
+### Community 27 - "categories.astro"
+Cohesion: 0.19
+Nodes (10): popular, year, GridItem, countGamesIn(), getPublishedCategories(), publishedCategoriesFrom(), crumbs, items (+2 more)
+
+### Community 28 - "published.ts"
+Cohesion: 0.32
+Nodes (5): categories, Category, categorySchema, HasCategories, MIN_PUBLISHED_GAMES
+
+### Community 29 - "Playzoni Phase 3 SEO audit — 11 Nov 2026"
+Cohesion: 0.33
+Nodes (5): Checks run, Findings, Playzoni Phase 3 SEO audit — 11 Nov 2026, Summary, What was not covered
+
 ## Knowledge Gaps
-- **27 isolated node(s):** `astro/tsconfigs/strict`, `Bounce ball mechanic`, `Internal linking rules`, `T0.3 category keyword data (skipped)`, `Phase 1 foundation` (+22 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 212 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **27 isolated node(s):** `astro/tsconfigs/strict`, `Ads plan (Phase 4)`, `Q4 legal page text`, `Phase 6 ads`, `Phase 0 setup and SEO research` (+22 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 268 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **9 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `@fontsource-variable/nunito` connect `dependencies` to `index.astro`, `package.json`?**
-  _High betweenness centrality (0.285) - this node is a cross-community bridge._
-- **What connects `astro/tsconfigs/strict`, `Bounce ball mechanic`, `Internal linking rules` to the rest of the system?**
+- **Why does `Approved tech stack` connect `Approved tech stack` to `dependencies`, `Category taxonomy`?**
+  _High betweenness centrality (0.223) - this node is a cross-community bridge._
+- **What connects `astro/tsconfigs/strict`, `Ads plan (Phase 4)`, `Q4 legal page text` to the rest of the system?**
   _27 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `devDependencies` be split into smaller, more focused modules?**
   _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._
-- **Why does `Approved tech stack` connect `Approved tech stack` to `Category taxonomy`?**
-  _High betweenness centrality (0.274) - this node is a cross-community bridge._
+- **Why does `tailwindcss` connect `dependencies` to `Approved tech stack`, `package.json`?**
+  _High betweenness centrality (0.221) - this node is a cross-community bridge._
 - **Should `[slug].astro` be split into smaller, more focused modules?**
-  _Cohesion score 0.05975609756097561 - nodes in this community are weakly interconnected._
-- **Why does `tailwindcss` connect `Approved tech stack` to `package.json`?**
-  _High betweenness centrality (0.268) - this node is a cross-community bridge._
+  _Cohesion score 0.09956709956709957 - nodes in this community are weakly interconnected._
+- **Why does `@fontsource-variable/nunito` connect `dependencies` to `BaseLayout.astro`, `package.json`?**
+  _High betweenness centrality (0.170) - this node is a cross-community bridge._
 - **Should `all-games/[...page].astro` be split into smaller, more focused modules?**
-  _Cohesion score 0.06028368794326241 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06553911205073996 - nodes in this community are weakly interconnected._
