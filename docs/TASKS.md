@@ -300,3 +300,124 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 ### T8.3 — Translate UI strings + first 100 game pages per language (batches of 20)
 - status: todo · deps: T8.1 · model: haiku · docs: I18N.md §Translation
 
+---
+## Phase 9 — Growth and retention (docs/GROWTH.md) — after launch
+Starts only after the site is live (**after T5.6**) and only when the planner moves it up (R30). Anything that needs cookie consent waits for **T6.1** (ads + consent) — never load a cookie-based or ad-related script before that consent exists.
+Owner work, not a build task: short gameplay videos for YouTube Shorts, Instagram Reels and TikTok that link to game pages (GROWTH tactic 8).
+Rules for every Phase 9 task (each task repeats them in its "Always" line):
+- Mobile first: works and looks right from 360px. UI parts are checked at 360, 390, 768 and 1280: nothing overflows, nothing is cut off, tap targets ≥ 44px.
+- Pages stay fully readable with JavaScript off. New features are small vanilla TS islands added after load; with JS off they simply do not appear. Our JS stays ≤ 25 KB gzipped per page (SEO-PLAN §Performance). No layout shift: anything added after load goes below the mosaic or into a reserved box.
+- Design tokens only (DESIGN.md) — no hard-coded colours or font sizes. New pills/cards reuse existing tile, pill and card styles.
+- No dark patterns: nothing on the list in `docs/GROWTH.md` "Not allowed on Playzoni" (no fake urgency or countdowns, no fake counts, no confirm-shaming, no nagging, no full-screen popups, no disguised ads).
+- No invented numbers: show a number only if real data produces it. No play counts are shown to visitors at all in this phase.
+- All localStorage access goes through `src/lib/storage.ts` (try/catch, `pz-` key prefix) and must work silently in a private window.
+- No new npm dependency (PRD §2). `npm run check` passes before every commit. At the end of the phase run `/graphify .`.
+
+### T9.1 — Installable app (PWA check, service worker only if needed)
+- status: todo · deps: T5.6 · model: **sonnet** · docs: DESIGN §Brand, GROWTH tactic 6
+- Do:
+  1. `public/site.webmanifest` already exists. Add only what is missing for installability: `id: "/"`, and a 512px icon entry with `purpose: "maskable"` (make `public/icon-maskable-512.png` from `icon.svg` with sharp: icon centred at 80% on `--c-bg` colour). Do not change name, colours or the other icons.
+  2. On the preview URL (Chrome desktop and Chrome Android), check installability (DevTools → Application → Manifest, "Installability"). Record the result in STATUS.
+  3. **Only if** Chrome says the site is not installable without a service worker: add `public/sw.js` — a minimal worker with `install`/`activate` that call `skipWaiting`/`clients.claim` and **no caching** (no fetch handler, or a network-only one). Never cache HTML, game iframes or provider files. Register it from the base layout after `load`, inside try/catch, only on `https:` or `localhost`. Add `Cache-Control: no-cache` for `/sw.js` in `public/_headers`. If no service worker is needed, do not add one (T9.9 adds OneSignal's own worker later).
+  4. Add `src/lib/install.ts`: listens for `beforeinstallprompt` (store the event, call `preventDefault`), `appinstalled` (save `pz-install` = `installed`), and exposes `canInstall()`, `isIos()` (Safari on iPhone/iPad, no `beforeinstallprompt`), `isInstalled()` (`display-mode: standalone` or `pz-install` = `installed`), `promptInstall()`. No UI in this task.
+- Always: mobile-first (360px+); pages readable with JS off; design tokens; no dark patterns (GROWTH "Not allowed"); no invented numbers; `npm run check` passes; check at 360/390/768/1280.
+- Done when: Chrome reports the preview as installable; installing opens `/` in a standalone window; no page or game is served from a cache; `npm run check` passes.
+
+### T9.2 — "Add to home screen" offer (once, after 2+ games)
+- status: todo · deps: T9.1, TP.7 · model: haiku · docs: DESIGN §V2.9, GROWTH tactic 6
+- Do:
+  1. Eligible only when: the visitor has played **2 or more different games** (from `storage.ts` play history), `isInstalled()` is false, and either `canInstall()` or `isIos()` is true.
+  2. **Small bar, shown once ever:** on the home page and category pages only (never on a game page, never over the player). A slim card in the page flow directly **after the mosaic** (not fixed, not over content, no layout shift above the fold): our icon, the text "Play faster: add Playzoni to your home screen.", a primary button "Add" and a plain text button "Not now". "Add" calls `promptInstall()`; on iPhone/iPad it instead shows one line inside the card: "Tap the Share button, then 'Add to Home Screen'." Any of Add / Not now / the close icon saves `pz-install` = `dismissed` (or `installed`) and the bar never shows again.
+  3. **Profile panel entry:** at the bottom of the profile panel (TP.7), above "Clear my history", a small text button "Add to home screen" shown whenever eligible (even after the bar was dismissed — the visitor opened the panel themselves). Hidden once installed.
+  4. Never a full-screen popup or modal, never a browser dialog on page load, never repeated after dismissal. No wording that shames ("No, I don't like games" etc.).
+- Always: mobile-first (360px+); pages readable with JS off (bar simply absent); design tokens; no dark patterns (GROWTH "Not allowed"); no invented numbers; `npm run check` passes; check at 360/390/768/1280.
+- Done when: in a fresh browser the bar appears only after playing 2 different games; "Not now" hides it for good (reload confirms); the profile entry still works; nothing shows on game pages; private window shows no errors; screenshots at 390 and 1280 in `docs/screens/T9.2/`.
+
+### T9.3 — Own play counting (Cloudflare Function + D1)
+- status: todo · deps: T5.6 · model: **sonnet** · docs: PRD §2 (Phase 2: Cloudflare Worker + D1), GROWTH "What Poki does" (own analytics events)
+- Do:
+  1. Owner action first: add a QUESTIONS entry "Owner action needed" with plain steps: create a D1 database `playzoni` in the Cloudflare dashboard, bind it to the Pages project as `DB` (production and preview), and paste `migrations/0001_plays.sql` into the D1 console. Continue building and testing with the fake DB below while waiting.
+  2. `migrations/0001_plays.sql`: one table of **daily totals only** — `plays(day TEXT, slug TEXT, event TEXT, variant TEXT, n INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (day, slug, event, variant))`. No visitor id, no IP, no user agent, no timestamp finer than the UTC day.
+  3. `functions/api/play.ts` (a Cloudflare Pages Function = the Worker approved in PRD §2, deployed with the site — no `wrangler` needed on the owner's PC): `POST` only, JSON body ≤ 200 bytes `{ e, g, v? }`. `e` must be `play_start`, `play_30s` or `play_end`; `g` must match `^[a-z0-9-]{1,80}$` **and** exist in the built `/games-index.json` (read through `env.ASSETS`, cached in memory); `v` is `a`, `b` or absent (stored as `-`). Upsert `n = n + 1` for (today UTC, g, e, v). Reply `204`. Bad input → `400`, no detail. Never set or read cookies. Never log the request body or headers.
+  4. `functions/api/popular-week.ts`: `GET` returns `{ week, games: [slug…] }` — top 24 slugs by `play_30s` over the **last complete ISO week (Monday–Sunday, UTC)**, only slugs still in `/games-index.json`. `Cache-Control: public, max-age=3600`.
+  5. Game page player script: send events with `navigator.sendBeacon('/api/play', …)` — `play_start` when the iframe is created (Play click or desktop auto-load), `play_30s` once when the TP.7 visible-time counter reaches 30 s, `play_end` once on `pagehide` if `play_start` was sent. Wrap in try/catch; a failed beacon changes nothing for the player. Add `connect-src 'self'` (or keep it if present) in `public/_headers`.
+  6. Tests (in `npm run validate`, run with `tsx`, no wrangler): the handlers with a fake `DB` and fake `ASSETS` — valid event counted, each kind of bad input rejected, unknown slug rejected, week boundaries correct, response never contains personal data.
+  7. Update the `/privacy` page in one short paragraph: "We count plays per game per day (no cookies, no personal data) to show which games are popular."
+- Always: mobile-first (360px+); pages readable with JS off (no events are sent then — fine); design tokens; no dark patterns (GROWTH "Not allowed"); no invented numbers — counts are only ever used for ranking, never shown; `npm run check` passes; check the game page at 360/390/768/1280 (nothing visible changes).
+- Done when: tests pass; after the owner binds D1, playing a game on the preview adds rows for `play_start`, `play_30s` and `play_end` (check in the D1 console, record in STATUS); `/api/popular-week` answers; game-page Lighthouse TBT unchanged.
+
+### T9.4 — "Popular this week" row from real plays
+- status: todo · deps: T9.3 · model: haiku · docs: PRD §6, DESIGN §Rows §V2.8 (search panel "Popular this week")
+- Do:
+  1. `scripts/popular-week.ts` runs before `astro build` (add to the `build` script): fetch `${PUBLIC_SITE_URL}/api/popular-week` (5 s timeout). Use the list only if it has **at least 12 published games** that each have ≥ 20 `play_30s` that week (the endpoint adds a `min` count per slug for this check; add it in this task). Otherwise — or on any error — fall back to the current popularity order (top 24 published games). Write `data/popular-week.json` `{ week, source: "plays" | "fallback", games: [slug…] }` (git-ignored; the build creates it every time).
+  2. Home page: a "Popular this week" row (S tiles, same as other rows, with "See all" → `/popular-games`) as the **first** row, directly above "Popular games". To avoid a near-duplicate, the "Popular games" row skips games already shown in "Popular this week". The search panel's "Popular this week" grid (§V2.8) uses the same list.
+  3. The list changes once a week by itself (the endpoint only counts complete weeks) and is refreshed on every deploy. Weekly automatic rebuild: add a QUESTIONS entry for the owner (A) Cloudflare deploy hook + a tiny scheduled Worker, B) a GitHub Actions schedule) — do not build either until answered.
+  4. Show **no** numbers (no play counts, no "1.2k playing") anywhere.
+- Always: mobile-first (360px+); row is static HTML, so readable with JS off; design tokens; no dark patterns (GROWTH "Not allowed"); no invented numbers; `npm run check` passes; check at 360/390/768/1280.
+- Done when: with the endpoint unreachable the build still passes and uses the fallback (`source: "fallback"`); with a fake response of 12+ qualifying games the row follows it; no duplicate games between the two popular rows; screenshots at 390 and 1280 in `docs/screens/T9.4/`.
+
+### T9.5 — "Game of the day" tile
+- status: todo · deps: T5.6 · model: haiku · docs: DESIGN §V2.2 §V2.9 (pill style), GROWTH tactic 9
+- Do:
+  1. `src/lib/game-of-day.ts`: eligible = published games with `mobile: true`, sorted by slug A–Z. Day number `d` = whole days from 2026-01-01 00:00 UTC to the current UTC day. Pick = `eligible[(d × 7919) mod N]`. Same game for everyone in the world at the same moment (UTC), no randomness, no visitor data.
+  2. Home mosaic: one **L tile (2×2)** placed directly after the 5 featured games from R29, with a small white pill "Game of the day" in the bottom-left (same pill style as "Played today" in §V2.9, no clock icon). The played badge still applies. The same game is not repeated elsewhere in the mosaic.
+  3. The build computes the picks for the next 14 days and embeds them as a small JSON (`[{d, slug, title}]`) in the page; a tiny inline script right after the tile swaps link, image and accessible name to today's UTC pick (same tile size, so no layout shift). With JS off the tile shows the build-day pick.
+  4. **No** countdown, no "ends in", no "X people played today", no streaks.
+- Always: mobile-first (360px+); readable with JS off; design tokens; no dark patterns (GROWTH "Not allowed"); no invented numbers; `npm run check` passes; check at 360/390/768/1280.
+- Done when: a unit test (in validate) gives the same pick for the same date and a different pick on the next day; changing the computer's time zone does not change the pick; tile matches the pill style at 390 and 1280 (screenshots in `docs/screens/T9.5/`); CLS on home unchanged.
+
+### T9.6 — "Because you played X" row (local history only)
+- status: todo · deps: T5.6, TP.7 · model: haiku · docs: PRD §6, DESIGN §Rows, `src/lib/related.ts`
+- Do:
+  1. If `/games-index.json` lacks them, add two short fields per game: primary category slug `c` and up to 5 tag slugs `t`. Keep the file as small as possible (record its size before/after in STATUS).
+  2. Home page: client-side row "Because you played {title}" directly **after** the "Recently played" row (below the mosaic, like PRD §6.3 — no layout shift). X = the most recently played game in `storage.ts`. Candidates: same primary category as X, then shared tags, then popularity — the same order as `related.ts`, written as a small client function (do not import build-time code). Exclude X and every game already played. Max 12 S tiles; show the row only if there are at least 6, otherwise hide it. Title links to X's game page.
+  3. Uses only localStorage + the static index. Nothing is sent to any server.
+- Always: mobile-first (360px+); pages readable with JS off (row absent); design tokens; no dark patterns (GROWTH "Not allowed"); no invented numbers; `npm run check` passes; check at 360/390/768/1280.
+- Done when: after playing one game and returning home the row shows similar, unplayed games; with no history it is absent; private window shows no errors; home JS still ≤ 25 KB gzipped; screenshots in `docs/screens/T9.6/`.
+
+### T9.7 — Simple A/B switch (home page, 2 variants)
+- status: todo · deps: T9.3, T9.4 · model: **sonnet** · docs: GROWTH "What Poki does" (A/B tests), PRD §2
+- Do:
+  1. `data/experiments.json`: at most **one** active experiment: `{ id, active, start, b: { rowOrder?, hotBadges?, mosaicOrder? } }`. Allowed knobs only: `rowOrder` (order of the home rows), `hotBadges` (`false` = no hot badges), `mosaicOrder` (`"popularity"` or `"newest"` for tiles after the 5 featured). Variant A = the normal site. Start with the planner's example: `{ "id": "rows-1", "active": false, "start": "", "b": { "rowOrder": ["new", "popular-week", "popular"] } }`.
+  2. When an experiment is active, the build also outputs the variant-B home page at `/_ab/b` — `noindex,nofollow`, canonical `/`, left out of the sitemap, Pagefind and the link checker. Only the home page is tested.
+  3. `functions/index.ts` (runs for `/` only, so other pages and files do not use Function requests): no experiment active → serve the normal page. Otherwise: visitors from the EEA, UK or Switzerland (`request.cf.country`), unknown countries and bots/crawlers (user agent contains bot, crawl, spider, lighthouse) always get A **with no cookie**. Everyone else: read cookie `pz_ab` (`<id>.a` / `<id>.b`); if missing or from an old experiment, pick A or B 50/50 and set `pz_ab` (Max-Age 30 days, Path=/, SameSite=Lax, Secure, value only the id and letter). Serve B through `env.ASSETS.fetch('/_ab/b')`. Response `Cache-Control: private, no-store`.
+  4. Events: the home page sends one `home_view` beacon with `v` per page load when a variant cookie exists; game pages add `v` from the cookie to play events. Add `home_view` to the T9.3 event allowlist.
+  5. Results: `functions/api/ab.ts` `GET ?exp=<id>` returns per variant the totals of `home_view`, `play_start`, `play_30s` since `start`. `npm run ab:report -- <id>` prints a small table and one plain sentence: "B gets X more/fewer 30-second plays per 100 home visits than A." If either variant has fewer than 1,000 home views it prints "Not enough data yet." instead.
+  6. Add a QUESTIONS note for the owner: Function requests count toward Cloudflare's free daily limit (100,000/day); the planner decides when to turn an experiment on.
+- Always: mobile-first (360px+); both variants readable with JS off; design tokens; no dark patterns (GROWTH "Not allowed"); no invented numbers; `npm run check` passes; check both variants at 360/390/768/1280.
+- Done when: tests (fake ASSETS/DB) cover: no experiment → normal page, EEA/bot → A without cookie, cookie kept on return, old cookie reassigned; with `active: true` on the preview, a cleared browser lands on A or B and stays there; `/_ab/b` is not in the sitemap and has noindex; `ab:report` prints "Not enough data yet." on a fresh DB.
+
+### T9.8 — Own promo in unfilled ad slots
+- status: todo · deps: T6.1, T9.2 · model: haiku · docs: PRD §11, DESIGN §V2.8 (ad labels), GROWTH "What Poki does" (empty ad slots)
+- Do:
+  1. In `AdSlot`, watch the AdSense `<ins>` for `data-ad-status="unfilled"`. When unfilled, hide the `<ins>` and show our own promo card **inside the same reserved box** (same size, no layout shift) and remove the "ADVERTISEMENT" label for that box (it is not an ad).
+  2. Three promo cards (our icons, our text, one button each), first one that applies, a different one per slot on the same page: Favourites — "Tap the heart to save games you love." → `/favourites`; Profile — "See your games and time played." → opens the profile panel; Add to home screen — only if T9.2 eligibility is true **and** `pz-install` is not `dismissed`/`installed` → calls the same install flow.
+  3. Promo cards must not look like a game tile, a Play button or an ad (no game thumbnails, no "Play" wording). Never inside or over the player.
+  4. When ads are off (`PUBLIC_ADS_ENABLED` not `true`) no slot and no promo is rendered (unchanged).
+- Always: mobile-first (360px+); pages readable with JS off (box stays empty and reserved, as today); design tokens; no dark patterns (GROWTH "Not allowed"); no invented numbers; `npm run check` passes; check at 360/390/768/1280 for each slot size (300×250, 728×90, 320×100, in-grid).
+- Done when: forcing `data-ad-status="unfilled"` in DevTools shows the right promo in every slot size with CLS unchanged; a filled ad is never replaced; screenshots in `docs/screens/T9.8/`.
+
+### T9.9 — New-game alerts (web push with OneSignal)
+- status: todo · deps: T9.1, TP.7 · model: **sonnet** · docs: GROWTH tactic 7, DESIGN §V2.9
+- Note: **OneSignal is an owner-approved addition to the stack (11 Nov 2026)**. Use OneSignal's Web SDK only — no other push library or service.
+- Do:
+  1. Owner action: QUESTIONS entry "Owner action needed" — create the OneSignal account and web app for playzoni.com and send the App ID. App ID goes in `.env` as `PUBLIC_ONESIGNAL_APP_ID` (add it **empty** to `.env.example`). With the ID empty, the whole feature is off and nothing loads.
+  2. Visits: count a "visit" in `storage.ts` (`pz-visits`) when a page loads more than 30 minutes after the last page view. Nothing about push is shown before the **3rd visit**.
+  3. Soft opt-in (ours, never the browser prompt on page load): from the 3rd visit, a small in-flow card **after the mosaic** on the home page, shown once ever: "Get new-game alerts — at most 2 a week." with buttons "Get new-game alerts" and "No thanks". The same "Get new-game alerts" button sits in the profile panel. Only when the visitor clicks "Get new-game alerts" do we load the OneSignal SDK and ask for browser permission. "No thanks" saves `pz-push` = `no` and the card never shows again. Show none of this where the browser has no `PushManager` (e.g. iPhone Safari not installed as an app).
+  4. Service worker: put OneSignal's worker file at the site root as OneSignal's docs say. If T9.1 added `public/sw.js`, merge them (one worker that `importScripts` OneSignal's worker) — never two workers on the same scope. Still no page caching.
+  5. Easy unsubscribe: profile panel shows "New-game alerts: On" with a "Turn off" button (OneSignal opt-out, saves `pz-push` = `off`) and "Turn on" when off. One click either way, no confirm-shaming.
+  6. Push image: generate a **4:3 landscape image per game** for notifications (large image shows on Android and Windows only; iPhone/Mac show icon + text): **1440×1080** (min 1350px wide), the game's `l` thumbnail centred at 75% of the height on a cover-fitted, blurred copy of itself, JPEG quality ~80, saved as `public/thumbs/<slug>/push.jpg`. Made with sharp (already approved) by the import script (staging) and copied by the publish script, like `og.jpg`; add `npm run images:push` to backfill games already published (skips existing files). Record the total added size in STATUS. Notification icon = `icon.svg` as a 192px PNG (`public/icon-192.png` already exists — reuse it).
+  7. `docs/PUSH.md` for the owner in plain steps: how to send an alert in the OneSignal dashboard (title, short text, game URL, large image = `https://playzoni.com/thumbs/<slug>/push.jpg`, icon = `/icon-192.png`), and the rule **max 2 alerts per week**, only about new or updated games, never fake urgency.
+  8. Update `/privacy` and `/cookies` pages: what OneSignal stores and how to turn alerts off.
+- Always: mobile-first (360px+); pages readable with JS off (no card, no SDK); design tokens; no dark patterns (GROWTH "Not allowed": no nagging, no repeat prompts); no invented numbers; `npm run check` passes; check at 360/390/768/1280.
+- Done when: in a fresh browser nothing appears on visits 1–2; on visit 3 the card appears once; no OneSignal request is made before the click (check the Network tab); subscribe and "Turn off" both work on Chrome desktop and Android with the owner's App ID; `push.jpg` exists for every published game at 1440×1080; screenshots in `docs/screens/T9.9/`.
+
+### T9.10 — Remarketing tags (Google Ads + Microsoft Ads), only after consent
+- status: todo · deps: T6.1 · model: haiku · docs: PRD §11, GROWTH "What Poki does" (paid re-marketing), SEO-PLAN §Performance
+- Do:
+  1. Owner action first: QUESTIONS entry "Owner action needed" — owner creates Google Ads and Microsoft Advertising accounts and sends the Google Ads tag ID + conversion label for "played a game" and the Microsoft UET tag ID. Env: `PUBLIC_GADS_ID`, `PUBLIC_GADS_PLAY_LABEL`, `PUBLIC_UET_ID` (all **empty** in `.env.example`). Empty ID = that tag never loads. Do not start step 2 until the owner answers.
+  2. `src/lib/remarketing.ts`: wait for the consent from T6.1's Google CMP (TCF signal). Load Google's `gtag.js` and Microsoft's UET script **only after a positive advertising consent signal**. No signal (for example, a region where the CMP shows no message) = no tags; ask the owner in QUESTIONS if he wants that changed. Never load before consent, never on page load before interaction.
+  3. Audience event: on `play_start` (same hook as T9.3) send the Google Ads conversion (`send_to: <ID>/<label>`) and UET `event play_start` — this builds the "played at least 1 game" lists. Nothing else is sent (no game title, no personal data).
+  4. Update the `/cookies` and `/privacy` pages: list both tags, what they do, and that they load only after consent. The site stays general-audience, not directed at children (PRD §11).
+- Always: mobile-first (360px+); pages readable with JS off (no tags); design tokens; no dark patterns (GROWTH "Not allowed": no trick questions in consent); no invented numbers; `npm run check` passes; check at 360/390/768/1280 (nothing visible changes).
+- Done when: on the preview, with consent refused or not given, the Network tab shows no request to Google Ads or Microsoft (bat.bing.com); with consent given both load and fire on `play_start`; Lighthouse TBT and CLS unchanged before consent.
