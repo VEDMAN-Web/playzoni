@@ -14,18 +14,6 @@ Answer: —
 
 ## Open
 
-### Q10 — Category page H1 and the nav spacer   (T2.3, asked 10 Nov 2026, by build agent)
-Question: PRD §5 says the H1 sits at the top of category pages, but DESIGN §Grid and §Header say the first grid item on a category page is the nav spacer (so tiles flow around the floating nav box). Both cannot be at the very top. I put the breadcrumbs and H1 above the grid, below the nav box, and left the spacer out on category pages. Is that right, or should the grid start with the spacer and the H1 move elsewhere?
-Options: A) Keep the H1 above the grid, no spacer (what is built now) B) Grid first with the spacer, and the H1 in a row above it
-Blocking: nothing (one template line to change)
-Answer: —
-
-### Q9 — Manifest and theme colour   (T1.6, asked 10 Nov 2026, by build agent)
-Question: DESIGN §Brand says the manifest `theme_color` is `--c-primary` (blue), but the new DESIGN §Colours says the `theme-color` meta and manifest `theme_color` are `--c-bg` (light blue). I followed §Colours, so both are #E3F1FF. Is that right?
-Options: A) Yes, use the light blue (what is built now) B) No, use the primary blue #1F7AFF
-Blocking: nothing (a one-line change in data/brand.json and public/site.webmanifest)
-Answer: —
-
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later
@@ -58,6 +46,19 @@ Blocking: T5.3
 Answer: —
 
 ## Answered
+
+### Q10 — Category page H1 and the nav spacer   (T2.3, asked 10 Nov 2026, by build agent)
+Question: PRD §5 says the H1 sits at the top of category pages, but DESIGN §Grid and §Header say the first grid item on a category page is the nav spacer (so tiles flow around the floating nav box). Both cannot be at the very top. I put the breadcrumbs and H1 above the grid, below the nav box, and left the spacer out on category pages. Is that right, or should the grid start with the spacer and the H1 move elsewhere?
+Options: A) Keep the H1 above the grid, no spacer (what is built now) B) Grid first with the spacer, and the H1 in a row above it
+Blocking: nothing (one template line to change)
+Answer (planner): B, Poki-style, on ≥1024 only. Grid starts with the nav spacer (3×1), then a white **title tile** (4×1 cells, radius `--r-card`, padding 16) holding the breadcrumbs (`--t-small`) and the H1 (`--t-h2` size so it fits; it is still the page's only `<h1>`). Below 1024 keep what is built now (breadcrumbs + H1 above the grid). Same pattern on list pages (T2.7). Do this as review item R10.
+
+### Q9 — Manifest and theme colour   (T1.6, asked 10 Nov 2026, by build agent)
+Question: DESIGN §Brand says the manifest `theme_color` is `--c-primary` (blue), but the new DESIGN §Colours says the `theme-color` meta and manifest `theme_color` are `--c-bg` (light blue). I followed §Colours, so both are #E3F1FF. Is that right?
+Options: A) Yes, use the light blue (what is built now) B) No, use the primary blue #1F7AFF
+Blocking: nothing (a one-line change in data/brand.json and public/site.webmanifest)
+Answer (planner): A — keep light blue #E3F1FF. DESIGN §Brand updated to match.
+
 
 ### Q8 — Keyword and search-results tool   (T0.3 blocked, T0.4 partly done, asked 10 Nov 2026, by build agent)
 Question: T0.3 needs real monthly search volume and difficulty for US and India, and T0.4 needs real Google top-10 results. No keyword tool is set up. The START-HERE guide suggests the "Open SEO keyword-research" skill, but I could not find it on npm, and I will not invent numbers. The web search tool I have only gives a list of links in its own order, so the T0.4 tables are research-only (see docs/seo-research/serp-snapshot.md).

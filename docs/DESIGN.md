@@ -5,7 +5,7 @@ Original brand. Bright, friendly, fast. Light theme only in MVP. All values belo
 ## §Brand
 - Name: **Playzoni** (always this casing in text; logo is lowercase `playzoni`).
 - Tagline: "Play free games instantly."
-- Logo: SVG wordmark `playzoni` in Nunito 900, colour `--c-ink`, with the `o` replaced by a filled circle in `--c-primary` containing a white play triangle. Provide `logo.svg` (wordmark) and `icon.svg` (circle + triangle only). Favicons: 32px PNG, 180px apple-touch-icon, 192/512 PNG + `site.webmanifest` (name, short_name, theme_color = `--c-primary`, background_color = `--c-bg`).
+- Logo: SVG wordmark `playzoni` in Nunito 900, colour `--c-ink`, with the `o` replaced by a filled circle in `--c-primary` containing a white play triangle. Provide `logo.svg` (wordmark) and `icon.svg` (circle + triangle only). Favicons: 32px PNG, 180px apple-touch-icon, 192/512 PNG + `site.webmanifest` (name, short_name, theme_color = `--c-bg`, background_color = `--c-bg`).
 
 ## §Colours
 Light blue theme (changed 10 Nov 2026 at the owner's request).
