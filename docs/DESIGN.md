@@ -50,7 +50,7 @@ Text blocks max width 72ch.
 - Title: hidden by default; on hover (desktop) and focus, a bottom gradient (`transparent → rgba(29,26,47,.85)`) slides up with the title in white `--t-tile`, 2 lines max, ellipsis. On touch devices the title is not shown on tiles (image + `alt` + `aria-label` only), except in rows where a 1-line title is shown below the tile.
 - Hover: `transform: translateY(-3px) scale(1.03)`, shadow `--sh-tile-hover`, 150ms ease-out. Respect `prefers-reduced-motion` (no transform).
 - Badges (top-left, pill, `--t-small`): "New" (`--c-accent`, ink text) if addedDate ≤ 14 days; "Hot" (`--c-accent-2`) if in top 20 popularity. Max one badge.
-- Whole tile is one `<a href="/game/<slug>">` with `aria-label="{Title}"`.
+- Whole tile is one `<a href="/game/<slug>">` with **no** `aria-label`; its accessible name comes from the title text inside it (visually hidden or overlay, but never `display:none`). The thumbnail `<img>` inside a tile has `alt=""` (the link text already names the game).
 
 ## §Grid (`GameGrid`)
 - Cell size `--cell`: 88px (<480), 100px (480–1279), 112px (≥1280). Gap 10px (<480), 12px (≥480).
