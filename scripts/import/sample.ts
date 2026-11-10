@@ -20,7 +20,7 @@ const FEED_FILE = join(ROOT, 'data', 'sample-feed.json');
 
 export const SAMPLE_PATHS: ImportPaths = {
   stagingDir: join(ROOT, 'data', 'staging', '_sample'),
-  thumbsDir: join(ROOT, 'data', 'staging', '_sample', 'thumbs'),
+  thumbsDir: join(ROOT, 'data', 'staging', '_sample', 'thumbs'), // = <stagingDir>/thumbs
   categoriesJson: join(ROOT, 'data', 'categories.json'),
   categoryMapJson: join(ROOT, 'data', 'sample-category-map.json'),
   contentGamesDir: join(ROOT, 'src', 'content', 'games'),

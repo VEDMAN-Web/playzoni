@@ -1,12 +1,12 @@
 // Self-test for npm run publish and npm run shortlist (T4.5). Runs in temp folders; no repo files change.
 
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { parseFrontmatter } from './validate/frontmatter';
 import { validateContent, type ContentPaths } from './validate/content';
-import { draftMarkdown, parseArgs, publishDrafts } from './publish';
-import { readStagingGames } from './import/staging';
+import { draftMarkdown, IMAGE_FILES, parseArgs, publishDrafts } from './publish';
+import { readStagingGames, thumbsDirFor } from './import/staging';
 import { csvCell, shortlistCsv, writeShortlist, HEADER } from './shortlist';
 import type { StagingGame } from './import/types';
 
@@ -35,25 +35,42 @@ function writeStaged(stagingRoot: string, game: StagingGame): void {
   writeFileSync(join(stagingRoot, game.source, `${game.slug}.json`), JSON.stringify(game, null, 2));
 }
 
+// Placeholder images in the staging folder, one bytes-per-file so the copy can be checked.
+function writeImages(stagingRoot: string, slug: string): void {
+  const dir = join(thumbsDirFor(stagingRoot), slug);
+  mkdirSync(dir, { recursive: true });
+  for (const file of IMAGE_FILES) writeFileSync(join(dir, file), `${slug}-${file}`);
+}
+
 function testPublish(tmp: string): void {
   const staging = join(tmp, 'staging');
   const games = join(tmp, 'games');
+  const publicThumbs = join(tmp, 'public-thumbs');
   mkdirSync(games, { recursive: true });
   writeStaged(staging, staged({}));
   writeStaged(staging, staged({ slug: 'no-cats', title: 'No Cats', sourceId: 'n1', categories: [] }));
   writeStaged(staging, staged({ slug: 'exists-already', title: 'Exists', sourceId: 'e1' }));
+  writeStaged(staging, staged({ slug: 'bare', title: 'Bare', sourceId: 'b1' }));
+  writeStaged(staging, staged({ slug: 'exists-img', title: 'Exists Img', sourceId: 'i1' }));
+  writeImages(staging, 'zorp-blaster');
+  writeImages(staging, 'exists-img');
+  mkdirSync(join(publicThumbs, 'exists-img'), { recursive: true });
   writeFileSync(join(games, 'exists-already.md'), '---\ntitle: "Old"\n---\n');
   mkdirSync(join(staging, '_sample'));
   writeStaged(join(staging, '_sample'), staged({ slug: 'test-only', title: 'Test Only', sourceId: 't1', source: 'own' }));
 
-  const result = publishDrafts({ slugs: ['zorp-blaster', 'no-cats', 'exists-already', 'missing', 'test-only'], stagingRoot: staging, gamesDir: games, date: '2026-11-11' });
+  const result = publishDrafts({ slugs: ['zorp-blaster', 'no-cats', 'exists-already', 'missing', 'test-only', 'bare', 'exists-img'], stagingRoot: staging, gamesDir: games, publicThumbsRoot: publicThumbs, date: '2026-11-11' });
   same(result.written, ['zorp-blaster'], 'only the clean game is written');
   expect(result.problems.some((p) => p.startsWith('no-cats: no category')), `no-category game is refused: ${result.problems.join(' | ')}`);
   expect(result.problems.some((p) => p.startsWith('exists-already: a game page already exists')), 'existing game page is not overwritten');
   expect(result.problems.some((p) => p.startsWith('missing: not in staging')), 'unknown slug is reported');
+  expect(result.problems.some((p) => p.startsWith('bare: images missing') && p.includes('s.webp')), `a game with no images is refused: ${result.problems.join(' | ')}`);
+  expect(result.problems.some((p) => p.startsWith('exists-img: public/thumbs/exists-img already exists')), 'an existing public image folder is not overwritten');
+  expect(!existsSync(join(games, 'bare.md')) && !existsSync(join(publicThumbs, 'bare')), 'a refused game leaves no page and no images');
   expect(readFileSync(join(games, 'exists-already.md'), 'utf8').includes('"Old"'), 'the existing page is unchanged');
 
-  const again = publishDrafts({ slugs: ['zorp-blaster'], stagingRoot: staging, gamesDir: games, date: '2026-11-11' });
+  for (const file of IMAGE_FILES) same(readFileSync(join(publicThumbs, 'zorp-blaster', file), 'utf8'), `zorp-blaster-${file}`, `image ${file} copied to public/thumbs`);
+  const again = publishDrafts({ slugs: ['zorp-blaster'], stagingRoot: staging, gamesDir: games, publicThumbsRoot: publicThumbs, date: '2026-11-11' });
   same(again.written, [], 'publishing the same slug twice writes nothing the second time');
 
   const markdown = readFileSync(join(games, 'zorp-blaster.md'), 'utf8');

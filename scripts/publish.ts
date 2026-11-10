@@ -1,11 +1,12 @@
-// npm run publish -- --slugs a,b [--date 2026-11-11] [--staging data/staging] [--games-dir src/content/games]
-// Copies staged games into src/content/games as status: draft, with empty text fields for a human to fill.
-// Never overwrites a game page and never publishes: a draft builds no page (docs/PRD.md §10).
+// npm run publish -- --slugs a,b [--date 2026-11-11] [--staging data/staging] [--games-dir src/content/games] [--public-thumbs public/thumbs]
+// Copies staged games into src/content/games as status: draft, with empty text fields for a human to fill,
+// and copies each game's images from <staging>/thumbs/<slug>/ into public/thumbs/<slug>/ (docs/TASKS.md T4.5, Q13).
+// Never overwrites a game page or an image folder, and never publishes: a draft builds no page (docs/PRD.md §10).
 
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { readStagingGames, type StagedFile } from './import/staging';
+import { readStagingGames, thumbsDirFor, type StagedFile } from './import/staging';
 import type { StagingGame } from './import/types';
 
 const ROOT = join(import.meta.dirname, '..');
@@ -14,6 +15,8 @@ export interface PublishOptions {
   slugs: string[];
   stagingRoot: string;
   gamesDir: string;
+  /** Receives public/thumbs/<slug>/ for published games. */
+  publicThumbsRoot: string;
   /** YYYY-MM-DD used for addedDate and updatedDate. */
   date: string;
   includeTestFolders?: boolean;
@@ -68,12 +71,19 @@ export function draftMarkdown(game: StagingGame, date: string): string {
   return `${lines.join('\n')}\n`;
 }
 
-function problemsFor(slug: string, matches: StagedFile[], gamesDir: string): string | null {
+// The four images the import makes for every game (docs/SEO-PLAN.md §Technical).
+export const IMAGE_FILES = ['s.webp', 'm.webp', 'l.webp', 'og.png'] as const;
+
+function problemsFor(slug: string, matches: StagedFile[], options: PublishOptions): string | null {
   if (matches.length === 0) return `${slug}: not in staging (run an import first)`;
   if (matches.length > 1) return `${slug}: found in more than one staging folder (${matches.map((m) => m.file).join(', ')})`;
   const [{ game }] = matches;
   if (game.categories.length === 0) return `${slug}: no category could be mapped; fix data/category-map.json first`;
-  if (existsSync(join(gamesDir, `${slug}.md`))) return `${slug}: a game page already exists (src/content/games/${slug}.md), not overwritten`;
+  if (existsSync(join(options.gamesDir, `${slug}.md`))) return `${slug}: a game page already exists (src/content/games/${slug}.md), not overwritten`;
+  const source = join(thumbsDirFor(options.stagingRoot), slug);
+  const missing = IMAGE_FILES.filter((f) => !existsSync(join(source, f)));
+  if (missing.length > 0) return `${slug}: images missing in ${source} (${missing.join(', ')}); run the import again`;
+  if (existsSync(join(options.publicThumbsRoot, slug))) return `${slug}: public/thumbs/${slug} already exists, not overwritten`;
   return null;
 }
 
@@ -84,11 +94,15 @@ export function publishDrafts(options: PublishOptions): PublishResult {
   mkdirSync(options.gamesDir, { recursive: true });
   for (const slug of [...new Set(options.slugs)]) {
     const matches = staged.filter((s) => s.game.slug === slug);
-    const problem = problemsFor(slug, matches, options.gamesDir);
+    const problem = problemsFor(slug, matches, options);
     if (problem) {
       problems.push(problem);
       continue;
     }
+    const imageSource = join(thumbsDirFor(options.stagingRoot), slug);
+    const imageTarget = join(options.publicThumbsRoot, slug);
+    mkdirSync(imageTarget, { recursive: true });
+    for (const file of IMAGE_FILES) copyFileSync(join(imageSource, file), join(imageTarget, file));
     writeFileSync(join(options.gamesDir, `${slug}.md`), draftMarkdown(matches[0].game, options.date), { flag: 'wx' });
     written.push(slug);
   }
@@ -118,9 +132,10 @@ function main(): void {
     slugs,
     stagingRoot: resolve(ROOT, args.staging ?? join('data', 'staging')),
     gamesDir: resolve(ROOT, args['games-dir'] ?? join('src', 'content', 'games')),
+    publicThumbsRoot: resolve(ROOT, args['public-thumbs'] ?? join('public', 'thumbs')),
     date: args.date ?? todayIso(),
   });
-  for (const slug of result.written) console.log(`draft written: src/content/games/${slug}.md`);
+  for (const slug of result.written) console.log(`draft written: src/content/games/${slug}.md, images in public/thumbs/${slug}/`);
   for (const problem of result.problems) console.error(`not written: ${problem}`);
   console.log(`publish: ${result.written.length} written, ${result.problems.length} not written`);
   if (result.problems.length > 0) process.exit(1);

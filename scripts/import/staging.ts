@@ -31,3 +31,8 @@ export function readStagingGames(stagingRoot: string, includeTestFolders = false
 export function sourceOf(file: StagedFile): SourceKey {
   return file.game.source;
 }
+
+// Images from the import live in <staging>/thumbs/<slug>/ and are git-ignored (docs/TASKS.md T4.5, Q13).
+export function thumbsDirFor(stagingRoot: string): string {
+  return join(stagingRoot, 'thumbs');
+}
