@@ -10,6 +10,8 @@ export const THUMB_SIZES = { s: 150, m: 300, l: 600 } as const;
 export const WEBP_QUALITY = 78;
 export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
+// JPEG shows reliably in every social app (WhatsApp, Facebook, X, LinkedIn) and stays small (Q15).
+export const OG_JPEG_QUALITY = 80;
 
 const MIN_SOURCE_SIDE = 150; // smaller pictures would be blown up too far for the l thumbnail
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
@@ -139,7 +141,8 @@ function ogTextSvg(title: string, colours: BrandColours): string {
   ].join('');
 }
 
-async function renderOg(source: Buffer, title: string, colours: BrandColours): Promise<Buffer> {
+// The 1200x630 social image: square picture with rounded corners, the title and the site name, as JPEG.
+export async function renderOgImage(source: Buffer, title: string, colours: BrandColours): Promise<Buffer> {
   const size = 360;
   const mask = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect width="${size}" height="${size}" rx="44"/></svg>`);
   const thumb = await sharp(source)
@@ -153,11 +156,12 @@ async function renderOg(source: Buffer, title: string, colours: BrandColours): P
       { input: thumb, left: (OG_WIDTH - size) / 2, top: 36 },
       { input: Buffer.from(ogTextSvg(title, colours)), left: 0, top: 0 },
     ])
-    .png()
+    .flatten({ background: colours.background })
+    .jpeg({ quality: OG_JPEG_QUALITY, mozjpeg: true })
     .toBuffer();
 }
 
-// Square s/m/l WebP (quality 78) and the 1200x630 og PNG, all in memory: nothing is written
+// Square s/m/l WebP (quality 78) and the 1200x630 og JPEG, all in memory: nothing is written
 // until every size has worked, so a bad picture never leaves half a folder behind.
 export async function renderImages(source: Buffer, title: string, colours: BrandColours): Promise<RenderedImages> {
   const meta = await sharp(source).metadata();
@@ -167,7 +171,7 @@ export async function renderImages(source: Buffer, title: string, colours: Brand
   }
   const thumb = (size: number): Promise<Buffer> =>
     sharp(source).rotate().resize(size, size, { fit: 'cover' }).webp({ quality: WEBP_QUALITY }).toBuffer();
-  const [s, m, l, og] = await Promise.all([thumb(THUMB_SIZES.s), thumb(THUMB_SIZES.m), thumb(THUMB_SIZES.l), renderOg(source, title, colours)]);
+  const [s, m, l, og] = await Promise.all([thumb(THUMB_SIZES.s), thumb(THUMB_SIZES.m), thumb(THUMB_SIZES.l), renderOgImage(source, title, colours)]);
   return { s, m, l, og };
 }
 
@@ -176,5 +180,5 @@ export function writeImages(dir: string, images: RenderedImages): void {
   writeFileSync(join(dir, 's.webp'), images.s);
   writeFileSync(join(dir, 'm.webp'), images.m);
   writeFileSync(join(dir, 'l.webp'), images.l);
-  writeFileSync(join(dir, 'og.png'), images.og);
+  writeFileSync(join(dir, 'og.jpg'), images.og);
 }

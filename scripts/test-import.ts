@@ -131,7 +131,7 @@ const feed = (): RawGame[] => [
 ];
 
 async function checkImages(dir: string, slug: string): Promise<void> {
-  const sizes: [string, string, number, number][] = [['s.webp', 'webp', 150, 150], ['m.webp', 'webp', 300, 300], ['l.webp', 'webp', 600, 600], ['og.png', 'png', 1200, 630]];
+  const sizes: [string, string, number, number][] = [['s.webp', 'webp', 150, 150], ['m.webp', 'webp', 300, 300], ['l.webp', 'webp', 600, 600], ['og.jpg', 'jpeg', 1200, 630]];
   for (const [file, format, width, height] of sizes) {
     const meta = await sharp(join(dir, slug, file)).metadata();
     same([meta.format, meta.width, meta.height], [format, width, height], `${slug}/${file}`);

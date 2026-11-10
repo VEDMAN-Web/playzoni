@@ -79,7 +79,7 @@ export function draftMarkdown(game: StagingGame, date: string): string {
 const NOT_STAGED = 'not in staging (run an import first)';
 
 // The four images the import makes for every game (docs/SEO-PLAN.md §Technical).
-export const IMAGE_FILES = ['s.webp', 'm.webp', 'l.webp', 'og.png'] as const;
+export const IMAGE_FILES = ['s.webp', 'm.webp', 'l.webp', 'og.jpg'] as const;
 
 function problemsFor(slug: string, matches: StagedFile[], options: PublishOptions): string | null {
   if (matches.length === 0) return `${slug}: ${NOT_STAGED}`;

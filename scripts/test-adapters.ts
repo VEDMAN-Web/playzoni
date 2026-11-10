@@ -133,7 +133,7 @@ async function testNetwork(tmp: string): Promise<void> {
       });
       same(report.imported, ['zed-game'], 'runImport imports the game');
       same(readFileSync(join(staging, 'failed.txt'), 'utf8'), 'gm\t9\tLeft Out\tbecause reasons\n', 'adapter skips are written to failed.txt on one line');
-      expect(existsSync(join(staging, 'gm', 'zed-game.json')) && existsSync(join(staging, 'thumbs', 'zed-game', 'og.png')), 'staging file and pictures exist');
+      expect(existsSync(join(staging, 'gm', 'zed-game.json')) && existsSync(join(staging, 'thumbs', 'zed-game', 'og.jpg')), 'staging file and pictures exist');
       const staged = JSON.parse(readFileSync(join(staging, 'gm', 'zed-game.json'), 'utf8')) as { categories: string[] };
       same(staged.categories, ['puzzle-games'], 'the category map is applied');
     },

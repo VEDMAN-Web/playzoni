@@ -28,7 +28,7 @@ const entry = games.find((g) => g.data.slug === slug)!;
 const d = entry.data;
 
 // The import's 1200x630 og image when it has been published with the game (docs/TASKS.md T4.5, Q13).
-const ogPath = `/thumbs/${slug}/og.png`;
+const ogPath = `/thumbs/${slug}/og.jpg`;
 const ogImage = existsSync(join(process.cwd(), 'public', ogPath)) ? ogPath : undefined;
 
 const primary = categories.find((c) => c.slug === d.categories[0]);

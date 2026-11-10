@@ -51,7 +51,7 @@ export interface StagingGame {
 export interface ImportPaths {
   /** Holds `<source>/<slug>.json`, `unmapped.txt` and `failed.txt`. */
   stagingDir: string;
-  /** Receives `<slug>/{s,m,l}.webp` and `<slug>/og.png`. Always `<stagingDir>/thumbs` (git-ignored, see Q13). */
+  /** Receives `<slug>/{s,m,l}.webp` and `<slug>/og.jpg`. Always `<stagingDir>/thumbs` (git-ignored, see Q13). */
   thumbsDir: string;
   categoriesJson: string;
   categoryMapJson: string;

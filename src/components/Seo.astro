@@ -20,6 +20,8 @@ if (!draftPreview) assertDescription(description);
 
 const canonical = canonicalUrl(canonicalPath);
 const image = new URL(ogImage, 'https://playzoni.com').toString();
+const imageTypes: Record<string, string> = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+const imageType = imageTypes[ogImage.split('.').pop()?.toLowerCase() ?? ''];
 ---
 <title>{title}</title>
 <meta name="description" content={description} />
@@ -31,6 +33,7 @@ const image = new URL(ogImage, 'https://playzoni.com').toString();
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={image} />
+{imageType ? <meta property="og:image:type" content={imageType} /> : null}
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />

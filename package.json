@@ -21,6 +21,7 @@
     "shortlist": "tsx scripts/shortlist.ts",
     "unmapped:report": "tsx scripts/unmapped-report.ts",
     "qa:new": "tsx scripts/qa/new.ts",
+    "images:og": "tsx scripts/import/regen-og.ts",
     "icons": "tsx scripts/make-icons.ts",
     "postbuild": "pagefind --site dist && tsx scripts/sitemap-check.ts && tsx scripts/validate-dist.ts",
     "headers": "tsx scripts/headers-check.ts",
