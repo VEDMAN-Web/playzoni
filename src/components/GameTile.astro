@@ -10,9 +10,11 @@ interface Props {
   eager?: boolean;
   priority?: boolean;
   badge?: BadgeKind;
+  previewVideo?: string;
+  screenshots?: string[];
 }
 
-const { title, slug, size, eager = false, priority = false, badge } = Astro.props;
+const { title, slug, size, eager = false, priority = false, badge, previewVideo, screenshots } = Astro.props;
 
 // Picture files: S uses the 150px file (300px on 2x screens); L the 300px file (600px on 2x); XL the 600px file.
 // Phones never download the 600px file at 1x for a small tile.
@@ -25,7 +27,13 @@ const srcset =
       ? `/thumbs/${slug}/m.webp 1x, /thumbs/${slug}/l.webp 2x`
       : undefined;
 ---
-<a class={`tile tile-${size.toLowerCase()}`} href={`/game/${slug}`}>
+<a
+  class={`tile tile-${size.toLowerCase()}`}
+  href={`/game/${slug}`}
+  data-slug={slug}
+  data-preview-video={previewVideo}
+  data-screenshots={screenshots && screenshots.length > 0 ? screenshots.join(' ') : undefined}
+>
   <img
     src={`/thumbs/${slug}/${file}.webp`}
     srcset={srcset}
@@ -50,7 +58,7 @@ const srcset =
           <path d="M12 21a2.2 2.2 0 0 1-2.2-2.2c0-1.1.9-1.9 2.2-3 1.3 1.1 2.2 1.9 2.2 3A2.2 2.2 0 0 1 12 21z" />
         </svg>
       )}
-      {badge === 'Updated' && (
+      {badge === 'Played' && (
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 12a8 8 0 1 1-2.4-5.7" />
           <path d="M20 4v5h-5" />
@@ -100,34 +108,16 @@ const srcset =
     height: auto;
     aspect-ratio: 1 / 1;
     object-fit: cover;
+    transition: transform 240ms ease-out;
   }
-  /* Badge: a 28px white rounded square with one line icon (new, hot or updated). */
-  .badge {
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 26px;
-    height: 26px;
-    border-radius: 8px;
-    background: var(--c-surface);
-    color: var(--c-primary);
-    box-shadow: 0 1px 4px rgba(14, 36, 64, 0.25);
-  }
-  /* Phones: a smaller badge (22px square, 14px icon) so it does not cover the picture (R23). */
-  @media (max-width: 479px) {
-    .badge {
-      top: 5px;
-      left: 5px;
-      width: 22px;
-      height: 22px;
-      border-radius: 6px;
-    }
-    .badge svg {
-      width: 14px;
-      height: 14px;
+  /* Hover preview without a video or screenshots: a slow zoom of the picture, 1 to 1.12 over 3 seconds (DESIGN §V2.8).
+     Games that have preview media get it from src/lib/tile-preview.ts; if that media fails the script adds .zoom. */
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .tile:not([data-preview-video]):not([data-screenshots]):hover > img,
+    .tile:not([data-preview-video]):not([data-screenshots]):focus-visible > img,
+    .tile.zoom:hover > img {
+      transform: scale(1.12);
+      transition: transform 3s linear;
     }
   }
   /* Title overlay: shown on desktop hover and keyboard focus only. Everywhere else it is visually hidden but stays

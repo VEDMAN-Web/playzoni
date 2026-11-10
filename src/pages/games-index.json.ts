@@ -1,10 +1,10 @@
 import type { APIRoute } from 'astro';
 import { getPublishedGames } from '../lib/games';
 
-// Small index of every published game (slug, title, thumbnail). The favourites page and the
+// Small index of every published game (slug, title, thumbnail), most popular first. The favourites page and the
 // "Recently played" row read it in the browser, so they can show tiles without a server.
 export const GET: APIRoute = async () => {
-  const games = await getPublishedGames();
+  const games = [...(await getPublishedGames())].sort((a, b) => b.data.popularity - a.data.popularity);
   const index = games.map((g) => ({
     slug: g.data.slug,
     title: g.data.title,

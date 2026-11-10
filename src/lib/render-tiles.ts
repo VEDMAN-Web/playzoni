@@ -26,6 +26,7 @@ export function gameTile(game: IndexGame, withTitle: boolean): HTMLElement {
   const link = document.createElement('a');
   link.className = 'pz-tile';
   link.href = `/game/${game.slug}`;
+  link.dataset.slug = game.slug;
   link.setAttribute('aria-label', game.title);
 
   const img = document.createElement('img');

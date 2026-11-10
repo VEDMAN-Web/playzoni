@@ -1,16 +1,24 @@
 ---
-// Category tile (DESIGN §V2.10): 2 cells wide (204px), 1 cell tall. A 56px rounded square with the emoji on the left, the
-// name in UPPERCASE on the right (13px, 800, at most 2 lines). Whole tile is a link.
+// Category tile (docs/DESIGN.md §V2.8 and §V2.10): 2 cells wide (204px), 1 cell tall, white, radius 16, padding 12px.
+// On the left a 56x56 picture with radius 12: the thumbnail of the category's most popular published game; only if the
+// category has no game picture, the emoji on a rounded square instead. The name is on the right in UPPERCASE, 13px,
+// weight 800, at most 2 lines. The whole tile is a link.
 interface Props {
   slug: string;
   shortName: string;
   emoji: string;
+  /** Slug of the game whose thumbnail is shown. */
+  imageSlug?: string;
 }
 
-const { slug, shortName, emoji } = Astro.props;
+const { slug, shortName, emoji, imageSlug } = Astro.props;
 ---
 <a class="cat-tile" href={`/${slug}`}>
-  <span class="emoji" aria-hidden="true">{emoji}</span>
+  {imageSlug ? (
+    <img class="pic" src={`/thumbs/${imageSlug}/s.webp`} width="56" height="56" alt="" loading="lazy" decoding="async" />
+  ) : (
+    <span class="pic emoji" aria-hidden="true">{emoji}</span>
+  )}
   <span class="name">{shortName}<span class="sr-only"> games</span></span>
 </a>
 
@@ -38,13 +46,17 @@ const { slug, shortName, emoji } = Astro.props;
       text-decoration: none;
     }
   }
-  .emoji {
-    display: grid;
+  .pic {
+    display: block;
     flex: 0 0 auto;
-    place-items: center;
     width: 56px;
     height: 56px;
     border-radius: 12px;
+    object-fit: cover;
+  }
+  .emoji {
+    display: grid;
+    place-items: center;
     background: var(--c-bg);
     font-size: 28px;
     line-height: 1;

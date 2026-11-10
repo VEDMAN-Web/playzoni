@@ -128,3 +128,53 @@ main {
     padding-top: var(--gap);
   }
 }
+
+/* Badge on a game tile (DESIGN §V2.2, §V2.8): a 26px white rounded square (22px below 480px) with one line icon (new, hot or played).
+   Global because the played badge is added in the browser (src/lib/played-badge.ts), also on tiles built there. */
+.badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--c-surface);
+  color: var(--c-primary);
+  box-shadow: 0 1px 4px rgba(14, 36, 64, 0.25);
+}
+.badge svg {
+  display: block;
+}
+/* Phones: a smaller badge (22px square, 14px icon) so it does not cover the picture (R23). */
+@media (max-width: 479px) {
+  .badge {
+    top: 5px;
+    left: 5px;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+  }
+  .badge svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Hover preview media inside a tile (src/lib/tile-preview.ts). */
+.tile .pv {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+  pointer-events: none;
+}
+.tile .pv.is-on {
+  opacity: 1;
+}

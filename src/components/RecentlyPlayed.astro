@@ -28,6 +28,7 @@ import '../styles/client-tiles.css';
 <script>
   import { getRecentlyPlayed } from '../lib/storage';
   import { gameTile, loadIndex, pickGames } from '../lib/render-tiles';
+  import { applyPlayedBadges } from '../lib/played-badge';
 
   const section = document.querySelector<HTMLElement>('[data-recent]');
   const track = document.querySelector<HTMLElement>('[data-recent-track]');
@@ -37,8 +38,10 @@ import '../styles/client-tiles.css';
     void loadIndex().then((index) => {
       const games = pickGames(index, slugs);
       if (games.length === 0) return;
-      for (const game of games) track.appendChild(gameTile(game, true));
+      // Plain tiles, no names under them (R27); every game here has been played, so each gets the played badge.
+      for (const game of games) track.appendChild(gameTile(game, false));
       section.hidden = false;
+      applyPlayedBadges(track);
     });
   }
 </script>

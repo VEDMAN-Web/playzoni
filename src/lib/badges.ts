@@ -1,9 +1,10 @@
 // Which games get a badge (docs/DESIGN.md §V2.2). Pure functions, tested with plain tsx.
 //   new = added within 7 days AND among the newest 8 games on the site
 //   hot = the top 10 by popularity
-// One badge per game ("new" wins). "updated" has an icon but no rule yet, so nothing assigns it.
+// One badge per game ("new" wins). "Played" (circular arrow) is added in the browser by src/lib/played-badge.ts for
+// games the visitor has played; it replaces new and hot on that tile (DESIGN §V2.8).
 
-export type BadgeKind = 'New' | 'Hot' | 'Updated';
+export type BadgeKind = 'New' | 'Hot' | 'Played';
 
 export interface BadgeInput {
   slug: string;

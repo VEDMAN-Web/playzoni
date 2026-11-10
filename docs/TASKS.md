@@ -213,7 +213,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: footer matches §V2.6 at 390 and 1280; one H1 per page still; `npm run check` passes.
 
 ### TP.6 — Played badge, hover preview, search panel, category tiles
-- status: todo · deps: TP.4 · model: **sonnet** · docs: DESIGN §V2.8
+- status: done · deps: TP.4 · model: **sonnet** · docs: DESIGN §V2.8
 - Do: everything in DESIGN §V2.8. First check both feeds for a preview video or screenshot list per game and record in STATUS what exists (field names, how many games have it); add optional `previewVideo` and `screenshots` to staging/game data only if the feeds have them (download nothing on import except what the hover needs, max 1 MB video / 4 screenshots per game; store under `public/thumbs/<slug>/`).
 - Done when: played badge appears after playing a game and reloading; hover preview works with each of the three fallbacks; search panel matches §V2.8 at 390 and 1280; `/categories` uses 2×1 image tiles; screenshots saved in `docs/screens/TP.6/`; `npm run check` passes.
 

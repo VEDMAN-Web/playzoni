@@ -19,13 +19,16 @@ export interface GridGame {
   slug: string;
   featured?: boolean;
   badge?: BadgeKind;
+  previewVideo?: string;
+  screenshots?: string[];
 }
 export interface GridCategory {
   kind: 'category';
   slug: string;
   shortName: string;
   emoji: string;
-  count?: number;
+  /** Slug of the category's most popular game; its thumbnail is the tile picture (DESIGN §V2.8). */
+  imageSlug?: string;
 }
 export type GridItem = GridGame | GridCategory;
 
@@ -53,7 +56,7 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
   {placed.map((p, i) => (
     <div class={`cell cell-${p.size.toLowerCase()}`}>
       {p.item.kind === 'category' ? (
-        <CategoryTile slug={p.item.slug} shortName={p.item.shortName} emoji={p.item.emoji} />
+        <CategoryTile slug={p.item.slug} shortName={p.item.shortName} emoji={p.item.emoji} imageSlug={p.item.imageSlug} />
       ) : (
         <GameTile
           title={p.item.title}
@@ -62,6 +65,8 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
           eager={i < eagerCount}
           priority={priorityFirst && i === 0}
           badge={p.item.badge}
+          previewVideo={p.item.previewVideo}
+          screenshots={p.item.screenshots}
         />
       )}
     </div>

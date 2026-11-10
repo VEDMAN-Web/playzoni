@@ -27,6 +27,9 @@ const games = defineCollection({
     controls: z.object({ desktop: z.string(), mobile: z.string() }),
     featured: z.boolean().default(false),
     popularity: z.number(),
+    // Hover preview (DESIGN §V2.8). Optional: only games whose source gives a preview video or screenshots have them.
+    previewVideo: z.string().regex(/^\/thumbs\/[a-z0-9-]+\/[a-z0-9-]+\.(mp4|webm)$/).optional(),
+    screenshots: z.array(z.string().regex(/^\/thumbs\/[a-z0-9-]+\/[a-z0-9-]+\.(webp|jpg)$/)).max(4).optional(),
     status: z.enum(['draft', 'published']),
     faq: z.array(z.object({ q: z.string().min(1), a: z.string().min(1) })).max(5).default([]),
     sample: z.boolean().default(false),

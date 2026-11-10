@@ -28,6 +28,7 @@
 }
 
 .pz-tile {
+  position: relative;
   display: block;
   color: var(--c-ink);
   text-decoration: none;

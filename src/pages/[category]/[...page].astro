@@ -1,4 +1,6 @@
 ---
+import { popularSlugIn } from '../../lib/category-image';
+import { previewFields } from '../../lib/preview';
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
@@ -69,12 +71,14 @@ const gameItems: GridItem[] = pageGames.map((g) => ({
   title: g.data.title,
   slug: g.data.slug,
   featured: g.data.featured,
+  ...previewFields(g.data),
 }));
 const relatedCategoryItems: GridItem[] = [...(parent ? [parent] : []), ...children].map((c) => ({
   kind: 'category',
   slug: c.slug,
   shortName: c.shortName,
   emoji: c.emoji,
+  imageSlug: popularSlugIn(games, c.slug),
 }));
 const gridItems: GridItem[] =
   isFirst && gameItems.length > 30 && relatedCategoryItems.length > 0

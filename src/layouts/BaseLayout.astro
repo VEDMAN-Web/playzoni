@@ -58,7 +58,11 @@ const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
     <slot name="footer" />
     <script>
       import { startTileMotion } from '../lib/tile-motion';
+      import { startTilePreview } from '../lib/tile-preview';
+      import { applyPlayedBadges } from '../lib/played-badge';
       startTileMotion();
+      startTilePreview();
+      applyPlayedBadges();
     </script>
   </body>
 </html>

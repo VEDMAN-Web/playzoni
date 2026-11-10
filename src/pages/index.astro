@@ -1,4 +1,6 @@
 ---
+import { popularSlugIn } from '../lib/category-image';
+import { previewFields } from '../lib/preview';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -36,6 +38,7 @@ const gameItem = (g: (typeof games)[number]): GridItem => ({
   slug: g.data.slug,
   featured: g.data.featured,
   badge: badges.get(g.data.slug),
+  ...previewFields(g.data),
 });
 
 // Mosaic: up to 90 popular games. The nav categories go in after tile 36 (DESIGN §Category tile).
@@ -43,7 +46,7 @@ const mosaicGames: GridItem[] = byPopularity.slice(0, 90).map(gameItem);
 const navCategoryItems: GridItem[] = published
   .filter((c) => c.navOrder !== null)
   .sort((a, b) => (a.navOrder ?? 0) - (b.navOrder ?? 0))
-  .map((c) => ({ kind: 'category' as const, slug: c.slug, shortName: c.shortName, emoji: c.emoji }));
+  .map((c) => ({ kind: 'category' as const, slug: c.slug, shortName: c.shortName, emoji: c.emoji, imageSlug: popularSlugIn(games, c.slug) }));
 const mosaicItems: GridItem[] =
   mosaicGames.length > 36
     ? [...mosaicGames.slice(0, 36), ...navCategoryItems, ...mosaicGames.slice(36)]
@@ -71,6 +74,7 @@ const browseItems: GridItem[] = published.map((c) => ({
   slug: c.slug,
   shortName: c.shortName,
   emoji: c.emoji,
+  imageSlug: popularSlugIn(games, c.slug),
 }));
 
 // Popular categories list in the text block: one line each, taken from the category intro.
