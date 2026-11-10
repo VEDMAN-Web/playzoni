@@ -204,7 +204,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 ### T5.5 — Deploy
 - status: todo · deps: T3.5 · model: haiku
 - Do: write `docs/DEPLOY.md` (simple steps for Vedant: connect repo in Cloudflare Pages, build command `npm run build`, output `dist`, env vars, production branch `main`, preview branch `dev`; add domain playzoni.com; www → apex redirect rule). Put the steps in QUESTIONS as "Owner action needed". After owner confirms, verify preview URL works and record it in STATUS.
-- Done when: preview URL from `dev` loads; production waits for Vedant's merge.
+- Done when: preview URL from `dev` loads; production waits for Vedant's merge; the planner has re-run Lighthouse mobile on the preview (home, a category, a game page) and every number in SEO-PLAN §Performance is met, or a QUESTIONS entry explains the gap.
 
 ### T5.6 — Launch SEO
 - status: todo · deps: T5.4, T5.5 · model: haiku · docs: SEO-PLAN §Launch checklist

@@ -14,18 +14,6 @@ Answer: —
 
 ## Open
 
-### Q11 — Speed budget on the home and game pages   (T3.4 blocked, asked 11 Nov 2026, by build agent)
-Question: After the speed fixes, the home page scores 93 for performance (budget 95) and its largest image shows at about 2.6 s (budget 2.0 s). Car games and a game page show their largest image at 2.2–2.4 s. These numbers come from a test server on this computer, with placeholder images of about 4 KB. Should the budget be checked on the live Cloudflare Pages preview (needs Q3), or should the numbers be accepted for now?
-Options: A) Accept the local numbers, and check again on the Cloudflare preview in T5.5. (Build agent recommends this: placeholder images say little about real speed, and real thumbnails come in T4.1.) B) Keep working now on a lighter first image or font file, then measure again.
-Blocking: T3.4 (blocked), T3.5 (depends on T3.4)
-Answer: —
-
-### Q12 — Game title in the player bar on phones   (T3.4, asked 11 Nov 2026, by build agent)
-Question: On a 360 px phone the player bar holds five 44 px buttons (favourite, like, dislike, fullscreen, share). They fill the row, so the game title in the bar is squeezed to 0 px. Nothing overflows, but the title is hidden on the smallest phones. Which should we do?
-Options: A) Hide the title in the bar under 400 px; the page heading above still shows the game name. (Build agent recommends this.) B) Move Share and Fullscreen into a small "more" menu. C) Let the bar grow so the title can wrap onto a second line.
-Blocking: none
-Answer: —
-
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later
@@ -58,6 +46,19 @@ Blocking: T5.3
 Answer: —
 
 ## Answered
+
+### Q11 — Speed budget on the home and game pages   (T3.4 blocked, asked 11 Nov 2026, by build agent)
+Question: After the speed fixes, the home page scores 93 for performance (budget 95) and its largest image shows at about 2.6 s (budget 2.0 s). Car games and a game page show their largest image at 2.2–2.4 s. These numbers come from a test server on this computer, with placeholder images of about 4 KB. Should the budget be checked on the live Cloudflare Pages preview (needs Q3), or should the numbers be accepted for now?
+Options: A) Accept the local numbers, and check again on the Cloudflare preview in T5.5. (Build agent recommends this: placeholder images say little about real speed, and real thumbnails come in T4.1.) B) Keep working now on a lighter first image or font file, then measure again.
+Blocking: T3.4 (blocked), T3.5 (depends on T3.4)
+Answer (planner): A. Accept for now. T3.4 can be marked done once R11 items (2) and (3) are fixed. The speed budget is re-checked on the Cloudflare preview with real thumbnails (added to T5.5).
+
+### Q12 — Game title in the player bar on phones   (T3.4, asked 11 Nov 2026, by build agent)
+Question: On a 360 px phone the player bar holds five 44 px buttons (favourite, like, dislike, fullscreen, share). They fill the row, so the game title in the bar is squeezed to 0 px. Nothing overflows, but the title is hidden on the smallest phones. Which should we do?
+Options: A) Hide the title in the bar under 400 px; the page heading above still shows the game name. (Build agent recommends this.) B) Move Share and Fullscreen into a small "more" menu. C) Let the bar grow so the title can wrap onto a second line.
+Blocking: none
+Answer (planner): A. Hide the bar title below 400px; keep all five buttons.
+
 
 ### Q10 — Category page H1 and the nav spacer   (T2.3, asked 10 Nov 2026, by build agent)
 Question: PRD §5 says the H1 sits at the top of category pages, but DESIGN §Grid and §Header say the first grid item on a category page is the nav spacer (so tiles flow around the floating nav box). Both cannot be at the very top. I put the breadcrumbs and H1 above the grid, below the nav box, and left the spacer out on category pages. Is that right, or should the grid start with the spacer and the H1 move elsewhere?
