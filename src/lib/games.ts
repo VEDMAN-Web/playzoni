@@ -5,5 +5,9 @@ import { filterPublishedGames } from './games-core';
 // PUBLIC_INCLUDE_SAMPLES is 'true' (see CLAUDE.md and docs/PRD.md §4).
 export async function getPublishedGames() {
   const entries = await getCollection('games');
-  return filterPublishedGames(entries, import.meta.env.PUBLIC_INCLUDE_SAMPLES === 'true');
+  return filterPublishedGames(
+    entries,
+    import.meta.env.PUBLIC_INCLUDE_SAMPLES === 'true',
+    import.meta.env.PUBLIC_INCLUDE_DRAFTS === 'true',
+  );
 }

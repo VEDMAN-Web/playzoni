@@ -1,12 +1,14 @@
-// npm run publish -- --slugs a,b [--date 2026-11-11] [--staging data/staging] [--games-dir src/content/games] [--public-thumbs public/thumbs]
+// npm run publish -- --slugs a,b | --file data/launch-list.csv [--date 2026-11-11] [--staging data/staging] [--games-dir src/content/games] [--public-thumbs public/thumbs]
+// --file reads the `slug` column of a CSV. A slug that is not in staging is logged and skipped (T4.6).
 // Copies staged games into src/content/games as status: draft, with empty text fields for a human to fill,
 // and copies each game's images from <staging>/thumbs/<slug>/ into public/thumbs/<slug>/ (docs/TASKS.md T4.5, Q13).
 // Never overwrites a game page or an image folder, and never publishes: a draft builds no page (docs/PRD.md §10).
 
-import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from './import/args';
+import { columnValues } from './import/csv';
 import { readStagingGames, thumbsDirFor, type StagedFile } from './import/staging';
 import type { StagingGame } from './import/types';
 
@@ -25,6 +27,8 @@ export interface PublishOptions {
 
 export interface PublishResult {
   written: string[];
+  /** Slugs not in staging: logged and skipped, not an error. */
+  skipped: string[];
   problems: string[];
 }
 
@@ -72,11 +76,13 @@ export function draftMarkdown(game: StagingGame, date: string): string {
   return `${lines.join('\n')}\n`;
 }
 
+const NOT_STAGED = 'not in staging (run an import first)';
+
 // The four images the import makes for every game (docs/SEO-PLAN.md §Technical).
 export const IMAGE_FILES = ['s.webp', 'm.webp', 'l.webp', 'og.png'] as const;
 
 function problemsFor(slug: string, matches: StagedFile[], options: PublishOptions): string | null {
-  if (matches.length === 0) return `${slug}: not in staging (run an import first)`;
+  if (matches.length === 0) return `${slug}: ${NOT_STAGED}`;
   if (matches.length > 1) return `${slug}: found in more than one staging folder (${matches.map((m) => m.file).join(', ')})`;
   const [{ game }] = matches;
   if (game.categories.length === 0) return `${slug}: no category could be mapped; fix data/category-map.json first`;
@@ -91,11 +97,16 @@ function problemsFor(slug: string, matches: StagedFile[], options: PublishOption
 export function publishDrafts(options: PublishOptions): PublishResult {
   const staged = readStagingGames(options.stagingRoot, options.includeTestFolders);
   const written: string[] = [];
+  const skipped: string[] = [];
   const problems: string[] = [];
   mkdirSync(options.gamesDir, { recursive: true });
   for (const slug of [...new Set(options.slugs)]) {
     const matches = staged.filter((s) => s.game.slug === slug);
     const problem = problemsFor(slug, matches, options);
+    if (problem?.endsWith(NOT_STAGED)) {
+      skipped.push(`${slug}: not in staging`);
+      continue;
+    }
     if (problem) {
       problems.push(problem);
       continue;
@@ -107,7 +118,7 @@ export function publishDrafts(options: PublishOptions): PublishResult {
     writeFileSync(join(options.gamesDir, `${slug}.md`), draftMarkdown(matches[0].game, options.date), { flag: 'wx' });
     written.push(slug);
   }
-  return { written, problems };
+  return { written, skipped, problems };
 }
 
 export { parseArgs };
@@ -116,8 +127,9 @@ const todayIso = (): string => new Date().toISOString().slice(0, 10);
 
 function main(): void {
   const args = parseArgs(process.argv.slice(2));
-  const slugs = (args.slugs ?? '').split(',').map((s) => s.trim()).filter((s) => s !== '');
-  if (slugs.length === 0) throw new Error('usage: npm run publish -- --slugs a,b');
+  const fromFile = args.file ? columnValues(readFileSync(resolve(ROOT, args.file), 'utf8'), 'slug') : [];
+  const slugs = [...(args.slugs ?? '').split(',').map((s) => s.trim()).filter((s) => s !== ''), ...fromFile];
+  if (slugs.length === 0) throw new Error('usage: npm run publish -- --slugs a,b   or   --file data/launch-list.csv');
   const result = publishDrafts({
     slugs,
     stagingRoot: resolve(ROOT, args.staging ?? join('data', 'staging')),
@@ -126,8 +138,9 @@ function main(): void {
     date: args.date ?? todayIso(),
   });
   for (const slug of result.written) console.log(`draft written: src/content/games/${slug}.md, images in public/thumbs/${slug}/`);
+  for (const line of result.skipped) console.log(`skipped: ${line}`);
   for (const problem of result.problems) console.error(`not written: ${problem}`);
-  console.log(`publish: ${result.written.length} written, ${result.problems.length} not written`);
+  console.log(`publish: ${result.written.length} written, ${result.skipped.length} skipped (not in staging), ${result.problems.length} not written`);
   if (result.problems.length > 0) process.exit(1);
 }
 

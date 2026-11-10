@@ -47,6 +47,8 @@ const pages = htmlFiles(DIST);
 for (const file of pages) {
   const rel = relative(DIST, file).split(sep).join('/');
   const html = readFileSync(file, 'utf8');
+  // Draft preview pages (PUBLIC_INCLUDE_DRAFTS=true) are marked noindex,nofollow and may be unfinished: not checked.
+  if (/name="robots" content="noindex,nofollow"/.test(html)) continue;
   const add = (rule: string, detail: string): void => {
     errors.push(`dist/${rel}: ${rule}: ${detail}`);
   };

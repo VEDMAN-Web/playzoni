@@ -135,6 +135,7 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
       </nav>
 
       <h1 class="game-title" data-pagefind-meta={`image:/thumbs/${slug}/s.webp`}>{d.title}</h1>
+      {d.status === 'draft' && <span class="draft-badge">Draft</span>}
       <p class="intro">{d.intro}</p>
 
       <section class="text-card" aria-label="About this game">
@@ -196,6 +197,16 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
 </BaseLayout>
 
 <style>
+  .draft-badge {
+    display: inline-block;
+    margin-left: var(--s-2);
+    padding: 2px var(--s-2);
+    border-radius: var(--r-pill);
+    background: var(--c-accent);
+    color: var(--c-ink);
+    font: var(--t-small);
+    vertical-align: middle;
+  }
   .game-layout {
     display: block;
     max-width: 1440px;

@@ -11,9 +11,12 @@ interface Props {
 
 const { title, description, canonicalPath, ogImage = '/og/default.png', noindex = false } = Astro.props;
 
+// The owner's draft preview: every page is hidden from search engines (docs/TASKS.md T4.6).
+const draftPreview = import.meta.env.PUBLIC_INCLUDE_DRAFTS === 'true';
 // Build fails here if a page breaks the length rules (docs/SEO-PLAN.md §Templates).
+// Draft preview pages are noindex and may still have no text yet (docs/TASKS.md T4.6), so the description rule is not applied there.
 assertTitle(title);
-assertDescription(description);
+if (!draftPreview) assertDescription(description);
 
 const canonical = canonicalUrl(canonicalPath);
 const image = new URL(ogImage, 'https://playzoni.com').toString();
@@ -21,7 +24,7 @@ const image = new URL(ogImage, 'https://playzoni.com').toString();
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
-{noindex ? <meta name="robots" content="noindex,follow" /> : null}
+{draftPreview ? <meta name="robots" content="noindex,nofollow" /> : noindex ? <meta name="robots" content="noindex,follow" /> : null}
 <meta property="og:site_name" content={SITE_NAME} />
 <meta property="og:type" content="website" />
 <meta property="og:title" content={title} />

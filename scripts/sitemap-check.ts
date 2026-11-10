@@ -37,7 +37,8 @@ const noindexPaths = new Set<string>();
 const indexablePaths = new Set<string>();
 for (const file of htmlFiles(DIST)) {
   const path = urlPathFor(file);
-  if (isNoindex(readFileSync(file, 'utf8'))) noindexPaths.add(path);
+  const html = readFileSync(file, 'utf8');
+  if (isNoindex(html)) noindexPaths.add(path);
   else indexablePaths.add(path);
 }
 

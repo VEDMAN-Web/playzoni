@@ -63,7 +63,8 @@ function testPublish(tmp: string): void {
   same(result.written, ['zorp-blaster'], 'only the clean game is written');
   expect(result.problems.some((p) => p.startsWith('no-cats: no category')), `no-category game is refused: ${result.problems.join(' | ')}`);
   expect(result.problems.some((p) => p.startsWith('exists-already: a game page already exists')), 'existing game page is not overwritten');
-  expect(result.problems.some((p) => p.startsWith('missing: not in staging')), 'unknown slug is reported');
+  expect(result.skipped.some((p) => p.startsWith('missing: not in staging')), 'an unknown slug is skipped and logged');
+  expect(!result.problems.some((p) => p.startsWith('missing:')), 'an unknown slug is not an error');
   expect(result.problems.some((p) => p.startsWith('bare: images missing') && p.includes('s.webp')), `a game with no images is refused: ${result.problems.join(' | ')}`);
   expect(result.problems.some((p) => p.startsWith('exists-img: public/thumbs/exists-img already exists')), 'an existing public image folder is not overwritten');
   expect(!existsSync(join(games, 'bare.md')) && !existsSync(join(publicThumbs, 'bare')), 'a refused game leaves no page and no images');
