@@ -225,6 +225,16 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Do: `docs/QA-GUIDE.md` in very simple English (team members fill it): how to open a draft game on the preview, what to check on phone and desktop, how to fill `data/qa/<slug>.json` (with one filled example), when to mark a game "reject". Add `npm run qa:new -- <slug>` that creates the empty JSON from the template.
 - Done when: guide ≤ 1 page, example valid against a zod schema used by validate.
 
+### T5.1b — Play modes (local 2-player, online, invite link)
+- status: todo · deps: T5.1 · model: haiku · docs: SEO-PLAN §Schema, DESIGN §Content blocks
+- Do:
+  1. QA notes schema (`scripts/qa/schema.ts`) gets a required `playModes` object: `localTwoPlayer` (two people on one screen/keyboard), `onlineMultiplayer` (plays with other people over the internet), `inviteLink` (the game itself lets you invite a friend with a link or room code) — each `true`/`false`. Update `npm run qa:new` template, the example, and `docs/QA-GUIDE.md` with one plain sentence per question ("Open the game's menu. Is there a 2 Players or Local button? …").
+  2. Game frontmatter gets the same optional `playModes` (copied from the QA file when the game page is written).
+  3. Game page: under the player bar, show small pill labels only for `true` values: "2 players on one keyboard", "Play online", "Invite a friend". Add an info-table row "Play modes".
+  4. JSON-LD `VideoGame`: add `playMode` — `SinglePlayer` always, plus `MultiPlayer` if local or online is true, `CoOp` only if the QA notes say so (skip otherwise).
+  5. Category rule in `validate` (published games only, drafts exempt): a game may be in `two-player-games` only if `localTwoPlayer` or `inviteLink` is true; in `multiplayer-games` or `io-games` only if `onlineMultiplayer` is true. Report violations as errors.
+- Done when: `npm run check` passes; a test QA file with all three true shows all three pills; validate catches a wrong 2-player category.
+
 ### T5.2 — Category texts
 - status: todo · deps: T4.5 · model: haiku · docs: SEO-PLAN §Content
 - Do: write `src/content/categories/<slug>.md` for every category with ≥ 12 published real games, using only published games in "Top" sections. Repeatable task: run again whenever a category reaches 12.
