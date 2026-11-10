@@ -1,0 +1,45 @@
+{
+  "name": "playzoni",
+  "version": "1.0.0",
+  "description": "Playzoni — free browser games (playzoni.com)",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "lint": "eslint .",
+    "validate": "tsx scripts/validate.ts",
+    "check": "astro check && npm run lint && npm run validate && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VEDMAN-Web/playzoni.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/VEDMAN-Web/playzoni/issues"
+  },
+  "homepage": "https://github.com/VEDMAN-Web/playzoni#readme",
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/nunito": "^5.3.0",
+    "@tailwindcss/vite": "^4.3.5",
+    "astro": "^7.4.8",
+    "tailwindcss": "^4.3.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "prettier": "^3.9.10",
+    "prettier-plugin-astro": "^1.1.2",
+    "sharp": "^0.35.5",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.2"
+  },
+  "private": true
+}
