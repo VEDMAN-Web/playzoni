@@ -5,14 +5,15 @@ Updated by the build agent after every task. The reviewer reads this first.
 - Last updated: 10 Nov 2026
 - Phase: 1
 - Preview URL: — (after T5.5)
-- Next task: T1.2
+- Next task: T1.3
 
 ## Current task
-(none — T1.1 finished)
+(none — T1.2 finished)
 
 ## Log (newest first)
 | Date | Task | What changed (files) | How verified | Left open |
 |---|---|---|---|---|
+| 10 Nov 2026 | T1.2 | src/content.config.ts (games schema from PRD §4 + `sample`; categories collection); data/categories.json (38 categories from SEO-PLAN, navOrder 1–12, original description 120–155 chars and 2-sentence intro); src/lib/games-core.ts (pure filter) and src/lib/games.ts (`getPublishedGames()`); scripts/make-placeholders.ts + `npm run placeholders`; 24 sample games in src/content/games/sample-game-01…24.md; public/thumbs/sample-game-NN/{s,m,l}.webp; public/sample-game.html | `npm run check` exit 0 (0 errors, 0 warnings, 0 hints, validate ok); category counts: action-games 12, car-games 12, puzzle-games 24, every nav category ≥ 2; temp page: `getPublishedGames()` returns 24 with PUBLIC_INCLUDE_SAMPLES=true and 0 without (page then removed); categories.json: all 38 descriptions 120–155 chars, no duplicates, all parents exist | Build log shows a glob warning "no files in src/content/categories" until T2.3 adds the first category text. Samples are placeholders and must not reach production (T5.4). |
 | 10 Nov 2026 | R4 (spacing names), R5 (STATUS top lines) | R4: global.css spacing tokens renamed to `--spacing-s1`…`s8` (e14b084), so utilities are `p-s1`…`p-s8`; verified `.p-s5` builds to `var(--s-5)`. R5: STATUS Phase set to 1 and Next task to T1.2; no duplicate heading existed (already fixed in 3bb7042) | `npm run check` exit 0; `grep -c "Log (newest first)"` = 1 | none |
 | 10 Nov 2026 | R1, R2, R3 (review items) | package.json `"type": "module"` (8dd6730); STATUS heading fix (3bb7042); rebased onto planner commit e25ba02 | `npm run check` exit 0 after the ES module change | none |
 | 10 Nov 2026 | T1.1 | src/styles/tokens.css (every DESIGN token; type tokens are font shorthands `--t-h1` etc., responsive H1 at 768px, gutter/cell/gap by breakpoint); src/styles/global.css (font import, Tailwind v4 `@theme inline` mapping of colours, spacing, radius, shadow; body base, focus ring, link styles, reduced-motion rule); src/pages/index.astro imports global.css | `npm run check` exit 0 (0 errors, 0 warnings, 0 hints, validate ok, build complete); grep: no hex colour outside tokens.css; every `--name` in DESIGN exists in tokens.css | Tailwind's default `font-sans` utility is not remapped (a self-referencing mapping broke the build and was removed). Body and type tokens use `--font-sans` from tokens.css. No visual check yet (placeholder page; the 4-width check belongs to UI tasks). |

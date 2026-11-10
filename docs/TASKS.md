@@ -43,7 +43,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: every token name in DESIGN exists in tokens.css with the exact value; no hex colours anywhere else in `src/` (grep check).
 
 ### T1.2 — Content schemas, taxonomy and sample data
-- status: todo · deps: T1.1 · model: haiku · docs: PRD §4, SEO-PLAN §Categories §Templates §Content
+- status: done · deps: T1.1 · model: haiku · docs: PRD §4, SEO-PLAN §Categories §Templates §Content
 - Do:
   1. `src/content.config.ts`: `games` collection with every field in PRD §4 plus `sample: boolean` (default false). `categories` collection for `src/content/categories/*.md` (body only, slug = filename).
   2. `data/categories.json`: all categories from SEO-PLAN §Categories with `slug,name,h1,shortName,parent,navOrder,description,intro`. `navOrder` 1–12 for the nav list, null otherwise. Write `description` (120–155 chars) and `intro` (2 sentences) originally for each, following §Templates rules.

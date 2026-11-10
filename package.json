@@ -11,7 +11,8 @@
     "preview": "astro preview",
     "lint": "eslint .",
     "validate": "tsx scripts/validate.ts",
-    "check": "astro check && npm run lint && npm run validate && npm run build"
+    "check": "astro check && npm run lint && npm run validate && npm run build",
+    "placeholders": "tsx scripts/make-placeholders.ts"
   },
   "repository": {
     "type": "git",
