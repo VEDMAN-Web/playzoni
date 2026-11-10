@@ -178,6 +178,16 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Do: change the T4.1 import so thumbnails and og images go to `data/staging/thumbs/<slug>/` (gitignored). `npm run publish -- --slugs a,b` copies staging → `src/content/games/<slug>.md` as `status: draft` with fields filled from staging, empty text fields, **and copies that game's images into `public/thumbs/<slug>/`**. Game page uses `ogImage=/thumbs/<slug>/og.png` when the file exists, else the default (Q13). `npm run shortlist`: takes all staging games and writes `docs/seo-research/game-candidates.csv` (`slug,title,source,mobile,categories,providerRank`) sorted by the provider's own popularity order (mobile-ready first). Leave space for a `volume` column; it is filled later by the owner's SEO team from Google Keyword Planner. Owner picks the launch 300 from this file.
 - Done when: both commands work on sample staging data.
 
+### T4.6 — Launch list as drafts + draft preview (so the owner can see and play)
+- status: todo · deps: T4.5 · model: haiku · docs: PRD §4 §10, SEO-PLAN §Technical
+- Do:
+  1. `npm run publish -- --file data/launch-list.csv` publishes every slug in that CSV as `status: draft` (same as `--slugs`, reading the `slug` column). Skip and log any slug not found in staging.
+  2. Add a preview mode: when `PUBLIC_INCLUDE_DRAFTS=true`, draft games are built like published games, show a small "Draft" badge on the game page, and **every page** gets `noindex,nofollow`. Draft games count towards the 12-game rule in this mode only.
+  3. Safety: the production build must never include drafts. Fail the build if `PUBLIC_INCLUDE_DRAFTS=true` and `CF_PAGES_BRANCH=main`. Add `PUBLIC_INCLUDE_DRAFTS` to `.env.example` (empty).
+  4. Content checks (word counts, QA file, feed overlap) skip drafts; schema and link checks still run.
+  5. Build with drafts on, run `npm run preview`, and play one Playgama game and one GameMonetize game to the first level (check the CSP `frame-src` allows their real embed host; fix `src/lib/providers.ts` if not).
+- Done when: `npm run check` passes with drafts off; with drafts on the home page shows the real games, categories with 12+ games appear, both test games play on desktop and phone width. Tell Vedant in plain words: "Open http://localhost:4321 while the preview is running."
+
 ---
 ## Phase 5 — Content and launch
 
