@@ -25,7 +25,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: `graphify-out/GRAPH_REPORT.md` exists and is committed.
 
 ### T0.3 — Category keyword data
-- status: blocked (Q8) · deps: T0.1 · model: haiku · docs: SEO-PLAN §Categories §Strategy
+- status: skipped (Q8 answer C — volumes come later from Search Console / Keyword Planner) · deps: T0.1 · model: haiku · docs: SEO-PLAN §Categories §Strategy
 - Do: with the installed SEO keyword-research skill, get monthly search volume and keyword difficulty for every category name in SEO-PLAN §Categories, in **United States** and **India**, plus these modifiers for the 12 nav categories: "`<name>` online", "`<name>` free", "`<name>` for mobile". If the skill needs a paid API key you don't have → QUESTIONS (do not invent numbers). Save `docs/seo-research/category-keywords.csv` with columns `keyword,country,volume,difficulty,source,date`.
 - Done when: CSV has one row per keyword × country, every number came from the tool, `source` names the tool.
 
@@ -165,7 +165,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 
 ### T4.5 — Publish script and launch shortlist
 - status: todo · deps: T4.1 · model: haiku · docs: PRD §10, SEO-PLAN §Strategy
-- Do: `npm run publish -- --slugs a,b` copies staging → `src/content/games/<slug>.md` as `status: draft` with fields filled from staging, empty text fields. `npm run shortlist`: takes all staging games, gets US + India search volume for "`<title>`" and "`<title>` online" with the SEO keyword skill (batched; if no API → QUESTIONS), and writes `docs/seo-research/game-candidates.csv` (`slug,title,source,mobile,categories,volume_us,volume_in,difficulty`) sorted by volume. Owner picks the launch 300 from this file.
+- Do: `npm run publish -- --slugs a,b` copies staging → `src/content/games/<slug>.md` as `status: draft` with fields filled from staging, empty text fields. `npm run shortlist`: takes all staging games and writes `docs/seo-research/game-candidates.csv` (`slug,title,source,mobile,categories,providerRank`) sorted by the provider's own popularity order (mobile-ready first). Leave space for a `volume` column; it is filled later by the owner's SEO team from Google Keyword Planner. Owner picks the launch 300 from this file.
 - Done when: both commands work on sample staging data.
 
 ---

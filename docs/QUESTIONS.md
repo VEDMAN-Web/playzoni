@@ -14,24 +14,6 @@ Answer: —
 
 ## Open
 
-### Q8 — Keyword and search-results tool   (T0.3 blocked, T0.4 partly done, asked 10 Nov 2026, by build agent)
-Question: T0.3 needs real monthly search volume and difficulty for US and India, and T0.4 needs real Google top-10 results. No keyword tool is set up. The START-HERE guide suggests the "Open SEO keyword-research" skill, but I could not find it on npm, and I will not invent numbers. The web search tool I have only gives a list of links in its own order, so the T0.4 tables are research-only (see docs/seo-research/serp-snapshot.md).
-Options: A) Set up a keyword tool with an account you already have (tell me which one, and how to give me the key via .env) B) Pay for a DataForSEO account (pay-as-you-go, you approve the cost first) C) Skip volumes for now and build without them (T0.3 stays blocked; Phase 1 can continue)
-Blocking: T0.3, and any later task that uses search volume (T4.5 shortlist)
-Answer: —
-
-### Q7 — Five doc conflicts found by the graph   (T0.2, asked 10 Nov 2026, by build agent)
-Question: The graph extraction found places where our docs disagree. Which version should the build follow?
-(1) Game tile size L: PRD §6 says 2x2, DESIGN §Game tile says 3x3 (and M is 2x2). Blocks T2.1.
-(2) Favourites in header: PRD §8 says the icon opens a drawer; TASKS T1.5 says it links to /favourites. Blocks T1.5.
-(3) Heart button: TASKS T2.6 puts a favourite heart in the player bar; DESIGN §Player does not list one. Blocks T2.6.
-(4) Tailwind: PRD §2 says "official Astro integration". T0.1 used `@tailwindcss/vite` (Tailwind's own Vite plugin, which is what Astro now recommends; the older `@astrojs/tailwind` is deprecated). Please confirm this is fine. No blocker.
-(5) Search: robots.txt disallows /search, so Google never sees the noindex on /search. Should we keep the Disallow or drop it? Blocks T3.1.
-Also: PRD §6 cites "SEO-PLAN §Home", which does not exist (no blocker).
-Options: for each item, the doc you want followed.
-Blocking: T1.1 (none directly), T1.5, T2.1, T2.6, T3.1 — see items above
-Answer: —
-
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later
@@ -64,4 +46,23 @@ Blocking: T5.3
 Answer: —
 
 ## Answered
-(none yet)
+
+### Q8 — Keyword and search-results tool   (T0.3 blocked, T0.4 partly done, asked 10 Nov 2026, by build agent)
+Question: T0.3 needs real monthly search volume and difficulty for US and India, and T0.4 needs real Google top-10 results. No keyword tool is set up. The START-HERE guide suggests the "Open SEO keyword-research" skill, but I could not find it on npm, and I will not invent numbers. The web search tool I have only gives a list of links in its own order, so the T0.4 tables are research-only (see docs/seo-research/serp-snapshot.md).
+Options: A) Set up a keyword tool with an account you already have (tell me which one, and how to give me the key via .env) B) Pay for a DataForSEO account (pay-as-you-go, you approve the cost first) C) Skip volumes for now and build without them (T0.3 stays blocked; Phase 1 can continue)
+Blocking: T0.3, and any later task that uses search volume (T4.5 shortlist)
+Answer (planner, 10 Nov 2026): C. Paid keyword tools are not worth it before launch. T0.3 is skipped. T0.4 snapshot stays as research only. T4.5 now sorts by provider popularity; search volumes come later from Google Keyword Planner and Search Console (owner's SEO team).
+
+### Q7 — Five doc conflicts found by the graph   (T0.2, asked 10 Nov 2026, by build agent)
+Question: The graph extraction found places where our docs disagree. Which version should the build follow?
+(1) Game tile size L: PRD §6 says 2x2, DESIGN §Game tile says 3x3 (and M is 2x2). Blocks T2.1.
+(2) Favourites in header: PRD §8 says the icon opens a drawer; TASKS T1.5 says it links to /favourites. Blocks T1.5.
+(3) Heart button: TASKS T2.6 puts a favourite heart in the player bar; DESIGN §Player does not list one. Blocks T2.6.
+(4) Tailwind: PRD §2 says "official Astro integration". T0.1 used `@tailwindcss/vite` (Tailwind's own Vite plugin, which is what Astro now recommends; the older `@astrojs/tailwind` is deprecated). Please confirm this is fine. No blocker.
+(5) Search: robots.txt disallows /search, so Google never sees the noindex on /search. Should we keep the Disallow or drop it? Blocks T3.1.
+Also: PRD §6 cites "SEO-PLAN §Home", which does not exist (no blocker).
+Options: for each item, the doc you want followed.
+Blocking: T1.1 (none directly), T1.5, T2.1, T2.6, T3.1 — see items above
+Answer (planner, 10 Nov 2026): (1) Follow DESIGN: S 1×1, M 2×2, L 3×3 — PRD fixed. (2) Heart links to /favourites, no drawer — PRD fixed. (3) Yes, heart in the player bar — DESIGN fixed. (4) @tailwindcss/vite approved — PRD fixed. (5) Good catch: `Disallow: /search` removed from SEO-PLAN; keep `Disallow: /*?` and noindex on /search. PRD §6 reference fixed.
+
+

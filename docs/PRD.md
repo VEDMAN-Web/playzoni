@@ -13,7 +13,7 @@ Reference model: Poki.com (structure only — see `CLAUDE.md` "Never"). Poki wor
 | Layer | Choice | Why |
 |---|---|---|
 | Framework | Astro (latest stable, check with `npm view astro version`), TypeScript strict | Static pages, near-zero JS, best Core Web Vitals |
-| Styling | Tailwind CSS (latest stable, official Astro integration) | Fast, consistent, tokens via CSS variables |
+| Styling | Tailwind CSS (latest stable, official Vite plugin `@tailwindcss/vite`) | Fast, consistent, tokens via CSS variables |
 | Font | `@fontsource-variable/nunito` (self-hosted) | One variable font, no Google Fonts request |
 | Content | Astro content collections + zod schemas | Typed game/category data, build fails on bad data |
 | Search | Pagefind (`pagefind` devDependency) | Static search index, no server |
@@ -108,11 +108,11 @@ Phase 3 (later, not MVP): language versions `/hi/`, `/es/`, `/pt/`, `/id/`… wi
 
 ## 6. Home page (top to bottom)
 1. Header (see §8).
-2. **Mosaic grid**: 60–90 tiles mixing sizes — L (2×2) for featured, M for popular, S for the rest. Dense packing, no gaps (`grid-auto-flow: dense`).
+2. **Mosaic grid**: 60–90 tiles mixing sizes — L (3×3) for featured, M for popular, S for the rest. Dense packing, no gaps (`grid-auto-flow: dense`).
 3. "Recently played" row (only if the visitor has history; client-side, localStorage). Hidden otherwise — no layout shift: render it after the mosaic, not above.
 4. Rows: Popular games, New games, then one row per top-8 category (15 tiles each + "See all" link).
 5. "Browse by category" tile list (all categories).
-6. SEO text block (H1 + content from `SEO-PLAN` §Home). The H1 is visually in this block, not at the top.
+6. SEO text block (H1 + content from `TASKS.md` T2.2). The H1 is visually in this block, not at the top.
 7. Footer.
 
 ## 7. Game page (top to bottom)
@@ -133,7 +133,7 @@ Phase 3 (later, not MVP): language versions `/hi/`, `/es/`, `/pt/`, `/id/`… wi
 10. Footer.
 
 ## 8. Header and footer
-- Header (sticky, 64px desktop / 56px mobile): logo (left), search field (desktop) / search icon (mobile, opens overlay), category nav (12 main categories, horizontal scroll on mobile), "Favourites" icon (opens favourites drawer, localStorage).
+- Header (sticky, 64px desktop / 56px mobile): logo (left), search field (desktop) / search icon (mobile, opens overlay), category nav (12 main categories, horizontal scroll on mobile), "Favourites" icon (links to `/favourites`).
 - Footer: logo + one-line tagline, Popular categories (8 links), All games, New, Popular, About, For developers, Contact, Privacy, Terms, Cookies, © year SparkBeta Tech.
 
 ## 9. Components (build these, reuse everywhere)

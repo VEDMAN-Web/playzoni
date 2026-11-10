@@ -13,6 +13,7 @@ Owner: Vedant Paliwal (SparkBeta Tech). He is non-technical. Any message you wri
 6. If `graphify-out/GRAPH_REPORT.md` exists, read it before searching files.
 
 ## How to do one task (follow every step)
+0. **Sync**: `git pull --rebase origin dev` (the reviewer also pushes to `dev`). If it conflicts, stop and ask.
 1. **Plan first** (Karpathy guidelines): write a 3–6 line plan under "Current task" in `docs/STATUS.md`: what you will change, which files, how you will verify. Keep it the simplest thing that meets the acceptance criteria.
 2. **Build** only what the task says. Surgical changes. Touch only files the task needs.
 3. **Verify**: run `npm run check` (must pass with zero errors). Then check every acceptance criterion in the task, one by one. UI tasks: check at 360px, 390px, 768px and 1280px widths — nothing overflows, nothing is cut off, tap targets ≥ 44px.

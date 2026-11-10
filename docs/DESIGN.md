@@ -67,7 +67,7 @@ Height 56px mobile / 64px ≥768, `--c-surface`, bottom border `--c-line`, stick
 ## §Player
 - Container background `--c-player-bg`, radius `--r-player`, aspect from game (`landscape` 16:9, `portrait` 9:16 with max-height `calc(100vh - 160px)`, `square` 1:1). Max width 1100px.
 - Cover state: blurred, darkened `l` thumbnail as background; centred `m` thumbnail (radius 20), title (`--t-h2`, white), and the Play button: pill, `--c-primary`, white 20px 800 text "Play", 56px tall, min 180px wide, play icon left, gentle pulse animation (off with reduced motion).
-- Bar under player: 56px, `--c-surface`, rounded bottom corners. Left: 40px icon + title (700) + developer (`--c-ink-2`). Right: icon buttons 44×44 — like, dislike, fullscreen, share, report (flag). Tooltips via `title` + `aria-label`.
+- Bar under player: 56px, `--c-surface`, rounded bottom corners. Left: 40px icon + title (700) + developer (`--c-ink-2`). Right: icon buttons 44×44 — favourite (heart), like, dislike, fullscreen, share, report (flag). Tooltips via `title` + `aria-label`.
 - Mobile overlay (<768): fixed, inset 0, z-index top, black background, iframe fills it (safe-area insets), close button top-right 44×44 with white × on 50% black circle.
 
 ## §Content blocks
