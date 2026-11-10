@@ -19,19 +19,19 @@ const file = size === 'S' ? 's' : 'm';
 const px = size === 'S' ? 150 : size === 'M' ? 300 : 600;
 const srcset = size === 'S' ? `/thumbs/${slug}/s.webp 1x, /thumbs/${slug}/m.webp 2x` : `/thumbs/${slug}/m.webp 1x, /thumbs/${slug}/l.webp 2x`;
 ---
-<a class={`tile tile-${size.toLowerCase()}`} href={`/game/${slug}`} aria-label={title}>
+<a class={`tile tile-${size.toLowerCase()}`} href={`/game/${slug}`}>
   <img
     src={`/thumbs/${slug}/${file}.webp`}
     srcset={srcset}
     width={px}
     height={px}
-    alt={title}
+    alt=""
     loading={eager ? 'eager' : 'lazy'}
     decoding="async"
     fetchpriority={priority ? 'high' : undefined}
   />
   {badge && <span class={`badge badge-${badge.toLowerCase()}`}>{badge}</span>}
-  <span class="overlay" aria-hidden="true">{title}</span>
+  <span class="overlay">{title}</span>
   {rowTitle && <span class="row-title">{title}</span>}
 </a>
 
