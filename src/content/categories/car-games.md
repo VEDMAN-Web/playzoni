@@ -18,11 +18,11 @@ Car games vary a lot. Some are fast arcade races with boosts, tight corners and 
 
 <!-- replace in T5.2: these are sample games for layout testing, not real recommendations -->
 
-- [Sample Game 13](/game/sample-game-13): a short placeholder for checking how a game page looks.
-- [Sample Game 14](/game/sample-game-14): another placeholder, used to check the grid and tiles.
-- [Sample Game 15](/game/sample-game-15): a placeholder with a portrait layout.
-- [Sample Game 16](/game/sample-game-16): a placeholder for testing related games.
-- [Sample Game 17](/game/sample-game-17): a placeholder for checking the player.
+- Sample Game 13: a short placeholder for checking how a game page looks.
+- Sample Game 14: another placeholder, used to check the grid and tiles.
+- Sample Game 15: a placeholder with a portrait layout.
+- Sample Game 16: a placeholder for testing related games.
+- Sample Game 17: a placeholder for checking the player.
 
 ## Types of car games
 

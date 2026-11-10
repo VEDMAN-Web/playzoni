@@ -138,7 +138,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: `npx wrangler pages dev dist` (dev-only, via npx) serves pages with headers; sample game still plays (CSP allows it).
 
 ### T3.3 — Full content validator
-- status: todo · deps: T2.4, T2.3 · model: **sonnet** · docs: SEO-PLAN §Content "Validate checks"
+- status: done · deps: T2.4, T2.3 · model: **sonnet** · docs: SEO-PLAN §Content "Validate checks"
 - Do: implement every check in the list in `scripts/validate.ts`, with clear one-line errors (`file: rule: detail`). Samples are exempt from QA-file, word-count and feed-overlap checks only. Link checker runs on `dist/` after build (so `check` runs validate-links after build).
 - Done when: a deliberately broken copy of a sample game (in a temp test) fails with the right messages; real build passes.
 

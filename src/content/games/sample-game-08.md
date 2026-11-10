@@ -32,4 +32,26 @@ faq:
 sample: true
 ---
 
-Sample Game 08 is a placeholder page for testing the site.
+## How to play Sample Game 08
+
+This is a placeholder game used to test the site. Click or tap the ball to make it bounce.
+
+### Controls
+
+- Desktop: click the ball to bounce it.
+- Mobile: tap the screen to bounce the ball.
+
+## Tips for Sample Game 08
+
+- This game is not real, so there is nothing to win.
+- Use it to check how pages look on a phone and on a desktop.
+
+## Features
+
+### Test page
+
+A simple bouncing ball that loads from this site.
+
+## Games like Sample Game 08
+
+Other sample games are listed under More games like this.
