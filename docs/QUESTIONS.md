@@ -14,6 +14,18 @@ Answer: —
 
 ## Open
 
+### Q7 — Five doc conflicts found by the graph   (T0.2, asked 10 Nov 2026, by build agent)
+Question: The graph extraction found places where our docs disagree. Which version should the build follow?
+(1) Game tile size L: PRD §6 says 2x2, DESIGN §Game tile says 3x3 (and M is 2x2). Blocks T2.1.
+(2) Favourites in header: PRD §8 says the icon opens a drawer; TASKS T1.5 says it links to /favourites. Blocks T1.5.
+(3) Heart button: TASKS T2.6 puts a favourite heart in the player bar; DESIGN §Player does not list one. Blocks T2.6.
+(4) Tailwind: PRD §2 says "official Astro integration". T0.1 used `@tailwindcss/vite` (Tailwind's own Vite plugin, which is what Astro now recommends; the older `@astrojs/tailwind` is deprecated). Please confirm this is fine. No blocker.
+(5) Search: robots.txt disallows /search, so Google never sees the noindex on /search. Should we keep the Disallow or drop it? Blocks T3.1.
+Also: PRD §6 cites "SEO-PLAN §Home", which does not exist (no blocker).
+Options: for each item, the doc you want followed.
+Blocking: T1.1 (none directly), T1.5, T2.1, T2.6, T3.1 — see items above
+Answer: —
+
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later

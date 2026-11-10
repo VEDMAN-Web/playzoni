@@ -20,7 +20,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: `npm run check` passes; `dev` is pushed and `main` still has only the README commit; `README.md` has 5 lines: what it is, `npm install`, `npm run dev`, `npm run check`, "see docs/".
 
 ### T0.2 — Knowledge graph
-- status: todo · deps: T0.1 · model: haiku
+- status: done · deps: T0.1 · model: haiku
 - Do: run `/graphify .` and `graphify claude install` (project scope). Commit `graphify-out/GRAPH_REPORT.md` only.
 - Done when: `graphify-out/GRAPH_REPORT.md` exists and is committed.
 
