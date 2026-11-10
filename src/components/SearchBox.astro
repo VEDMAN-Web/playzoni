@@ -1,0 +1,144 @@
+---
+// Search. Works without JavaScript: the form submits to /search, and on mobile the icon links there.
+// With JavaScript, the mobile icon opens a full-screen overlay instead.
+---
+<form class="search-desktop" role="search" action="/search" method="get">
+  <label class="sr-only" for="search-desktop-input">Search games</label>
+  <span class="search-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="20" height="20"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" /><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+  </span>
+  <input id="search-desktop-input" class="search-input" type="search" name="q" placeholder="Search games" autocomplete="off" />
+</form>
+
+<a class="icon-btn search-toggle" href="/search" aria-label="Search games" data-search-toggle>
+  <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" /><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+</a>
+
+<div class="search-overlay" data-search-overlay hidden role="dialog" aria-modal="true" aria-label="Search games">
+  <form class="search-overlay-form" action="/search" method="get">
+    <label class="sr-only" for="search-mobile-input">Search games</label>
+    <input id="search-mobile-input" class="search-input" type="search" name="q" placeholder="Search games" autocomplete="off" />
+    <button class="icon-btn" type="button" aria-label="Close search" data-search-close>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+    </button>
+  </form>
+</div>
+
+<style>
+  .search-desktop {
+    display: none;
+    position: relative;
+    flex: 1;
+    max-width: 420px;
+    margin-left: auto;
+  }
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--c-ink-2);
+    display: inline-flex;
+    pointer-events: none;
+  }
+  .search-input {
+    width: 100%;
+    height: 44px;
+    box-sizing: border-box;
+    padding: 0 16px 0 44px;
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-pill);
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font: var(--t-body);
+  }
+  .search-input::placeholder {
+    color: var(--c-ink-2);
+  }
+  .icon-btn {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-pill);
+    color: var(--c-ink);
+    text-decoration: none;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  .icon-btn:hover {
+    color: var(--c-primary);
+    text-decoration: none;
+  }
+  .search-toggle {
+    margin-left: auto;
+  }
+  .search-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: var(--c-surface);
+    padding: var(--gutter);
+  }
+  .search-overlay[hidden] {
+    display: none;
+  }
+  .search-overlay-form {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    max-width: 640px;
+    margin: 0 auto;
+    padding-top: var(--s-2);
+  }
+  .search-overlay-form .search-input {
+    flex: 1;
+    padding-left: 16px;
+  }
+  @media (min-width: 768px) {
+    .search-desktop {
+      display: flex;
+      align-items: center;
+    }
+    .search-toggle {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Mobile search overlay. Plain DOM code; the page works without it.
+  const toggle = document.querySelector<HTMLAnchorElement>('[data-search-toggle]');
+  const overlay = document.querySelector<HTMLElement>('[data-search-overlay]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-search-close]');
+  const input = document.getElementById('search-mobile-input') as HTMLInputElement | null;
+
+  function openOverlay(): void {
+    if (!overlay) return;
+    overlay.hidden = false;
+    input?.focus();
+  }
+
+  function closeOverlay(): void {
+    if (!overlay) return;
+    overlay.hidden = true;
+    toggle?.focus();
+  }
+
+  if (toggle && overlay) {
+    toggle.addEventListener('click', (event: MouseEvent) => {
+      // Only the mobile icon opens the overlay; on desktop it is hidden.
+      if (window.matchMedia('(min-width: 768px)').matches) return;
+      event.preventDefault();
+      openOverlay();
+    });
+  }
+  closeBtn?.addEventListener('click', closeOverlay);
+  document.addEventListener('keydown', (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && overlay && !overlay.hidden) closeOverlay();
+  });
+</script>

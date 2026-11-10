@@ -1,10 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 
 const title = 'Playzoni — Play Free Online Games Instantly';
 const description =
   'Play free online games instantly on Playzoni. No download and no sign-up needed. Browse action, car, puzzle, sports and more browser games.';
 ---
 <BaseLayout title={title} description={description} canonicalPath="/">
+  <Header slot="header" />
   <h1>Playzoni — coming soon</h1>
+  <Footer slot="footer" />
 </BaseLayout>

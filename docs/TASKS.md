@@ -62,7 +62,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: files exist, manifest valid JSON, logo readable at 28px height.
 
 ### T1.5 — Header, category nav, footer
-- status: todo · deps: T1.3, T1.4 · model: haiku · docs: DESIGN §Header, PRD §8
+- status: done · deps: T1.3, T1.4 · model: haiku · docs: DESIGN §Header, PRD §8
 - Do: build `Header`, `CategoryNav` (12 nav categories from `categories.json` that are published — see SEO-PLAN §Categories rule; with samples, show all 12), `SearchBox` (plain GET form to `/search` with `q`, works without JS), mobile search overlay (small vanilla script; without JS the icon links to `/search`), favourites icon (links to `/favourites`, page built in T2.6), `Footer` per PRD §8. Active nav chip on category pages.
 - Done when: 4-width check passes; nav scrolls sideways on 360px with no page overflow; all links are real `<a href>`.
 

@@ -1,0 +1,83 @@
+---
+import { getPublishedGames } from '../lib/games';
+import categories from '../../data/categories.json';
+import CategoryNav from './CategoryNav.astro';
+import SearchBox from './SearchBox.astro';
+
+interface Props {
+  activeSlug?: string;
+}
+
+const { activeSlug } = Astro.props;
+
+// With sample games on, every nav category shows (see CategoryNav).
+const showAll = import.meta.env.PUBLIC_INCLUDE_SAMPLES === 'true';
+const games = await getPublishedGames();
+const counts: Record<string, number> = {};
+for (const c of categories) {
+  counts[c.slug] = games.filter((g) => g.data.categories.includes(c.slug)).length;
+}
+---
+<header class="site-header">
+  <div class="bar">
+    <a class="logo" href="/" aria-label="Playzoni home">
+      <img src="/logo.svg" alt="Playzoni" width="101" height="28" />
+    </a>
+    <SearchBox />
+    <a class="icon-btn" href="/favourites" aria-label="Favourites">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+        <path d="M12 20.5s-7.5-4.6-7.5-10A4 4 0 0 1 12 7.8a4 4 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+      </svg>
+    </a>
+  </div>
+  <CategoryNav activeSlug={activeSlug} showAll={showAll} counts={counts} />
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--c-surface);
+    border-bottom: 1px solid var(--c-line);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    height: 56px;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+    box-sizing: border-box;
+  }
+  @media (min-width: 768px) {
+    .bar {
+      height: 64px;
+    }
+  }
+  .logo {
+    display: inline-flex;
+    flex: 0 0 auto;
+  }
+  .logo img {
+    display: block;
+    height: 28px;
+    width: auto;
+  }
+  .icon-btn {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-pill);
+    color: var(--c-ink);
+    text-decoration: none;
+  }
+  .icon-btn:hover {
+    color: var(--c-primary);
+    text-decoration: none;
+  }
+</style>

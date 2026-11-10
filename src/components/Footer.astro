@@ -1,0 +1,89 @@
+---
+import categories from '../../data/categories.json';
+
+// Popular categories: the first eight nav categories.
+const popular = categories
+  .filter((c) => c.navOrder !== null && c.navOrder <= 8)
+  .sort((a, b) => (a.navOrder ?? 0) - (b.navOrder ?? 0));
+
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="inner">
+    <div class="brand">
+      <img src="/logo.svg" alt="Playzoni" width="101" height="28" />
+      <p>Play free games instantly.</p>
+    </div>
+    <nav aria-label="Popular categories">
+      <h2>Popular categories</h2>
+      <ul>
+        {popular.map((c) => (
+          <li><a href={`/${c.slug}`}>{c.shortName}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <nav aria-label="Site">
+      <h2>Playzoni</h2>
+      <ul>
+        <li><a href="/all-games">All games</a></li>
+        <li><a href="/new-games">New</a></li>
+        <li><a href="/popular-games">Popular</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/developers">For developers</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/privacy">Privacy</a></li>
+        <li><a href="/terms">Terms</a></li>
+        <li><a href="/cookies">Cookies</a></li>
+      </ul>
+    </nav>
+  </div>
+  <p class="copy">© {year} SparkBeta Tech</p>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--s-7);
+    padding: var(--s-6) var(--gutter) var(--s-5);
+    background: var(--c-surface);
+    border-top: 1px solid var(--c-line);
+    color: var(--c-ink-2);
+    font: var(--t-small);
+  }
+  .inner {
+    display: grid;
+    gap: var(--s-6);
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  @media (min-width: 768px) {
+    .inner {
+      grid-template-columns: 1fr 2fr 1fr;
+    }
+  }
+  .brand p {
+    margin: var(--s-2) 0 0;
+  }
+  h2 {
+    margin: 0 0 var(--s-2);
+    color: var(--c-ink);
+    font: var(--t-h3);
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-1) var(--s-4);
+  }
+  li a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--c-ink-2);
+  }
+  .copy {
+    max-width: 1440px;
+    margin: var(--s-5) auto 0;
+  }
+</style>
