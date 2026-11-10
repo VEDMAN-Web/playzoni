@@ -57,7 +57,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: unit-style check script `scripts/test-seo.ts` (run inside `validate`) confirms the 3 title fallbacks for a 20-, 45- and 70-char title; a test page renders canonical `https://playzoni.com/...` with no trailing slash.
 
 ### T1.4 — Logo, favicons, manifest
-- status: todo · deps: T1.1 · model: haiku · docs: DESIGN §Brand
+- status: done · deps: T1.1 · model: haiku · docs: DESIGN §Brand
 - Do: `public/logo.svg`, `public/icon.svg`, favicon 32 PNG, apple-touch-icon 180, 192/512 PNG (generated from icon.svg with sharp in `scripts/make-icons.ts`), `site.webmanifest`. Static og images `public/og/home.png`, `public/og/default.png` (1200×630: cream bg, logo, tagline).
 - Done when: files exist, manifest valid JSON, logo readable at 28px height.
 

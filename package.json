@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "validate": "tsx scripts/validate.ts && tsx scripts/test-seo.ts",
     "check": "astro check && npm run lint && npm run validate && npm run build",
-    "placeholders": "tsx scripts/make-placeholders.ts"
+    "placeholders": "tsx scripts/make-placeholders.ts",
+    "icons": "tsx scripts/make-icons.ts"
   },
   "repository": {
     "type": "git",
