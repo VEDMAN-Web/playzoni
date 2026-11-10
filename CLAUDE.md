@@ -32,7 +32,7 @@ Write the question in `docs/QUESTIONS.md` (format there), set the task to `block
 - Never push, merge or commit to `main`. Only `dev`. Vedant merges after review.
 - Never print, log, or commit secrets or `.env` values. Use `.env` (gitignored) + `.env.example` with empty values.
 - Never add a dependency that is not in the approved list (`docs/PRD.md` §Tech stack). Ask instead.
-- Never use the name "Poki", its logo, colours, text, images, game thumbnails or screenshots. Poki is a reference for structure only. All copy must be original.
+- Never use the name "Poki" or its logo, mascot, text, images, game thumbnails, screenshots or code. Copying Poki's layout, page flow and features is intended (see DESIGN.md). Logo, wording and images must be our own.
 - Never invent ratings, review counts, play counts, player numbers or awards. Show a number only if real data produces it.
 - Never copy a game's description from the provider feed onto the page as-is. Feed text is input only (see `docs/SEO-PLAN.md` §Content).
 - Never delete or rewrite files outside the current task. Never "clean up" other code.

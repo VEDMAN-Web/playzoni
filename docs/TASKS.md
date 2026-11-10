@@ -69,9 +69,19 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 ---
 ## Phase 2 — Pages
 
+### T1.6 — Light blue theme and Poki-style nav box
+- status: todo · deps: T1.5 · model: haiku · docs: DESIGN §Colours §Header §Category tile, PRD §8
+- Do:
+  1. Update `tokens.css` colours to the new DESIGN §Colours values (names unchanged). Update `brand.json` theme colour, `site.webmanifest` and regenerate icons/og images if they use the old colours.
+  2. Replace the header bar and the category chip row with the nav box exactly as DESIGN §Header (fixed top-left; 3×1 cells ≥1024, one line 56px below). Remove `CategoryNav` from the header. Keep `SearchBox` logic but move it into the new search panel.
+  3. Build the search panel (slide-in from the left; full screen on phones) with input + chips for all published categories. No-JS fallback: search button is a link to `/search`.
+  4. Add the `nav-spacer` helper class and the page `padding-top` rules from DESIGN §Header in `global.css`. On the current placeholder home page, add top padding so nothing hides under the nav box.
+  5. Add `emoji` (one emoji each, fitting the category) to every category in `data/categories.json` and make it required in the schema.
+- Done when: `npm run check` passes; 4-width check passes; nav box never covers page text at any width; search panel opens/closes with mouse, keyboard (Escape) and touch; without JS the search button goes to `/search`; no old orange colour left (`grep -ri "FF5A36\|FFF7EE" src public data` returns nothing).
+
 ### T2.1 — Tiles, grid, rows
-- status: todo · deps: T1.5 · model: haiku · docs: DESIGN §Game tile §Grid §Rows
-- Do: `GameTile` (S/M/L, badges, hover, srcset), `GameGrid` (mosaic + uniform modes, exact pattern from DESIGN), `GameRow` (scroll-snap, arrows ≥1024 via tiny script, works without JS as a swipe/scroll row). First 6 tiles on a page eager, first `fetchpriority=high` (prop `eagerCount`).
+- status: todo · deps: T1.6 · model: haiku · docs: DESIGN §Game tile §Grid §Rows
+- Do: `GameTile` (S/M/L, badges, hover, srcset), `CategoryTile` (DESIGN §Category tile), `GameGrid` (mosaic + uniform modes, exact pattern from DESIGN, nav spacer as first item, category tiles inserted where DESIGN says), `GameRow` (scroll-snap, arrows ≥1024 via tiny script, works without JS as a swipe/scroll row). First 6 tiles on a page eager, first `fetchpriority=high` (prop `eagerCount`).
 - Done when: on a temporary page `/dev-grid` (delete it at the end of the task) 24 sample tiles show the mosaic pattern; no gaps; no horizontal overflow at 4 widths; reduced-motion disables transforms.
 
 ### T2.2 — Home page

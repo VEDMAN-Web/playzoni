@@ -133,7 +133,7 @@ Phase 3 (later, not MVP): language versions `/hi/`, `/es/`, `/pt/`, `/id/`… wi
 10. Footer.
 
 ## 8. Header and footer
-- Header (sticky, 64px desktop / 56px mobile): logo (left), search field (desktop) / search icon (mobile, opens overlay), category nav (12 main categories, horizontal scroll on mobile), "Favourites" icon (links to `/favourites`).
+- Header: a fixed white nav box at the top-left (logo, search button, favourites button) — no full-width bar, no chip row. Search opens a side panel with the search box and all categories. Categories also appear as tiles in the grid. Exact spec: DESIGN §Header, §Category tile.
 - Footer: logo + one-line tagline, Popular categories (8 links), All games, New, Popular, About, For developers, Contact, Privacy, Terms, Cookies, © year SparkBeta Tech.
 
 ## 9. Components (build these, reuse everywhere)

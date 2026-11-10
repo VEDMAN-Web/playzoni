@@ -8,22 +8,23 @@ Original brand. Bright, friendly, fast. Light theme only in MVP. All values belo
 - Logo: SVG wordmark `playzoni` in Nunito 900, colour `--c-ink`, with the `o` replaced by a filled circle in `--c-primary` containing a white play triangle. Provide `logo.svg` (wordmark) and `icon.svg` (circle + triangle only). Favicons: 32px PNG, 180px apple-touch-icon, 192/512 PNG + `site.webmanifest` (name, short_name, theme_color = `--c-primary`, background_color = `--c-bg`).
 
 ## §Colours
+Light blue theme (changed 10 Nov 2026 at the owner's request).
 | Token | Hex | Use |
 |---|---|---|
-| `--c-bg` | `#FFF7EE` | Page background (warm cream) |
-| `--c-surface` | `#FFFFFF` | Tiles, cards, header |
-| `--c-ink` | `#1D1A2F` | Main text, logo |
-| `--c-ink-2` | `#5B5670` | Secondary text |
-| `--c-line` | `#EDE4D8` | Borders, dividers |
-| `--c-primary` | `#FF5A36` | Play button, links hover, active nav, logo dot |
+| `--c-bg` | `#E3F1FF` | Page background (light blue) |
+| `--c-surface` | `#FFFFFF` | Tiles, cards, nav box |
+| `--c-ink` | `#0E2440` | Main text, logo |
+| `--c-ink-2` | `#50607A` | Secondary text |
+| `--c-line` | `#D2E3F5` | Borders, dividers |
+| `--c-primary` | `#1F7AFF` | Play button, active states, logo dot |
 | `--c-primary-ink` | `#FFFFFF` | Text on primary |
-| `--c-primary-dark` | `#E24420` | Primary hover/pressed |
-| `--c-accent` | `#FFC531` | "New" badge, focus highlights |
-| `--c-accent-2` | `#2EC4B6` | "Hot" badge, secondary chips |
-| `--c-player-bg` | `#14121F` | Behind the game iframe |
-| `--c-focus` | `#1D1A2F` | 3px focus ring (always visible on keyboard focus) |
+| `--c-primary-dark` | `#0F5FD6` | Primary hover/pressed |
+| `--c-accent` | `#FFC531` | "New" badge |
+| `--c-accent-2` | `#FF5A8A` | "Hot" badge |
+| `--c-player-bg` | `#0B1A2E` | Behind the game iframe |
+| `--c-focus` | `#0E2440` | 3px focus ring (always visible on keyboard focus) |
 
-Contrast: body text on `--c-bg` ≥ 7:1; white on `--c-primary` is used only at ≥ 18px bold (large text) or on icons.
+Contrast: body text on `--c-bg` ≥ 7:1; white on `--c-primary` only at ≥ 18px bold (large text) or on icons. `theme-color` meta and manifest `theme_color` = `--c-bg`.
 
 ## §Type
 Font: Nunito Variable (`@fontsource-variable/nunito`), fallback `system-ui, sans-serif`.
@@ -54,15 +55,29 @@ Text blocks max width 72ch.
 ## §Grid (`GameGrid`)
 - Cell size `--cell`: 88px (<480), 100px (480–1279), 112px (≥1280). Gap 10px (<480), 12px (≥480).
 - `display:grid; grid-template-columns: repeat(auto-fill, var(--cell)); grid-auto-rows: var(--cell); grid-auto-flow: dense; justify-content: center;`
-- Mosaic mode (home, category page 1): pattern repeats every 18 tiles — positions 1 and 10 are L, positions 4, 7, 14 are M, the rest S. Featured games fill L slots first. Below 480px use M instead of L (L would fill the full width).
+- Mosaic mode (home, category page 1): first item is the nav spacer (§Header). Pattern repeats every 18 tiles — positions 1 and 10 are L, positions 4, 7, 14 are M, the rest S. Featured games fill L slots first. Below 480px use M instead of L (L would fill the full width).
 - Uniform mode (rows, related, lists): all S, or all M where the task says so.
 - No horizontal page scroll at any width.
 
 ## §Rows (`GameRow`)
 Title (`--t-h3`) left, "See all ›" link right. Tiles in one horizontal line, scroll-snap, swipe on touch, hidden scrollbar, arrow buttons on desktop (≥1024) at both ends. Tile size M on desktop, S on mobile, with 1-line title below.
 
-## §Header
-Height 56px mobile / 64px ≥768, `--c-surface`, bottom border `--c-line`, sticky top. Left: logo (height 28px). Centre (≥768): search input, pill, 44px tall, max 420px, icon left. Mobile: search icon button (44×44) opening a full-screen search overlay. Right: favourites (heart) icon button 44×44. Below the header bar: category nav — horizontal pill chips (`--r-pill`, 36px tall, `--c-surface`, border `--c-line`, active = `--c-primary` bg + white text), scrolls sideways on mobile, wraps to one centred line on desktop if it fits.
+## §Header (nav box — no full-width bar)
+The site has **no full-width header bar and no category chip row**. Navigation lives in a small white "nav box" that floats at the top-left, and categories appear as tiles inside the grid (§Category tile) and in the search panel.
+
+- **Nav box:** `position: fixed; top: var(--gap); left: var(--gutter); z-index: 50`, `--c-surface`, radius `--r-card`, shadow `--sh-tile`. Contents left to right: logo (height 28px, links to `/`), then icon buttons 44×44: search (magnifier), favourites (heart, links to `/favourites`). 
+  - ≥1024: size exactly 3 cells wide × 1 cell tall (`calc(3*var(--cell) + 2*var(--gap))` × `var(--cell)`); logo on the top line, the two icon buttons on the bottom line, centred.
+  - <1024: one line, height 56px, width auto (padding 0 12px).
+- **Space for the nav box:**
+  - Pages with a grid (home, category, list pages): the grid's **first item** is an empty `<div class="nav-spacer" aria-hidden="true">` spanning 3×1 cells (≥1024) so tiles flow around the fixed box. Below 1024 the spacer is hidden and the page gets `padding-top: calc(56px + 2*var(--gap))`.
+  - Pages without a grid (game, static, search): `padding-top: calc(var(--cell) + 2*var(--gap))` on ≥1024, `calc(56px + 2*var(--gap))` below.
+- **Search panel:** the search button opens a panel that slides in from the left (`<dialog>` or a fixed `div`), width 400px on ≥768, full screen below. Contents: close button 44×44, search input (autofocus, pill, 48px), then "Categories" heading and **all published categories as chips** (§Chips), then search results (T2.8). Close on Escape, close button, or click outside. Without JS the search button is a plain link to `/search`. The panel's category links are in the page HTML (hidden until opened) so they still count as internal links.
+- **Footer** stays as built (8 categories + list pages + static pages).
+
+## §Category tile (`CategoryTile`)
+Size 2 cells wide × 1 cell tall, white, radius `--r-tile`, shadow `--sh-tile`. Left: 48px circle in `--c-bg` with the category emoji (field `emoji` in `categories.json`, required for every category). Right: category `shortName` + " Games" (`--t-h3`, ink). Hover as game tiles. Whole tile is a link to the category page.
+- Home mosaic: after tile 36, insert all 12 nav categories as category tiles in nav order; at the end of the home page "All categories" section uses category tiles for every published category.
+- Category page: after the first 30 game tiles, insert category tiles for its parent and children.
 
 ## §Player
 - Container background `--c-player-bg`, radius `--r-player`, aspect from game (`landscape` 16:9, `portrait` 9:16 with max-height `calc(100vh - 160px)`, `square` 1:1). Max width 1100px.
