@@ -38,7 +38,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 ## Phase 1 — Foundation
 
 ### T1.1 — Design tokens and global styles
-- status: todo · deps: T0.1 · model: haiku · docs: DESIGN §Colours §Type §Space
+- status: done · deps: T0.1 · model: haiku · docs: DESIGN §Colours §Type §Space
 - Do: `src/styles/tokens.css` with every token in DESIGN as CSS variables (responsive type via media queries). Map colours, radius, shadow, spacing into Tailwind theme. `src/styles/global.css`: import font, base body (bg, ink, font, 16px), focus ring rule, `prefers-reduced-motion` rule, link styles.
 - Done when: every token name in DESIGN exists in tokens.css with the exact value; no hex colours anywhere else in `src/` (grep check).
 

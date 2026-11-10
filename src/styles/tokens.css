@@ -1,0 +1,98 @@
+/* Design tokens — copied exactly from docs/DESIGN.md. Do not hard-code these values in components. */
+
+:root {
+  /* §Colours */
+  --c-bg: #FFF7EE;
+  --c-surface: #FFFFFF;
+  --c-ink: #1D1A2F;
+  --c-ink-2: #5B5670;
+  --c-line: #EDE4D8;
+  --c-primary: #FF5A36;
+  --c-primary-ink: #FFFFFF;
+  --c-primary-dark: #E24420;
+  --c-accent: #FFC531;
+  --c-accent-2: #2EC4B6;
+  --c-player-bg: #14121F;
+  --c-focus: #1D1A2F;
+
+  /* §Type — font */
+  --font-sans: 'Nunito Variable', system-ui, sans-serif;
+
+  /* §Type — each type token is a font shorthand: weight size/line-height family.
+     Use as: font: var(--t-h1); */
+
+  /* H1: 28/34 mobile, 36/42 from 768px (override below), weight 800 */
+  --t-h1: 800 28px/34px var(--font-sans);
+
+  /* H2: 22/28, 800 */
+  --t-h2: 800 22px/28px var(--font-sans);
+
+  /* H3 / row titles: 18/24, 700 */
+  --t-h3: 700 18px/24px var(--font-sans);
+
+  /* body: 16/26, 400 */
+  --t-body: 400 16px/26px var(--font-sans);
+
+  /* small (meta, chips, labels): 14/20, 600 */
+  --t-small: 600 14px/20px var(--font-sans);
+
+  /* tile title overlay: 13/16, 700 */
+  --t-tile: 700 13px/16px var(--font-sans);
+
+  /* §Space (px) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+
+  /* §Space — page gutter: 12px (<480), 16px (480–1023), 24px (≥1024) */
+  --gutter: 12px;
+
+  /* §Radius */
+  --r-tile: 16px;
+  --r-card: 20px;
+  --r-pill: 999px;
+  --r-player: 12px;
+
+  /* §Shadow */
+  --sh-tile: 0 2px 6px rgba(29, 26, 47, 0.10);
+  --sh-tile-hover: 0 8px 20px rgba(29, 26, 47, 0.18);
+
+  /* §Grid — cell size and gap */
+  --cell: 88px;
+  --gap: 10px;
+}
+
+/* 480px and up */
+@media (min-width: 480px) {
+  :root {
+    --gutter: 16px;
+    --cell: 100px;
+    --gap: 12px;
+  }
+}
+
+/* 768px and up */
+@media (min-width: 768px) {
+  :root {
+    --t-h1: 800 36px/42px var(--font-sans);
+  }
+}
+
+/* 1024px and up */
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 24px;
+  }
+}
+
+/* 1280px and up */
+@media (min-width: 1280px) {
+  :root {
+    --cell: 112px;
+  }
+}
