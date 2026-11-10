@@ -1,0 +1,26 @@
+---
+import TextPage from '../components/TextPage.astro';
+
+const title = 'Contact | Playzoni';
+const description =
+  'Contact Playzoni by email with questions, game problems or feedback. Send a message to hello@playzoni.com and we will read it.';
+---
+<TextPage title={title} description={description} canonicalPath="/contact" h1="Contact us">
+  <p>
+    Have a question, found a problem with a game, or want to tell us what you think of the site? Send us an email. We read
+    every message.
+  </p>
+
+  <p>
+    <a class="button" href="mailto:hello@playzoni.com">Email hello@playzoni.com</a>
+  </p>
+
+  <h2>Reporting a problem with a game</h2>
+  <p>
+    On every game page there is a flag button under the game. It opens an email that already has the name of the game in
+    the subject, so we know which game you mean. Please tell us what device you used and what went wrong.
+  </p>
+
+  <h2>Game developers</h2>
+  <p>If you make games and want to send one to us, read the page for <a href="/developers">game developers</a>.</p>
+</TextPage>

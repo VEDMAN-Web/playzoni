@@ -120,7 +120,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: searching a sample game name finds it; `/search` has noindex; Pagefind JS loads only on `/search`.
 
 ### T2.9 — Static pages and 404
-- status: todo · deps: T1.5 · model: haiku · docs: PRD §5
+- status: done · deps: T1.5 · model: haiku · docs: PRD §5
 - Do: `/about` (original ~300 words: Playzoni by SparkBeta Tech, Surat, India; how games are picked and tested; contact email placeholder `hello@playzoni.com`), `/developers` (how to submit a game: email with link + short description; we review every game), `/contact` (email + mailto button; no form yet), `/privacy`, `/terms`, `/cookies` (heading + "This page is being finalised." + `noindex` until owner text arrives — add Q in QUESTIONS for owner legal text), `404.astro` (message, search box, popular row).
 - Done when: all pages render with correct meta; legal pages noindex.
 
