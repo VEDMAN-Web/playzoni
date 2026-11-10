@@ -37,9 +37,11 @@ interface Props {
   eagerCount?: number;
   label?: string;
   xlFirst?: boolean;
+  /** The first tile loads with high priority (the LCP picture on grid pages). False on the game page, where the player cover is the LCP. */
+  priorityFirst?: boolean;
 }
 
-const { items, mode = 'mosaic', uniformSize = 'S', navBox = false, eagerCount = 6, label = 'Games', xlFirst = false } = Astro.props;
+const { items, mode = 'mosaic', uniformSize = 'S', navBox = false, eagerCount = 6, label = 'Games', xlFirst = false, priorityFirst = true } = Astro.props;
 
 const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
 ---
@@ -56,7 +58,7 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
           slug={p.item.slug}
           size={p.size === 'CAT' ? 'S' : p.size}
           eager={i < eagerCount}
-          priority={i === 0}
+          priority={priorityFirst && i === 0}
           badge={p.item.badge}
         />
       )}

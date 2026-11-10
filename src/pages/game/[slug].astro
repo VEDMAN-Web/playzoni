@@ -15,8 +15,10 @@ import { publishedCategoriesFrom } from '../../lib/published';
 import { relatedGames } from '../../lib/related';
 import { buildGameTitle, SITE_URL } from '../../lib/seo';
 
-// One page per published game. The player is static HTML here: the cover and the Play button.
-// The iframe is added by the player script (T2.5), only after the player clicks Play.
+// One page per published game (docs/DESIGN.md §V2.4). On desktop everything is one tile grid: the nav box, the
+// player block (6 cells wide, 4 tall, always wide) with related tiles packed around it, and the text in one white
+// card below the tiles. The player is static HTML here: the cover and the Play button. The iframe is added by the
+// player script: by itself on desktop, after a tap on Play on phones and tablets.
 export async function getStaticPaths() {
   const games = await getPublishedGames();
   return games.map((g) => ({ params: { slug: g.data.slug } }));
@@ -42,11 +44,11 @@ const chips = d.categories
   .filter((c): c is NonNullable<typeof c> => c !== undefined && publishedSlugs.has(c.slug))
   .map((c) => ({ slug: c.slug, name: c.name, count: countOf(c.slug) }));
 
-const related = relatedGames(entry, games, 24);
+// Related tiles pack the cells around the player, so there are enough of them to fill the rows beside it.
+const related = relatedGames(entry, games, 48);
 const toItem = (g: (typeof games)[number]): GridItem => ({ kind: 'game', title: g.data.title, slug: g.data.slug });
-const railLeft = related.slice(0, 6).map(toItem);
-const railRight = related.slice(6, 12).map(toItem);
-const moreItems = related.map(toItem);
+const tiles = related.map(toItem);
+const adsEnabled = import.meta.env.PUBLIC_ADS_ENABLED === 'true';
 
 const { Content } = await render(entry);
 const isoDate = (date: Date): string => date.toISOString().slice(0, 10);
@@ -104,19 +106,23 @@ const faqLd =
     : null;
 const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
 ---
-<BaseLayout title={title} description={d.description} canonicalPath={`/game/${slug}`} ogImage={ogImage}>
-  <Header slot="header" />
+<BaseLayout title={title} description={d.description} canonicalPath={`/game/${slug}`} ogImage={ogImage} mainClass="has-grid">
+  <Header slot="header" box={false} />
 
-  <div class="game-layout">
-    <aside class="rail rail-left" aria-label="Related games">
-      <GameGrid items={railLeft} mode="uniform" uniformSize="S" label="Related games" />
-    </aside>
+  <GameGrid items={tiles} mode="mosaic" navBox={true} eagerCount={0} priorityFirst={false} label="More games like this">
+    <div slot="lead" class="player-cell" data-pagefind-ignore>
+      <Player title={d.title} slug={slug!} developer={d.developer} embedUrl={d.embedUrl} aspect={d.aspect} />
+    </div>
+    {adsEnabled && (
+      <div slot="lead" class="ad-cell ad-cell-side"><AdSlot variant="side" /></div>
+    )}
+    {adsEnabled && (
+      <div slot="lead" class="ad-cell ad-cell-strip"><AdSlot variant="strip" /></div>
+    )}
+  </GameGrid>
 
-    <div class="game-main" data-pagefind-body>
-      <div data-pagefind-ignore>
-        <Player title={d.title} slug={slug!} developer={d.developer} embedUrl={d.embedUrl} aspect={d.aspect} />
-      </div>
-
+  <article class="text-card" data-pagefind-body>
+    <div class="card-inner">
       <nav class="crumbs" aria-label="Breadcrumb" data-pagefind-ignore>
         <ol>
           {crumbs.map((c, i) => (
@@ -138,7 +144,7 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
       {d.status === 'draft' && <span class="draft-badge">Draft</span>}
       <p class="intro">{d.intro}</p>
 
-      <section class="text-card" aria-label="About this game">
+      <section class="about" aria-label="About this game">
         <Content />
       </section>
 
@@ -179,24 +185,72 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
           ))}
         </ul>
       </nav>
-
-      <section class="more" aria-labelledby="more-games" data-pagefind-ignore>
-        <h2 id="more-games" class="block-heading">More games like this</h2>
-        <GameGrid items={moreItems} mode="uniform" uniformSize="S" label="More games like this" />
-      </section>
     </div>
-
-    <aside class="rail rail-right" aria-label="More games and advertising">
-      <GameGrid items={railRight} mode="uniform" uniformSize="S" label="More games" />
-      <AdSlot />
-    </aside>
-  </div>
+  </article>
 
   <JsonLd data={jsonLd} />
   <Footer slot="footer" />
 </BaseLayout>
 
 <style>
+  /* ---- Where the player and the ad blocks sit in the tile grid (§V2.4) ---- */
+  /* Phones and tablets: the player is the full width, the tiles follow below it. */
+  .player-cell {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+  .ad-cell {
+    display: none;
+    min-width: 0;
+  }
+  /* Desktop: column 1 is the nav box and tiles; the player takes the next columns, four rows tall. */
+  @media (min-width: 1024px) {
+    .player-cell {
+      grid-column: 2 / -1;
+      grid-row: 1 / span 4;
+    }
+    .ad-cell-strip {
+      display: block;
+      grid-column: 2 / -1;
+      grid-row: 5;
+    }
+  }
+  /* From 8 columns (1215px) the player is exactly 6 cells wide and the strip matches it. */
+  @media (min-width: 1215px) {
+    .player-cell {
+      grid-column: 2 / span 6;
+    }
+    .ad-cell-strip {
+      grid-column: 2 / span 6;
+    }
+  }
+  /* From 9 columns (1361px) there is room for the 2x2 ad block to the right of the player. */
+  @media (min-width: 1361px) {
+    .ad-cell-side {
+      display: block;
+      grid-column: 8 / span 2;
+      grid-row: 1 / span 2;
+    }
+  }
+
+  /* ---- The text card below the tiles (§V2.4, §V2.5) ---- */
+  .text-card {
+    box-sizing: border-box;
+    margin: var(--s-5) 0 var(--s-6);
+    padding: var(--s-4);
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    color: var(--c-ink);
+  }
+  @media (min-width: 768px) {
+    .text-card {
+      padding: var(--s-6);
+    }
+  }
+  .card-inner {
+    max-width: 78ch;
+  }
   .draft-badge {
     display: inline-block;
     margin-left: var(--s-2);
@@ -207,47 +261,12 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
     font: var(--t-small);
     vertical-align: middle;
   }
-  .game-layout {
-    display: block;
-    max-width: 1440px;
-    margin: 0 auto;
-  }
-  .game-main {
-    min-width: 0;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  .rail {
-    display: none;
-  }
-  @media (min-width: 1280px) {
-    .game-layout {
-      display: grid;
-      grid-template-columns: 136px minmax(0, 1100px) 336px;
-      justify-content: center;
-      gap: var(--s-5);
-    }
-    .rail {
-      display: block;
-    }
-    .rail-left {
-      grid-column: 1;
-    }
-    .game-main {
-      grid-column: 2;
-      margin: 0;
-    }
-    .rail-right {
-      grid-column: 3;
-    }
-  }
-
   .crumbs ol {
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-1);
     list-style: none;
-    margin: var(--s-3) 0 var(--s-2);
+    margin: 0 0 var(--s-2);
     padding: 0;
     color: var(--c-ink-2);
     font: var(--t-small);
@@ -268,36 +287,26 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
   .intro {
     margin: 0 0 var(--s-4);
     color: var(--c-ink-2);
-    max-width: 72ch;
   }
-  .text-card,
-  .faq,
-  .info {
-    max-width: 72ch;
-    margin: 0 0 var(--s-5);
-    padding: var(--s-5);
-    border-radius: var(--r-card);
-    background: var(--c-surface);
-    color: var(--c-ink);
-  }
-  .text-card :global(h2),
+  .about :global(h2),
   .faq h2,
-  .info h2,
-  .block-heading {
-    margin: 0 0 var(--s-2);
+  .info h2 {
+    margin: var(--s-5) 0 var(--s-2);
     font: var(--t-h2);
     color: var(--c-ink);
   }
-  .text-card :global(h2) {
-    margin-top: var(--s-4);
-  }
-  .text-card :global(h3) {
+  .about :global(h3) {
     margin: var(--s-3) 0 var(--s-1);
     font: var(--t-h3);
   }
-  .text-card :global(p),
-  .text-card :global(li) {
+  .about :global(p),
+  .about :global(li) {
     color: var(--c-ink-2);
+  }
+  .about :global(a),
+  .info a {
+    color: var(--c-primary-dark);
+    font-weight: 700;
   }
   .faq details {
     border-top: 1px solid var(--c-line);
@@ -328,15 +337,10 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
   .info th {
     width: 40%;
     color: var(--c-ink-2);
-    font: var(--t-small);
     font-weight: 600;
   }
-  .info td {
-    color: var(--c-ink);
-    font: var(--t-body);
-  }
   .related-categories {
-    margin: 0 0 var(--s-5);
+    margin-top: var(--s-5);
   }
   .chips {
     display: flex;
@@ -372,8 +376,5 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
   }
   .count {
     color: var(--c-ink-2);
-  }
-  .more {
-    margin: 0 0 var(--s-5);
   }
 </style>

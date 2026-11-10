@@ -1,7 +1,8 @@
 ---
-// Game player (DESIGN §Player, PRD §7). The page ships only the cover and the Play button.
-// The iframe is created by the script below, after the player clicks Play. Under 768px the game
-// opens in a full-screen overlay; from 768px it plays inline. No iframe is in the HTML.
+// Game player (docs/DESIGN.md §V2.4, PRD §7). The HTML holds only the cover and the Play button; no iframe.
+// The script below creates the iframe: from 1024px by itself, after the page has loaded and the browser is idle;
+// on phones and tablets (under 1024px) after a tap on Play, in a full-screen overlay.
+// The frame is always wide on desktop, whatever the feed says about orientation (R19).
 interface Props {
   title: string;
   slug: string;
@@ -13,14 +14,18 @@ interface Props {
 const { title, slug, developer, embedUrl, aspect } = Astro.props;
 const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Problem with ${title} (${slug})`)}`;
 ---
-<section class="player" aria-label={`Play ${title}`} data-player data-slug={slug} data-title={title} data-embed={embedUrl}>
-  <div class={`player-frame aspect-${aspect}`} data-player-frame>
+<section class="player" aria-label={`Play ${title}`} data-player data-slug={slug} data-title={title} data-embed={embedUrl} data-aspect={aspect}>
+  <div class="player-frame" data-player-frame>
     <img class="cover-bg" src={`/thumbs/${slug}/l.webp`} alt="" width="600" height="600" aria-hidden="true" loading="eager" fetchpriority="high" decoding="async" data-player-bg />
     <div class="cover" data-player-cover>
       <img class="cover-thumb" src={`/thumbs/${slug}/m.webp`} alt={title} width="300" height="300" decoding="async" />
       <p class="cover-title">{title}</p>
       <button type="button" class="play-btn" data-play>Play</button>
     </div>
+    <div class="loading" role="status" aria-label="Loading the game" hidden data-player-loading>
+      <span class="spinner" aria-hidden="true"></span>
+    </div>
+    <p class="rotate-hint" hidden data-rotate-hint>Turn your phone sideways for the best view</p>
     <button type="button" class="close-btn" aria-label="Close game" title="Close game" hidden data-player-close>
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" /></svg>
     </button>
@@ -30,26 +35,32 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
     <img class="bar-icon" src={`/thumbs/${slug}/s.webp`} alt="" width="150" height="150" decoding="async" />
     <div class="bar-text">
       <p class="bar-title">{title}</p>
-      {developer && <p class="bar-dev">{developer}</p>}
+      {developer && <p class="bar-dev">by {developer}</p>}
     </div>
     <div class="bar-actions">
       <button type="button" class="icon-btn" aria-label="Favourite" title="Favourite" aria-pressed="false" data-fav>
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10A4 4 0 0 1 12 7.8a4 4 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+        <span class="btn-label">Favourite</span>
       </button>
       <button type="button" class="icon-btn" aria-label="Like" title="Like" aria-pressed="false" data-like>
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M7 11v9H4v-9h3zm2 9V10.5L12.5 4c1.4 0 2.5 1.1 2.5 2.5V10h4.6a1.5 1.5 0 0 1 1.5 1.8l-1.3 7A2 2 0 0 1 18 20H9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+        <span class="btn-label">Like</span>
       </button>
       <button type="button" class="icon-btn flip" aria-label="Dislike" title="Dislike" aria-pressed="false" data-dislike>
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M7 11v9H4v-9h3zm2 9V10.5L12.5 4c1.4 0 2.5 1.1 2.5 2.5V10h4.6a1.5 1.5 0 0 1 1.5 1.8l-1.3 7A2 2 0 0 1 18 20H9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+        <span class="btn-label">Dislike</span>
       </button>
       <button type="button" class="icon-btn" aria-label="Fullscreen" title="Fullscreen" data-fullscreen>
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <span class="btn-label">Fullscreen</span>
       </button>
       <button type="button" class="icon-btn" aria-label="Share" title="Share" data-share>
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="6" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="2" /><circle cx="18" cy="6" r="2.5" fill="none" stroke="currentColor" stroke-width="2" /><circle cx="18" cy="18" r="2.5" fill="none" stroke="currentColor" stroke-width="2" /><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6" stroke="currentColor" stroke-width="2" /></svg>
+        <span class="btn-label">Share</span>
       </button>
       <a class="icon-btn" href={reportHref} aria-label="Report a problem" title="Report a problem">
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <span class="btn-label">Report</span>
       </a>
     </div>
   </div>
@@ -58,27 +69,32 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
 </section>
 
 <style>
+  /* One block: the frame (16:9 on phones, as tall as its four grid rows on desktop) with the bar attached below. */
   .player {
     position: relative;
+    display: flex;
+    flex-direction: column;
     margin: 0 0 var(--s-3);
   }
   .player-frame {
     position: relative;
+    flex: 0 0 auto;
     overflow: hidden;
     width: 100%;
     aspect-ratio: 16 / 9;
-    border-radius: var(--r-player);
+    border-radius: var(--r-card) var(--r-card) 0 0;
     background: var(--c-player-bg);
   }
-  .player-frame.aspect-square {
-    aspect-ratio: 1 / 1;
-    width: min(100%, calc(100vh - 160px));
-    margin: 0 auto;
-  }
-  .player-frame.aspect-portrait {
-    aspect-ratio: 9 / 16;
-    width: min(100%, calc((100vh - 160px) * 9 / 16));
-    margin: 0 auto;
+  @media (min-width: 1024px) {
+    .player {
+      height: 100%;
+      margin: 0;
+    }
+    .player-frame {
+      flex: 1 1 auto;
+      min-height: 0;
+      aspect-ratio: auto;
+    }
   }
 
   /* Cover state */
@@ -143,10 +159,57 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
       transform: scale(1.04);
     }
   }
+
+  /* Loading state: player background with our spinner, until the game frame has loaded. */
+  .loading {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--c-player-bg);
+  }
+  .loading[hidden] {
+    display: none;
+  }
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid color-mix(in srgb, var(--c-primary-ink) 25%, transparent);
+    border-top-color: var(--c-primary-ink);
+    border-radius: 50%;
+    animation: spin 800ms linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .play-btn {
+    .play-btn,
+    .spinner {
       animation: none;
     }
+  }
+
+  /* Phones: a short hint above the game for landscape-only games held upright. */
+  .rotate-hint {
+    position: absolute;
+    left: 50%;
+    bottom: max(var(--s-4), env(safe-area-inset-bottom));
+    z-index: 3;
+    margin: 0;
+    padding: var(--s-2) var(--s-4);
+    transform: translateX(-50%);
+    border-radius: var(--r-pill);
+    background: color-mix(in srgb, var(--c-player-bg) 85%, transparent);
+    color: var(--c-primary-ink);
+    font: var(--t-small);
+    white-space: nowrap;
+  }
+  .rotate-hint[hidden] {
+    display: none;
   }
 
   /* The game itself */
@@ -159,7 +222,7 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
     background: var(--c-player-bg);
   }
 
-  /* Full-screen overlay: used on phones, and as the iOS fullscreen fallback. */
+  /* Full-screen overlay: used on phones and tablets, and as the iOS fullscreen fallback. */
   .player-frame.is-overlay {
     position: fixed;
     inset: 0;
@@ -200,16 +263,23 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
     display: none;
   }
 
-  /* Bar under the player */
+  /* Bar under the player: icon, title and developer on the left, labelled buttons on the right (desktop). */
   .player-bar {
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
     gap: var(--s-3);
     min-height: 56px;
     padding: 0 var(--s-3);
     box-sizing: border-box;
     background: var(--c-surface);
-    border-radius: 0 0 var(--r-player) var(--r-player);
+    border-radius: 0 0 var(--r-card) var(--r-card);
+  }
+  @media (min-width: 1024px) {
+    .player-bar {
+      height: 64px;
+      padding: 0 var(--s-4);
+    }
   }
   .bar-icon {
     flex: 0 0 auto;
@@ -232,8 +302,11 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
   }
   .bar-dev {
     margin: 0;
+    overflow: hidden;
     color: var(--c-ink-2);
     font: var(--t-small);
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .bar-actions {
     display: flex;
@@ -266,6 +339,24 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
     color: var(--c-ink);
     cursor: pointer;
     text-decoration: none;
+  }
+  .btn-label {
+    display: none;
+  }
+  /* Desktop: icon with a small label under it (§V2.4). Still a target of at least 44px. */
+  @media (min-width: 1024px) {
+    .icon-btn {
+      flex-direction: column;
+      gap: 2px;
+      width: 56px;
+      height: 52px;
+      border-radius: 12px;
+    }
+    .btn-label {
+      display: block;
+      color: inherit;
+      font: 700 11px/13px var(--font-sans);
+    }
   }
   .icon-btn[hidden] {
     display: none;
@@ -318,11 +409,14 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
     const fullscreenBtn = root.querySelector<HTMLButtonElement>('[data-fullscreen]')!;
     const shareBtn = root.querySelector<HTMLButtonElement>('[data-share]')!;
     const toast = root.querySelector<HTMLElement>('[data-toast]')!;
+    const loading = root.querySelector<HTMLElement>('[data-player-loading]')!;
+    const rotateHint = root.querySelector<HTMLElement>('[data-rotate-hint]')!;
     const favBtn = root.querySelector<HTMLButtonElement>('[data-fav]')!;
     const likeBtn = root.querySelector<HTMLButtonElement>('[data-like]')!;
     const dislikeBtn = root.querySelector<HTMLButtonElement>('[data-dislike]')!;
 
-    const phone = window.matchMedia('(max-width: 767px)');
+    // Phones and tablets: cover, Play button and full-screen overlay. From 1024px the game loads by itself.
+    const compact = window.matchMedia('(max-width: 1023px)');
     const canFullscreen = typeof frame.requestFullscreen === 'function' && document.fullscreenEnabled !== false;
     const isIos =
       /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -332,12 +426,22 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
     // On phones, closing the overlay ends the game. For the iOS fullscreen fallback it only leaves the overlay.
     let closeStopsGame = false;
 
+    // Landscape-only games: suggest turning the phone. The feed's orientation is used only here (R19).
+    function showRotateHint(): void {
+      if (root!.dataset.aspect !== 'landscape' || !window.matchMedia('(orientation: portrait)').matches) return;
+      rotateHint.hidden = false;
+      window.setTimeout(() => {
+        rotateHint.hidden = true;
+      }, 6000);
+    }
+
     function openOverlay(stopsGame: boolean): void {
       overlayOpen = true;
       closeStopsGame = stopsGame;
       frame.classList.add('is-overlay');
       closeBtn.hidden = false;
       document.body.style.overflow = 'hidden';
+      showRotateHint();
     }
 
     function closeOverlay(): void {
@@ -345,6 +449,7 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
       overlayOpen = false;
       frame.classList.remove('is-overlay');
       closeBtn.hidden = true;
+      rotateHint.hidden = true;
       document.body.style.overflow = '';
       if (closeStopsGame) {
         stopGame();
@@ -353,7 +458,8 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
       }
     }
 
-    function startGame(): void {
+    // `focus` is false for the automatic start on desktop, so the page keeps the keyboard focus.
+    function startGame(focus = true): void {
       if (iframe) return;
       addRecentlyPlayed(slug);
       iframe = document.createElement('iframe');
@@ -362,16 +468,21 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
       iframe.title = `${title} game`;
       iframe.setAttribute('allow', 'autoplay; fullscreen; gamepad; clipboard-write');
       iframe.setAttribute('allowfullscreen', '');
+      iframe.addEventListener('load', () => {
+        loading.hidden = true;
+      }, { once: true });
       frame.appendChild(iframe);
+      loading.hidden = false;
       cover.hidden = true;
       coverBg.hidden = true;
-      if (phone.matches) openOverlay(true);
-      iframe.focus();
+      if (compact.matches) openOverlay(true);
+      if (focus) iframe.focus();
     }
 
     function stopGame(): void {
       iframe?.remove();
       iframe = null;
+      loading.hidden = true;
       cover.hidden = false;
       coverBg.hidden = false;
       playBtn.focus();
@@ -407,7 +518,23 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
       }
     }
 
-    playBtn.addEventListener('click', startGame);
+    playBtn.addEventListener('click', () => startGame());
+
+    // Desktop: start by itself once the page has loaded and the browser is idle (300 ms at the latest).
+    function scheduleAutoStart(): void {
+      let started = false;
+      const go = (): void => {
+        if (started || iframe || compact.matches) return;
+        started = true;
+        startGame(false);
+      };
+      if ('requestIdleCallback' in window) window.requestIdleCallback(go, { timeout: 300 });
+      window.setTimeout(go, 300);
+    }
+    if (!compact.matches) {
+      if (document.readyState === 'complete') scheduleAutoStart();
+      else window.addEventListener('load', scheduleAutoStart, { once: true });
+    }
     closeBtn.addEventListener('click', closeOverlay);
     document.addEventListener('keydown', (event: KeyboardEvent) => {
       if (event.key === 'Escape') closeOverlay();

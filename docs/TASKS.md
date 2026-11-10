@@ -203,7 +203,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: behaviour works with mouse, keyboard and touch; works without JS (box and links still there); screenshots saved.
 
 ### TP.3 — Game page layout and auto-load
-- status: todo · deps: TP.2 · model: **sonnet** · docs: DESIGN §V2.4
+- status: done · deps: TP.2 · model: **sonnet** · docs: DESIGN §V2.4
 - Do: Poki-style grid layout around the player, desktop auto-load after idle with spinner, player bar with labelled buttons, reserved ad blocks (only when ads enabled), text card below the tiles.
 - Done when: a Playgama and a GameMonetize game auto-load on desktop and play; phones still use cover + overlay; Lighthouse (planner runs it) TBT ≤ 200 ms before the game starts.
 
