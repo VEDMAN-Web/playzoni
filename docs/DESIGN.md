@@ -186,3 +186,8 @@ Owner feedback on the R28 build. Implemented directly in the code by the planner
 - **Text card:** content column centred (860px; 1200px on the home page with `wide`). Home: centred H1 + lead + 3 perk pills; then two columns (text left; category cards + numbered top-5 games with thumbnails right); then 8 FAQs as soft-blue boxes with +/−, two columns from 1024px, plus FAQPage JSON-LD.
 - **Footer:** centred (max 1240px). Brand block (logo, tagline, one-line blurb, socials) + columns Popular categories (two short columns), Explore (New, Popular, All Categories, All Games A–Z), Help and support, Playzoni (About us, For developers). Bottom bar: "© year Playzoni. All rights reserved." and a "Back to top" pill.
 - **Organization JSON-LD:** name Playzoni, parentOrganization SparkBeta Tech (as SEO-PLAN §Schema says).
+
+### V2.12 One shared column (R34, 11 Nov 2026 — done by the planner)
+- On grid pages every block inside `main` (mosaic, rows, "Browse by category", text card) is exactly as wide as the tile grid's whole columns and centred, so all left and right edges line up (`global.css`, CSS `round()`; older browsers keep the old layout).
+- "Browse by category" uses the `wide` grid (2-cell columns that stretch to the full width).
+- Home text card: intro block left-aligned; paragraphs in the text card are justified (with hyphenation) from 600px up, left-aligned on phones. Top games are cards in the same style and width as the category cards.

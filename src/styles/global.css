@@ -103,6 +103,17 @@ main {
   box-sizing: border-box;
 }
 
+/* One shared column (DESIGN §V2.12): on grid pages every block in main (grid, rows, headings, text card) is exactly as
+   wide as the tile grid's whole columns, so all left and right edges line up. Browsers without CSS round() keep the
+   old full-width layout. */
+@supports (width: round(down, 10px, 3px)) {
+  main.has-grid.has-grid > * {
+    box-sizing: border-box;
+    max-width: calc(round(down, 100% + var(--gap), var(--cell) + var(--gap)) - var(--gap));
+    margin-inline: auto;
+  }
+}
+
 /* Tile reveal (§V2.2): tiles below the fold start hidden and rise in when they scroll into view. */
 .reveal-pre {
   opacity: 0;

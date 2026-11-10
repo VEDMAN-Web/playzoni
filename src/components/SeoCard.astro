@@ -63,6 +63,14 @@ const { label = 'About this page', wide = false } = Astro.props;
     color: var(--c-ink-2);
     font: var(--t-body);
   }
+  /* Body text is justified (owner, 11 Nov), with hyphenation so lines do not open wide gaps. Phones keep it
+     left-aligned: a narrow column justified leaves big holes between words. */
+  @media (min-width: 600px) {
+    .seo-card :global(p) {
+      text-align: justify;
+      hyphens: auto;
+    }
+  }
   .seo-card :global(strong) {
     color: var(--c-ink);
     font-weight: 800;

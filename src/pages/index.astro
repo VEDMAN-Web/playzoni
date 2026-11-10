@@ -161,7 +161,7 @@ const faqPage = {
 
   <section class="browse" aria-labelledby="browse-heading">
     <h2 id="browse-heading" class="block-heading">Browse by category</h2>
-    <GameGrid items={browseItems} mode="uniform" uniformSize="S" label="All categories" />
+    <GameGrid items={browseItems} mode="uniform" uniformSize="S" wide={true} label="All categories" />
   </section>
 
   <SeoCard label="About Playzoni" wide>
@@ -265,19 +265,17 @@ const faqPage = {
 
   /* Text card layout (DESIGN §V2.11): centred intro, then two columns from 1024px, then the FAQ. */
   .about-intro {
-    text-align: center;
     padding-bottom: var(--s-5);
     border-bottom: 1px solid var(--c-line);
   }
   .about-intro .lead {
-    max-width: 640px;
-    margin: 0 auto var(--s-4);
+    max-width: 760px;
+    margin: 0 0 var(--s-4);
     font: 400 18px/28px var(--font-sans);
   }
   .about-intro .perks {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: var(--s-2);
     list-style: none;
     margin: 0;
@@ -380,19 +378,23 @@ const faqPage = {
   .about-side .top-list li {
     margin: 0;
   }
+  /* Same box as the category cards above, so both lists share one left edge. */
   .top-list a {
     display: flex;
     align-items: center;
     gap: var(--s-3);
-    min-height: 52px;
-    padding: 6px var(--s-3) 6px 6px;
+    min-height: 56px;
+    box-sizing: border-box;
+    padding: var(--s-2) var(--s-3);
     border-radius: 14px;
+    background: var(--c-bg);
     text-decoration: none;
-    transition: background-color 120ms ease-out;
+    transition: background-color 120ms ease-out, box-shadow 120ms ease-out;
   }
   .top-list a:hover,
   .top-list a:focus-visible {
-    background: var(--c-bg);
+    background: var(--c-surface);
+    box-shadow: 0 0 0 2px var(--c-primary);
     text-decoration: none;
   }
   .top-rank {
