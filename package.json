@@ -14,7 +14,7 @@
     "check": "astro check && npm run lint && npm run validate && npm run build",
     "placeholders": "tsx scripts/make-placeholders.ts",
     "icons": "tsx scripts/make-icons.ts",
-    "postbuild": "pagefind --site dist"
+    "postbuild": "pagefind --site dist && tsx scripts/sitemap-check.ts"
   },
   "repository": {
     "type": "git",

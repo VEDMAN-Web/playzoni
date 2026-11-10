@@ -128,7 +128,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 ## Phase 3 — Technical SEO and quality
 
 ### T3.1 — Sitemap and robots
-- status: todo · deps: T2.3, T2.4, T2.7 · model: haiku · docs: SEO-PLAN §Technical
+- status: done · deps: T2.3, T2.4, T2.7 · model: haiku · docs: SEO-PLAN §Technical
 - Do: configure sitemap (exclude noindex pages via a shared list in `src/lib/noindex.ts` that pages also use), `lastmod` from `updatedDate`, `public/robots.txt` exactly as §Technical.
 - Done when: built sitemap contains every indexable page and no noindex page (script check in validate).
 
