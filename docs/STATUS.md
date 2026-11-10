@@ -3,9 +3,9 @@
 Updated by the build agent after every task. The reviewer reads this first.
 
 - Last updated: 10 Nov 2026
-- Phase: 0 (T0.3 blocked on Q8; Phase 0 not yet finished)
+- Phase: 1
 - Preview URL: — (after T5.5)
-- Next task: T1.2 (T0.3 still blocked on Q8)
+- Next task: T1.2
 
 ## Current task
 (none — T1.1 finished)
@@ -13,6 +13,7 @@ Updated by the build agent after every task. The reviewer reads this first.
 ## Log (newest first)
 | Date | Task | What changed (files) | How verified | Left open |
 |---|---|---|---|---|
+| 10 Nov 2026 | R4 (spacing names), R5 (STATUS top lines) | R4: global.css spacing tokens renamed to `--spacing-s1`…`s8` (e14b084), so utilities are `p-s1`…`p-s8`; verified `.p-s5` builds to `var(--s-5)`. R5: STATUS Phase set to 1 and Next task to T1.2; no duplicate heading existed (already fixed in 3bb7042) | `npm run check` exit 0; `grep -c "Log (newest first)"` = 1 | none |
 | 10 Nov 2026 | R1, R2, R3 (review items) | package.json `"type": "module"` (8dd6730); STATUS heading fix (3bb7042); rebased onto planner commit e25ba02 | `npm run check` exit 0 after the ES module change | none |
 | 10 Nov 2026 | T1.1 | src/styles/tokens.css (every DESIGN token; type tokens are font shorthands `--t-h1` etc., responsive H1 at 768px, gutter/cell/gap by breakpoint); src/styles/global.css (font import, Tailwind v4 `@theme inline` mapping of colours, spacing, radius, shadow; body base, focus ring, link styles, reduced-motion rule); src/pages/index.astro imports global.css | `npm run check` exit 0 (0 errors, 0 warnings, 0 hints, validate ok, build complete); grep: no hex colour outside tokens.css; every `--name` in DESIGN exists in tokens.css | Tailwind's default `font-sans` utility is not remapped (a self-referencing mapping broke the build and was removed). Body and type tokens use `--font-sans` from tokens.css. No visual check yet (placeholder page; the 4-width check belongs to UI tasks). |
 | 10 Nov 2026 | T0.4 | docs/seo-research/serp-snapshot.md (12 tables, 10 rows each) | 12 WebSearch calls, one per nav term; tables built from the returned link lists | Not real Google positions: the tool returns links in its own order and does not confirm US top 10. Research only. Needs a real SERP tool (Q8). |
