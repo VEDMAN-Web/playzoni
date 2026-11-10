@@ -60,7 +60,7 @@ Text blocks max width 72ch.
 - No horizontal page scroll at any width.
 
 ## §Rows (`GameRow`)
-Title (`--t-h3`) left, "See all ›" link right. Tiles in one horizontal line, scroll-snap, swipe on touch, hidden scrollbar, arrow buttons on desktop (≥1024) at both ends. Tile size M on desktop, S on mobile, with 1-line title below.
+Title (`--t-h3`) left, "See all ›" link right. Tiles in one horizontal line, scroll-snap, swipe on touch, hidden scrollbar, arrow buttons on desktop (≥1024) at both ends. Tile size S on all widths (smaller, Poki-style rows), with 1-line title below.
 
 ## §Header (nav box — no full-width bar)
 The site has **no full-width header bar and no category chip row**. Navigation lives in a small white "nav box" that floats at the top-left, and categories appear as tiles inside the grid (§Category tile) and in the search panel.
