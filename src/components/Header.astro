@@ -2,6 +2,7 @@
 import NavBox from './NavBox.astro';
 import NavIcon from './NavIcon.astro';
 import SearchPanel from './SearchPanel.astro';
+import ProfilePanel from './ProfilePanel.astro';
 
 // Site header (docs/DESIGN.md §V2.3). Three parts, each shown at its own screen size:
 // - the nav box: a 1x1 tile at the top-left of the page on desktop. Pages with a game grid put it inside the grid
@@ -26,6 +27,7 @@ const { box = true } = Astro.props;
     <a class="fb-btn" href="/categories" aria-label="All categories" data-tip="Categories"><NavIcon name="grid" /></a>
     <a class="fb-btn" href="/search" aria-label="Search games" aria-controls="search-panel" aria-expanded="false" data-tip="Search" data-search-open><NavIcon name="search" /></a>
     <a class="fb-btn" href="/favourites" aria-label="Favourites" data-tip="Favourites"><NavIcon name="heart" /></a>
+    <a class="fb-btn" href="/favourites" aria-label="Your games" aria-controls="profile-panel" aria-expanded="false" data-tip="Your games" data-profile-open><NavIcon name="smile" /></a>
   </nav>
 
   <nav class="top-bar" aria-label="Site">
@@ -33,10 +35,12 @@ const { box = true } = Astro.props;
     <div class="top-actions">
       <a class="fb-btn" href="/search" aria-label="Search games" aria-controls="search-panel" aria-expanded="false" data-search-open><NavIcon name="search" /></a>
       <a class="fb-btn" href="/favourites" aria-label="Favourites"><NavIcon name="heart" /></a>
+      <a class="fb-btn" href="/favourites" aria-label="Your games" aria-controls="profile-panel" aria-expanded="false" data-profile-open><NavIcon name="smile" /></a>
     </div>
   </nav>
 
   <SearchPanel />
+  <ProfilePanel />
 </header>
 
 <script>

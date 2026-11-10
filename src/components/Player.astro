@@ -410,7 +410,8 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
 </style>
 
 <script>
-  import { addRecentlyPlayed, getReaction, isFavourite, toggleFavourite, toggleReaction } from '../lib/storage';
+  import { addRecentlyPlayed, getReaction, isFavourite, recordPlayStart, recordPlayTime, toggleFavourite, toggleReaction } from '../lib/storage';
+  import { STEP_SECONDS, secondsToAdd } from '../lib/play-time';
 
   const root = document.querySelector<HTMLElement>('[data-player]');
   if (root) {
@@ -478,6 +479,7 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
     function startGame(focus = true): void {
       if (iframe) return;
       addRecentlyPlayed(slug);
+      recordPlayStart(slug);
       iframe = document.createElement('iframe');
       iframe.className = 'game-frame';
       iframe.src = embedUrl;
@@ -494,6 +496,16 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
       if (compact.matches) openOverlay(true);
       if (focus) iframe.focus();
     }
+
+    // Time played: every 5 seconds, while the game is running and this page is visible, up to 4 hours per visit (DESIGN §V2.9).
+    let visitSeconds = 0;
+    window.setInterval(() => {
+      if (!iframe || document.visibilityState !== 'visible') return;
+      const add = secondsToAdd(visitSeconds);
+      if (add === 0) return;
+      visitSeconds += add;
+      recordPlayTime(slug, add);
+    }, STEP_SECONDS * 1000);
 
     function stopGame(): void {
       iframe?.remove();

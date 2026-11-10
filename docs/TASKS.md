@@ -218,7 +218,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: played badge appears after playing a game and reloading; hover preview works with each of the three fallbacks; search panel matches §V2.8 at 390 and 1280; `/categories` uses 2×1 image tiles; screenshots saved in `docs/screens/TP.6/`; `npm run check` passes.
 
 ### TP.7 — Profile panel (local, no login)
-- status: todo · deps: TP.6 · model: haiku · docs: DESIGN §V2.9
+- status: done · deps: TP.6 · model: haiku · docs: DESIGN §V2.9
 - Do: profile icon in nav box/bar/phone bar, profile panel, play/time tracking in `storage.ts`, "Played today" labels, clear-history with in-panel confirm.
 - Done when: playing two games and reloading shows 2 games and a time; works in a private window without errors (shows the empty state); screenshots in `docs/screens/TP.7/`; `npm run check` passes.
 

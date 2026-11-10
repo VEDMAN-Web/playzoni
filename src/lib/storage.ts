@@ -1,3 +1,5 @@
+import { applyPlayStart, applyPlayTime, cleanStats, type StatsMap } from './play-time';
+
 // Small localStorage helpers. Every access is wrapped in try/catch, because storage can be
 // blocked (private windows, strict settings). Failures are silent: the feature just does nothing.
 
@@ -94,4 +96,44 @@ export function toggleReaction(slug: string, reaction: Reaction): Reaction | nul
     // Storage is not available. Nothing to do.
   }
   return next;
+}
+
+// ---- Play history for the profile panel (DESIGN §V2.9): per game first and last time played, plays and seconds ----
+const STATS_KEY = 'pz-stats';
+
+export function getStats(): StatsMap {
+  try {
+    const raw = window.localStorage.getItem(STATS_KEY);
+    return raw ? cleanStats(JSON.parse(raw)) : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeStats(stats: StatsMap): void {
+  try {
+    window.localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+  } catch {
+    // Storage is not available. Nothing to do.
+  }
+}
+
+// The game was started on its page.
+export function recordPlayStart(slug: string): void {
+  writeStats(applyPlayStart(getStats(), slug, Date.now()));
+}
+
+// Adds played seconds (the player calls this every 5 seconds while the game page is visible).
+export function recordPlayTime(slug: string, seconds: number): void {
+  writeStats(applyPlayTime(getStats(), slug, seconds, Date.now()));
+}
+
+// "Clear my history": recently played and the play history go. Favourites and likes stay.
+export function clearHistory(): void {
+  try {
+    window.localStorage.removeItem(RECENT_KEY);
+    window.localStorage.removeItem(STATS_KEY);
+  } catch {
+    // Storage is not available. Nothing to do.
+  }
 }

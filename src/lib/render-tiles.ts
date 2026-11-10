@@ -47,3 +47,54 @@ export function gameTile(game: IndexGame, withTitle: boolean): HTMLElement {
   }
   return link;
 }
+
+// A small clock (our own line drawing) for the "Played today" pill.
+function clockIcon(): SVGElement {
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('width', '14');
+  svg.setAttribute('height', '14');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2.4');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  const circle = document.createElementNS(ns, 'circle');
+  circle.setAttribute('cx', '12');
+  circle.setAttribute('cy', '12');
+  circle.setAttribute('r', '9');
+  const hands = document.createElementNS(ns, 'path');
+  hands.setAttribute('d', 'M12 7v5l3 2');
+  svg.append(circle, hands);
+  return svg;
+}
+
+// A large tile (2x2 size) with a small white pill under the picture's top edge, used by the profile panel's
+// "Ready for another round?" row. The played badge is added afterwards by applyPlayedBadges.
+export function largeTile(game: IndexGame, pillText: string): HTMLElement {
+  const link = document.createElement('a');
+  link.className = 'pz-tile pz-tile-l';
+  link.href = `/game/${game.slug}`;
+  link.dataset.slug = game.slug;
+  link.setAttribute('aria-label', game.title);
+
+  const img = document.createElement('img');
+  img.src = game.thumb.replace('/s.webp', '/m.webp');
+  img.width = 300;
+  img.height = 300;
+  img.alt = '';
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  link.appendChild(img);
+
+  if (pillText) {
+    const pill = document.createElement('span');
+    pill.className = 'pz-pill';
+    pill.appendChild(clockIcon());
+    pill.appendChild(document.createTextNode(pillText));
+    link.appendChild(pill);
+  }
+  return link;
+}
