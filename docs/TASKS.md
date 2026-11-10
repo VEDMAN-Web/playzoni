@@ -25,12 +25,12 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: `graphify-out/GRAPH_REPORT.md` exists and is committed.
 
 ### T0.3 — Category keyword data
-- status: todo · deps: T0.1 · model: haiku · docs: SEO-PLAN §Categories §Strategy
+- status: blocked (Q8) · deps: T0.1 · model: haiku · docs: SEO-PLAN §Categories §Strategy
 - Do: with the installed SEO keyword-research skill, get monthly search volume and keyword difficulty for every category name in SEO-PLAN §Categories, in **United States** and **India**, plus these modifiers for the 12 nav categories: "`<name>` online", "`<name>` free", "`<name>` for mobile". If the skill needs a paid API key you don't have → QUESTIONS (do not invent numbers). Save `docs/seo-research/category-keywords.csv` with columns `keyword,country,volume,difficulty,source,date`.
 - Done when: CSV has one row per keyword × country, every number came from the tool, `source` names the tool.
 
 ### T0.4 — SERP snapshot
-- status: todo · deps: T0.1 · model: haiku
+- status: done (research-only: tool order, not Google positions; see Q8) · deps: T0.1 · model: haiku
 - Do: for the 12 nav category head terms (e.g. "car games"), record the top 10 ranking domains (US) using the SEO skill or web search. Save `docs/seo-research/serp-snapshot.md` (one table per term: position, domain, URL). No analysis needed.
 - Done when: 12 tables present, each with 10 rows or a note why fewer.
 

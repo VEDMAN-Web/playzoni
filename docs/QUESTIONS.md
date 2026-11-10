@@ -14,6 +14,12 @@ Answer: —
 
 ## Open
 
+### Q8 — Keyword and search-results tool   (T0.3 blocked, T0.4 partly done, asked 10 Nov 2026, by build agent)
+Question: T0.3 needs real monthly search volume and difficulty for US and India, and T0.4 needs real Google top-10 results. No keyword tool is set up. The START-HERE guide suggests the "Open SEO keyword-research" skill, but I could not find it on npm, and I will not invent numbers. The web search tool I have only gives a list of links in its own order, so the T0.4 tables are research-only (see docs/seo-research/serp-snapshot.md).
+Options: A) Set up a keyword tool with an account you already have (tell me which one, and how to give me the key via .env) B) Pay for a DataForSEO account (pay-as-you-go, you approve the cost first) C) Skip volumes for now and build without them (T0.3 stays blocked; Phase 1 can continue)
+Blocking: T0.3, and any later task that uses search volume (T4.5 shortlist)
+Answer: —
+
 ### Q7 — Five doc conflicts found by the graph   (T0.2, asked 10 Nov 2026, by build agent)
 Question: The graph extraction found places where our docs disagree. Which version should the build follow?
 (1) Game tile size L: PRD §6 says 2x2, DESIGN §Game tile says 3x3 (and M is 2x2). Blocks T2.1.
