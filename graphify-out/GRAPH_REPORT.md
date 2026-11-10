@@ -1,144 +1,144 @@
 # Graph Report - playzoni-kit  (2026-11-10)
 
 ## Corpus Check
-- Corpus is ~10,512 words - fits in a single context window. You may not need a graph.
+- 28 files · ~19,299 words
+- Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 143 nodes · 182 edges · 18 communities (11 shown, 7 thin omitted)
-- Extraction: 79% EXTRACTED · 18% INFERRED · 3% AMBIGUOUS · INFERRED: 33 edges (avg confidence: 0.9)
+- 228 nodes · 280 edges · 21 communities (14 shown, 7 thin omitted)
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 13 edges (avg confidence: 0.83)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
 - Npm and Build Config
-- Agent Rules and Design Rules
-- Product Scope and Stack
-- Categories and Game Sources
+- Design Tokens and Visual Rules
+- SEO Helper Tests
+- Category Data and Nav
+- Product Stack and Hosting
+- Data Model and Sources
+- Agent Rules and Procedure
+- Sample Game Generator
 - Astro Config Dependencies
-- Content Schemas and Templates
-- Project Docs Index
+- Icon and Logo Generator
 - npm Scripts
-- Launch, Deploy and Ads Tasks
+- Font and Base Layout
 - TypeScript Config
-- Git Remote Config
-- Stop-and-Ask Rules
-- Brand Spec
-- Type Tokens
-- SEO KPIs
+- Ads and Legal Tasks
+- JSON-LD Component
+- Phase 0 Setup
+- README
 - Setup Guide
+- Build Agent Start Message
 
 ## God Nodes (most connected - your core abstractions)
-1. `scripts` - 7 edges
-2. `Read order for every session` - 6 edges
-3. `Reusable component list` - 6 edges
-4. `Always rules (mobile first, static output, tokens, SEO components)` - 5 edges
-5. `Start message for the build agent` - 5 edges
-6. `GameTile component spec (S 1x1, M 2x2, L 3x3 cells)` - 5 edges
-7. `Player and mobile overlay spec` - 5 edges
-8. `Technical SEO rules (canonical, robots, sitemap, headers)` - 5 edges
-9. `Golden content rules (real play notes, no invented facts, feed text is input only)` - 5 edges
-10. `Colour tokens` - 4 edges
+1. `scripts` - 9 edges
+2. `Approved tech stack` - 8 edges
+3. `Category taxonomy` - 6 edges
+4. `Q7 five doc conflicts` - 6 edges
+5. `pad()` - 5 edges
+6. `One-task procedure` - 5 edges
+7. `Game data model` - 5 edges
+8. `astro` - 4 edges
+9. `sharp` - 4 edges
+10. `gameMarkdown()` - 4 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Build commands (dev, build, check, validate, import)` --references--> `T0.1 Create repo and project skeleton (done)`  [INFERRED]
-  CLAUDE.md → docs/TASKS.md
-- `Read order for every session` --references--> `DESIGN design system v1.0`  [EXTRACTED]
-  CLAUDE.md → docs/DESIGN.md
-- `Read order for every session` --references--> `REVIEW reviewer notes log (currently empty)`  [EXTRACTED]
+- `Approved tech stack` --references--> `tailwindcss`  [EXTRACTED]
+  docs/PRD.md → package.json
+- `One-task procedure` --references--> `R4 spacing token names`  [EXTRACTED]
   CLAUDE.md → docs/REVIEW.md
-- `Read order for every session` --references--> `SEO-PLAN analysis and plan v1.0`  [EXTRACTED]
+- `Never rules` --references--> `Helpful content golden rules`  [EXTRACTED]
   CLAUDE.md → docs/SEO-PLAN.md
-- `Per-task procedure (plan, build, verify, record, commit)` --references--> `STATUS build progress log`  [EXTRACTED]
-  CLAUDE.md → docs/STATUS.md
+- `Never rules` --conceptually_related_to--> `Poki reference findings`  [INFERRED]
+  CLAUDE.md → docs/SEO-PLAN.md
+- `Always rules` --references--> `Colour tokens`  [EXTRACTED]
+  CLAUDE.md → docs/DESIGN.md
 
 ## Import Cycles
 - None detected.
 
 ## Hyperedges (group relationships)
-- **Game page content pipeline (QA notes to published page)** — docs_seo_plan_qa_notes, docs_seo_plan_game_template, docs_seo_plan_content_rules, docs_seo_plan_validate_checks, docs_tasks_t5_3_game_pages [INFERRED 0.75]
-- **Launch readiness gates** — docs_tasks_t3_5_phase3_audit, docs_seo_plan_performance, docs_seo_plan_validate_checks, docs_tasks_t5_5_deploy, docs_seo_plan_launch_checklist [INFERRED 0.75]
-- **Four-width UI verification (360, 390, 768, 1280 px)** — claude_task_procedure, docs_design_grid, docs_design_header, docs_design_player, docs_design_accessibility [INFERRED 0.75]
+- **Approved tech stack** — docs_prd_astro, ref_tailwindcss, docs_prd_nunito_font, docs_prd_pagefind, docs_prd_sharp, docs_prd_cloudflare_pages [EXTRACTED 1.00]
+- **Tasks marked model sonnet** — docs_tasks_t2_5_player, docs_tasks_t3_3_validator, docs_tasks_t4_1_normalizer, docs_tasks_t4_2_gd_adapter [EXTRACTED 1.00]
+- **Content quality gate** — docs_seo_plan_content_rules, docs_seo_plan_qa_notes, docs_seo_plan_validate_checks, docs_tasks_t3_3_validator [INFERRED 0.85]
 
-## Communities (18 total, 7 thin omitted)
+## Communities (21 total, 7 thin omitted)
 
 ### Community 0 - "Npm and Build Config"
-Cohesion: 0.08
-Nodes (31): bugs, url, description, devDependencies, @astrojs/check@^0.9.12, eslint@^10.14.0, @eslint/js@^10.0.1, eslint-plugin-astro@^3.2.1 (+23 more)
+Cohesion: 0.07
+Nodes (34): bugs, url, description, devDependencies, @astrojs/check@^0.9.12, eslint@^10.14.0, @eslint/js@^10.0.1, eslint-plugin-astro@^3.2.1 (+26 more)
 
-### Community 1 - "Agent Rules and Design Rules"
+### Community 1 - "Design Tokens and Visual Rules"
+Cohesion: 0.10
+Nodes (22): Colour tokens, GameTile component, GameGrid mosaic and uniform modes, Header design, Player design, Game page layout, Header and footer, Home page layout (+14 more)
+
+### Community 2 - "SEO Helper Tests"
 Cohesion: 0.13
-Nodes (19): Always rules (mobile first, static output, tokens, SEO components), Owner is non-technical, messages must be short plain English, Colour tokens, Content blocks (text card, FAQ, info table, chips, breadcrumbs), GameTile component spec (S 1x1, M 2x2, L 3x3 cells), GameGrid mosaic pattern (18-tile repeat), Header and category nav spec, Player and mobile overlay spec (+11 more)
+Nodes (17): cat, t20, t45, t70, canonical, image, Props, assertDescription() (+9 more)
 
-### Community 2 - "Product Scope and Stack"
+### Community 3 - "Category Data and Nav"
+Cohesion: 0.11
+Nodes (13): navItems, Props, popular, year, counts, Props, closeBtn, input (+5 more)
+
+### Community 4 - "Product Stack and Hosting"
+Cohesion: 0.12
+Nodes (13): Brand and logo, Type scale, Astro framework, Cloudflare Pages hosting, Nunito variable font, Pagefind search, sharp image library, Approved tech stack (+5 more)
+
+### Community 5 - "Data Model and Sources"
+Cohesion: 0.14
+Nodes (16): Category data model, Folder structure, Game data model, Game source provider adapters, Q2 game provider publisher accounts, QA notes file (data/qa), JSON-LD schema rules, Title and meta description templates (+8 more)
+
+### Community 6 - "Agent Rules and Procedure"
+Cohesion: 0.14
+Nodes (10): Playzoni project, Vedant Paliwal (owner), Space, radius and shadow scale, R4 spacing token names, R2 and R5 STATUS duplicate heading fix, SEO KPIs, Performance budget, Current build state (Phase 1 done, next T2.1) (+2 more)
+
+### Community 7 - "Sample Game Generator"
+Cohesion: 0.23
+Nodes (13): ASPECTS, categoriesFor(), EXTRA_CATEGORIES, gameMarkdown(), GAMES_DIR, main(), pad(), PALETTE (+5 more)
+
+### Community 8 - "Astro Config Dependencies"
 Cohesion: 0.18
-Nodes (13): Never rules (no main commits, no invented numbers, no Poki name), Ads plan (AdSense, consent, slot sizes), Repository folder structure, Out of scope for MVP (accounts, comments, leaderboards, own games), Playzoni product definition (free instant browser games, no download or account), Q6 game testers for QA notes (owner action), Poki study findings (structure only, copy no content), Game page markdown template (350-700 words) (+5 more)
+Nodes (10): dependencies, astro@^7.4.8, @astrojs/sitemap@^3.7.4, @tailwindcss/vite@^4.3.5, astro, @astrojs/sitemap, @tailwindcss/vite, categories (+2 more)
 
-### Community 3 - "Categories and Game Sources"
-Cohesion: 0.18
-Nodes (12): Category data model, Page inventory and URLs, Game source provider adapters and embed rules, Q1 unblocked games target (owner decision), Q2 game provider publisher accounts (owner action), Q5 contact email (hello@playzoni.com placeholder), Category taxonomy and 12-game publishing threshold, Category text template (400-900 words) (+4 more)
+### Community 9 - "Icon and Logo Generator"
+Cohesion: 0.22
+Nodes (8): brand, FONT_FILE, iconSvg, logoSvg(), main(), PUBLIC, ROOT, socialSvg()
 
-### Community 4 - "Astro Config Dependencies"
-Cohesion: 0.20
-Nodes (11): dependencies, astro@^7.4.8, @astrojs/sitemap@^3.7.4, @fontsource-variable/nunito@^5.3.0, tailwindcss@^4.3.5, @tailwindcss/vite@^4.3.5, astro, @astrojs/sitemap (+3 more)
+### Community 10 - "npm Scripts"
+Cohesion: 0.22
+Nodes (9): scripts, build, check, dev, icons, lint, placeholders, preview (+1 more)
 
-### Community 5 - "Content Schemas and Templates"
-Cohesion: 0.20
-Nodes (11): Build commands (dev, build, check, validate, import), CLAUDE.md build agent rules, Game data model (frontmatter fields), Home page section order (mosaic, recently played, rows, categories), JSON-LD schema rules (VideoGame, CollectionPage, no ratings), Title, meta description and heading templates, Validate checks (npm run validate), T1.2 Content schemas, taxonomy and sample data (+3 more)
-
-### Community 6 - "Project Docs Index"
-Cohesion: 0.33
-Nodes (10): Model note (Haiku vs Sonnet tasks), Read order for every session, DESIGN design system v1.0, PRD product requirements v1.0, REVIEW reviewer notes log (currently empty), SEO-PLAN analysis and plan v1.0, STATUS build progress log, TASKS task list (phases 0 to 6) (+2 more)
-
-### Community 7 - "npm Scripts"
+### Community 11 - "Font and Base Layout"
 Cohesion: 0.29
-Nodes (7): scripts, build, check, dev, lint, preview, validate
+Nodes (3): @fontsource-variable/nunito@^5.3.0, @fontsource-variable/nunito, Props
 
-### Community 8 - "Launch, Deploy and Ads Tasks"
-Cohesion: 0.40
-Nodes (5): Q3 domain and Cloudflare setup (owner action), Q4 legal page text (owner action), Launch checklist (Search Console, Bing, IndexNow, social), T5.5 Deploy to Cloudflare Pages, T6.1 AdSense and consent (blocked on approval)
-
-### Community 9 - "TypeScript Config"
+### Community 12 - "TypeScript Config"
 Cohesion: 0.40
 Nodes (4): astro/tsconfigs/strict, exclude, extends, include
 
-### Community 10 - "Git Remote Config"
-Cohesion: 0.67
-Nodes (3): repository, type, url
-
-## Ambiguous Edges - Review These
-- `GameTile component spec (S 1x1, M 2x2, L 3x3 cells)` → `Home page section order (mosaic, recently played, rows, categories)`  [AMBIGUOUS]
-  docs/PRD.md · relation: conceptually_related_to
-- `Player and mobile overlay spec` → `T2.6 Recently played, favourites and like/dislike`  [AMBIGUOUS]
-  docs/TASKS.md · relation: conceptually_related_to
-- `Approved tech stack` → `T0.1 completion log (repo and project skeleton, with deviations)`  [AMBIGUOUS]
-  docs/STATUS.md · relation: conceptually_related_to
-- `Page inventory and URLs` → `Technical SEO rules (canonical, robots, sitemap, headers)`  [AMBIGUOUS]
-  docs/SEO-PLAN.md · relation: conceptually_related_to
-- `Header and footer content` → `T1.5 Header, category nav and footer`  [AMBIGUOUS]
-  docs/TASKS.md · relation: conceptually_related_to
+### Community 13 - "Ads and Legal Tasks"
+Cohesion: 0.50
+Nodes (4): Ads plan (Phase 4), Q4 legal page text, Phase 6 ads, T6.1 AdSense and consent
 
 ## Knowledge Gaps
-- **24 isolated node(s):** `astro/tsconfigs/strict`, `Stop and ask rule`, `Owner is non-technical, messages must be short plain English`, `START-HERE build chat setup guide`, `Brand and logo spec` (+19 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 45 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **27 isolated node(s):** `astro/tsconfigs/strict`, `START-HERE build chat setup guide`, `README install and run guide`, `Start message for the build agent`, `Vedant Paliwal (owner)` (+22 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 101 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Always rules (mobile first, static output, tokens, SEO components)` connect `Agent Rules and Design Rules` to `Product Scope and Stack`?**
-  _High betweenness centrality (0.069) - this node is a cross-community bridge._
-- **Are the 6 inferred relationships involving `Reusable component list` (e.g. with `Always rules (mobile first, static output, tokens, SEO components)` and `Content blocks (text card, FAQ, info table, chips, breadcrumbs)`) actually correct?**
-  _`Reusable component list` has 6 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `astro/tsconfigs/strict`, `Stop and ask rule`, `Owner is non-technical, messages must be short plain English` to the rest of the system?**
-  _24 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Why does `Approved tech stack` connect `Product Stack and Hosting` to `Design Tokens and Visual Rules`?**
+  _High betweenness centrality (0.411) - this node is a cross-community bridge._
+- **What connects `astro/tsconfigs/strict`, `START-HERE build chat setup guide`, `README install and run guide` to the rest of the system?**
+  _27 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Npm and Build Config` be split into smaller, more focused modules?**
-  _Cohesion score 0.08333333333333333 - nodes in this community are weakly interconnected._
-- **Why does `Golden content rules (real play notes, no invented facts, feed text is input only)` connect `Product Scope and Stack` to `Categories and Game Sources`?**
-  _High betweenness centrality (0.060) - this node is a cross-community bridge._
-
-### Low-confidence Hints
-_AMBIGUOUS edges — the extractor was unsure. Verify before acting on these._
-
-- **What is the exact relationship between `GameTile component spec (S 1x1, M 2x2, L 3x3 cells)` and `Home page section order (mosaic, recently played, rows, categories)`?**
-  _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **What is the exact relationship between `Player and mobile overlay spec` and `T2.6 Recently played, favourites and like/dislike`?**
-  _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
+  _Cohesion score 0.0746031746031746 - nodes in this community are weakly interconnected._
+- **Why does `tailwindcss` connect `Product Stack and Hosting` to `Npm and Build Config`?**
+  _High betweenness centrality (0.384) - this node is a cross-community bridge._
+- **Should `Design Tokens and Visual Rules` be split into smaller, more focused modules?**
+  _Cohesion score 0.1 - nodes in this community are weakly interconnected._
+- **Why does `@fontsource-variable/nunito` connect `Font and Base Layout` to `Npm and Build Config`?**
+  _High betweenness centrality (0.287) - this node is a cross-community bridge._
+- **Should `SEO Helper Tests` be split into smaller, more focused modules?**
+  _Cohesion score 0.12681159420289856 - nodes in this community are weakly interconnected._
