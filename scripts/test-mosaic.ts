@@ -56,9 +56,13 @@ function testBadges(): void {
   same(pickBadges([], now).size, 0, 'no games, no badges');
 
   const items: Item[] = Array.from({ length: 20 }, (_, i) => ({ kind: 'game' as const, id: i, badge: 'Hot' }));
-  same(capBadges(items).filter((i) => i.badge).length, 12, 'a page keeps at most 12 badges');
+  same(capBadges(items).filter((i) => i.badge).length, 6, 'a page keeps at most 6 hot badges');
   same(capBadges(items)[0].badge, 'Hot', 'the first badges are kept');
-  same(capBadges(items, 3).filter((i) => i.badge).length, 3, 'the cap can be changed');
+  same(capBadges(items, 12, {}).filter((i) => i.badge).length, 12, 'without a per-kind limit the total cap of 12 applies');
+  same(capBadges(items, 3, {}).filter((i) => i.badge).length, 3, 'the cap can be changed');
+  const mixed2: Item[] = [...items.slice(0, 10), ...Array.from({ length: 10 }, (_, i) => ({ kind: 'game' as const, id: 100 + i, badge: 'New' }))];
+  const capped = capBadges(mixed2);
+  same([capped.filter((i) => i.badge === 'Hot').length, capped.filter((i) => i.badge === 'New').length], [6, 6], 'six hot, then new badges fill up to 12 in all');
 }
 
 testSlots();

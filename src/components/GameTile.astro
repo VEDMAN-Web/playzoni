@@ -10,10 +10,9 @@ interface Props {
   eager?: boolean;
   priority?: boolean;
   badge?: BadgeKind;
-  rowTitle?: boolean;
 }
 
-const { title, slug, size, eager = false, priority = false, badge, rowTitle = false } = Astro.props;
+const { title, slug, size, eager = false, priority = false, badge } = Astro.props;
 
 // Picture files: S uses the 150px file (300px on 2x screens); L the 300px file (600px on 2x); XL the 600px file.
 // Phones never download the 600px file at 1x for a small tile.
@@ -60,7 +59,6 @@ const srcset =
     </span>
   )}
   <span class="overlay">{title}</span>
-  {rowTitle && <span class="row-title">{title}</span>}
 </a>
 
 <style>
@@ -118,9 +116,31 @@ const srcset =
     color: var(--c-primary);
     box-shadow: 0 1px 4px rgba(14, 36, 64, 0.25);
   }
-  /* Title overlay: desktop hover and keyboard focus only. Touch devices get no overlay. */
+  /* Phones: a smaller badge (22px square, 14px icon) so it does not cover the picture (R23). */
+  @media (max-width: 479px) {
+    .badge {
+      top: 5px;
+      left: 5px;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+    }
+    .badge svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+  /* Title overlay: shown on desktop hover and keyboard focus only. Everywhere else it is visually hidden but stays
+     in the page as the link's accessible name (R27), so touch and screen-reader users still get the game's name. */
   .overlay {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   @media (hover: hover) and (pointer: fine) {
     .overlay {
@@ -129,6 +149,11 @@ const srcset =
       left: 0;
       right: 0;
       bottom: 0;
+      width: auto;
+      height: auto;
+      margin: 0;
+      clip-path: none;
+      white-space: normal;
       padding: var(--s-6) var(--s-2) var(--s-2);
       background: linear-gradient(transparent, color-mix(in srgb, var(--c-ink) 85%, transparent));
       color: var(--c-primary-ink);
@@ -146,15 +171,6 @@ const srcset =
       transform: translateY(0);
       opacity: 1;
     }
-  }
-  .row-title {
-    display: block;
-    margin-top: var(--s-1);
-    overflow: hidden;
-    color: var(--c-ink);
-    font: var(--t-small);
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
   @media (prefers-reduced-motion: reduce) {
     .tile:hover,

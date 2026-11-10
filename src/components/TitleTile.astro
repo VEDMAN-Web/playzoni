@@ -1,15 +1,17 @@
 ---
 // Title tile for grid pages (docs/DESIGN.md §V2.3). Goes in the "lead" slot of GameGrid, right after the nav box:
-// a white tile one cell wide and four cells tall, in the first column under the nav box, holding the breadcrumbs
-// and the page's only H1. Below 1024px it is a plain block above the tiles.
+// a white tile 3 cells wide and 1 tall (2 wide on the categories page) right after the nav box, holding the
+// breadcrumbs and the page's only H1 (Q16 answer, R23). Below 1024px it is a plain block above the tiles.
 interface Props {
   crumbs: { name: string; path: string }[];
   h1: string;
+  /** Width in cells from 1024px: 3 on category and list pages, 2 on the categories page. */
+  span?: 2 | 3;
 }
 
-const { crumbs, h1 } = Astro.props;
+const { crumbs, h1, span = 3 } = Astro.props;
 ---
-<div class="title-tile">
+<div class={`title-tile span-${span}`}>
   <nav class="crumbs" aria-label="Breadcrumb">
     <ol>
       {crumbs.map((c, i) => (
@@ -59,27 +61,26 @@ const { crumbs, h1 } = Astro.props;
   }
   @media (min-width: 1024px) {
     .title-tile {
-      grid-column: 1;
-      grid-row: 2 / span 4;
+      grid-column: span 3;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
+      justify-content: center;
       padding: var(--s-4);
       box-sizing: border-box;
       border-radius: var(--r-card);
       background: var(--c-surface);
       box-shadow: var(--sh-tile);
     }
-    /* 98px of text width: a smaller H1 and words that may break so long names never spill out. */
+    .title-tile.span-2 {
+      grid-column: span 2;
+    }
     .page-title {
       margin: 0;
-      font: 800 18px/22px var(--font-sans);
+      font: var(--t-h2);
       overflow-wrap: anywhere;
     }
     .crumbs ol {
-      margin: 0 0 var(--s-2);
-      font-size: 12px;
-      line-height: 16px;
+      margin: 0 0 var(--s-1);
     }
   }
 </style>

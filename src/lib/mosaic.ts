@@ -7,6 +7,7 @@
 export const MOSAIC_CYCLE = 24;
 export const LARGE_SLOTS: readonly number[] = [3, 16];
 export const MAX_BADGES_PER_PAGE = 12;
+export const MAX_HOT_BADGES_PER_PAGE = 6;
 
 export type PlacedSize = 'S' | 'L' | 'XL' | 'CAT';
 
@@ -55,13 +56,23 @@ export function placeItems<T extends Placeable>(items: T[], options: PlaceOption
   return placed;
 }
 
-// Keeps the first `max` badges on a page and drops the rest (docs/DESIGN.md §V2.2: never more than 12).
+// Keeps the first badges on a page and drops the rest (docs/DESIGN.md §V2.2): at most `max` in all and at most
+// `perKind[kind]` of one kind (six "Hot" by default, so a page does not open with a row of flames).
 // Items without a badge field (category tiles) pass through untouched.
-export function capBadges<T extends object>(items: T[], max: number = MAX_BADGES_PER_PAGE): T[] {
+export function capBadges<T extends object>(
+  items: T[],
+  max: number = MAX_BADGES_PER_PAGE,
+  perKind: Record<string, number> = { Hot: MAX_HOT_BADGES_PER_PAGE },
+): T[] {
   let used = 0;
+  const usedByKind: Record<string, number> = {};
   return items.map((item) => {
-    if (!(item as { badge?: string }).badge) return item;
+    const badge = (item as { badge?: string }).badge;
+    if (!badge) return item;
+    const kindUsed = usedByKind[badge] ?? 0;
+    if (used >= max || kindUsed >= (perKind[badge] ?? Infinity)) return { ...item, badge: undefined } as T;
     used++;
-    return used <= max ? item : ({ ...item, badge: undefined } as T);
+    usedByKind[badge] = kindUsed + 1;
+    return item;
   });
 }

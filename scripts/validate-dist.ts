@@ -56,6 +56,8 @@ for (const file of pages) {
   // At most 12 badges on a page (docs/DESIGN.md §V2.2).
   const badgeCount = (html.match(/class="badge /g) ?? []).length;
   if (badgeCount > 12) add('badge-count', `page has ${badgeCount} badges, at most 12`);
+  const hotCount = (html.match(/class="badge badge-hot/g) ?? []).length;
+  if (hotCount > 6) add('badge-hot-count', `page has ${hotCount} hot badges, at most 6`);
 
   const h1s = (html.match(/<h1[\s>]/g) ?? []).length;
   if (h1s !== 1) add('h1-count', `page has ${h1s} H1 headings, must have 1`);

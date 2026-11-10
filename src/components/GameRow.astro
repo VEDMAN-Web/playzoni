@@ -1,7 +1,7 @@
 ---
 import GameTile from './GameTile.astro';
 
-// Horizontal game row (DESIGN §Rows). Scroll-snap track, S tiles with one-line titles under them.
+// Horizontal game row (DESIGN §Rows). Scroll-snap track of plain S tiles; the name shows on hover and focus only (R27).
 // Desktop (1024px+) gets arrow buttons; a small script shows them and scrolls. Without JS it
 // is a plain swipe/scroll row (the arrows stay hidden).
 interface Props {
@@ -24,7 +24,7 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
     <div class="row-track" data-row-track>
       {games.map((g, i) => (
         <div class="row-item">
-          <GameTile title={g.title} slug={g.slug} size="S" eager={i < eagerCount} rowTitle />
+          <GameTile title={g.title} slug={g.slug} size="S" eager={i < eagerCount} />
         </div>
       ))}
     </div>
