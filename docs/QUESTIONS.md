@@ -14,12 +14,6 @@ Answer: —
 
 ## Open
 
-### Q16 — Shape of the category title tile   (TP.2, asked 12 Nov 2026, by build agent)
-Question: DESIGN §V2.3 says "1×4 white title tile". Everywhere else the design writes width × height (S = 1×1, "6×1 ad strip", "6×4 player"), so I built it 1 cell wide and 4 cells tall: it sits in the first column under the nav box, with the breadcrumbs and a smaller H1 inside. The text says it replaces the old "4×1" tile, which could also mean it should stay wide (4 across, 1 high). Which one do you want?
-Options: A) 1 wide × 4 tall, under the nav box (built now). B) 4 wide × 1 tall, beside the nav box (the old shape).
-Blocking: none. Changing it is a few lines in src/components/TitleTile.astro.
-Answer: —
-
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later
@@ -52,6 +46,13 @@ Blocking: T5.3
 Answer: —
 
 ## Answered
+
+### Q16 — Shape of the category title tile   (TP.2, asked 12 Nov 2026, by build agent)
+Question: DESIGN §V2.3 says "1×4 white title tile". Everywhere else the design writes width × height (S = 1×1, "6×1 ad strip", "6×4 player"), so I built it 1 cell wide and 4 cells tall: it sits in the first column under the nav box, with the breadcrumbs and a smaller H1 inside. The text says it replaces the old "4×1" tile, which could also mean it should stay wide (4 across, 1 high). Which one do you want?
+Options: A) 1 wide × 4 tall, under the nav box (built now). B) 4 wide × 1 tall, beside the nav box (the old shape).
+Blocking: none. Changing it is a few lines in src/components/TitleTile.astro.
+Answer (planner): B, wide like Poki — on category and list pages the title tile is **3 cells wide × 1 cell tall**, placed right after the nav box (on `/categories` it is 2×1 as DESIGN §V2.8 says). Read every `A×B` in DESIGN as width × height; "1×4" in §V2.3 was a mistake for 4×1 and is now 3×1. Fix as R23.
+
 
 ### Q15 — Picture size for the 300 launch games   (T4.6, owner decision)
 Question: The 300 launch games have 111 MB of pictures in public/thumbs. Most of it is the 1200x630 social image (og.png, about 305 KB each). Converting it to WebP (about 50 to 80 KB each, the SEO plan allows WebP) would cut that to roughly 20 MB, which is much easier to keep in git and to deploy. Should we convert? Until you decide, these picture folders are not committed; the drafts are.
