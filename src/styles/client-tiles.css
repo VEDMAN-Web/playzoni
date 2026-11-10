@@ -1,0 +1,70 @@
+/* Styles for tiles that are built in the browser (src/lib/render-tiles.ts).
+   Same look as GameTile (S size) and GameRow. Global on purpose: these elements are not
+   created by an Astro component, so scoped styles would not reach them. */
+
+.pz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--cell));
+  grid-auto-rows: max-content;
+  justify-content: center;
+  gap: var(--gap);
+}
+
+.pz-row {
+  display: flex;
+  gap: var(--gap);
+  overflow-x: auto;
+  padding: var(--s-1) 0 var(--s-2);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.pz-row::-webkit-scrollbar {
+  display: none;
+}
+.pz-row > .pz-tile {
+  flex: 0 0 auto;
+  width: var(--cell);
+  scroll-snap-align: start;
+}
+
+.pz-tile {
+  display: block;
+  color: var(--c-ink);
+  text-decoration: none;
+  transition: transform 150ms ease-out;
+}
+.pz-tile img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: var(--r-tile);
+  background: var(--c-surface);
+  box-shadow: var(--sh-tile);
+  transition: box-shadow 150ms ease-out;
+}
+.pz-tile:hover,
+.pz-tile:focus-visible {
+  transform: translateY(-3px) scale(1.03);
+  color: var(--c-ink);
+  text-decoration: none;
+}
+.pz-tile:hover img,
+.pz-tile:focus-visible img {
+  box-shadow: var(--sh-tile-hover);
+}
+.pz-title {
+  display: block;
+  margin-top: var(--s-1);
+  overflow: hidden;
+  font: var(--t-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pz-tile:hover,
+  .pz-tile:focus-visible {
+    transform: none;
+  }
+}

@@ -4,6 +4,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import GameGrid, { type GridItem } from '../components/GameGrid.astro';
 import GameRow from '../components/GameRow.astro';
+import RecentlyPlayed from '../components/RecentlyPlayed.astro';
 import JsonLd from '../components/JsonLd.astro';
 import { getPublishedGames } from '../lib/games';
 import { publishedCategoriesFrom } from '../lib/published';
@@ -98,6 +99,8 @@ const organization = {
   <Header slot="header" />
 
   <GameGrid items={mosaicItems} mode="mosaic" navSpacer={true} eagerCount={6} label="Popular and featured games" />
+
+  <RecentlyPlayed />
 
   {popularRow.length > 0 && <GameRow title="Popular games" seeAllHref="/popular-games" games={popularRow} />}
   {newRow.length > 0 && <GameRow title="New games" seeAllHref="/new-games" games={newRow} />}

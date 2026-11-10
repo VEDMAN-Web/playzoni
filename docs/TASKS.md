@@ -105,7 +105,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: sample game plays inline on desktop and in overlay at 360/390; close works; no console errors; Lighthouse TBT on game page ≤ 100 ms before click.
 
 ### T2.6 — Recently played, favourites, like/dislike
-- status: todo · deps: T2.4 · model: haiku · docs: PRD §6 §7 §8, DESIGN §States
+- status: done · deps: T2.4 · model: haiku · docs: PRD §6 §7 §8, DESIGN §States
 - Do: `src/lib/storage.ts` (all localStorage access wrapped in try/catch, max 24 recent, max 100 favourites). Recently played row on home (rendered client-side after the mosaic, hidden when empty — no layout shift above the fold). Heart button in PlayerBar toggles favourite. `/favourites` page (noindex): renders saved games client-side from a small JSON index `/games-index.json` (slug, title, thumb) built at build time. Like/dislike: toggles state only, no counts shown.
 - Done when: works in a normal and a private window (private: features silently do nothing, no errors); CLS on home ≤ 0.05.
 
