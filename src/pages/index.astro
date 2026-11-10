@@ -5,7 +5,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import GameGrid, { type GridItem } from '../components/GameGrid.astro';
-import GameRow from '../components/GameRow.astro';
+import MoreRows from '../components/MoreRows.astro';
 import RecentlyPlayed from '../components/RecentlyPlayed.astro';
 import SeoCard from '../components/SeoCard.astro';
 import JsonLd from '../components/JsonLd.astro';
@@ -26,7 +26,6 @@ const published = publishedCategoriesFrom(games);
 const pictures = categoryPictures(games, published);
 
 const byPopularity = [...games].sort((a, b) => b.data.popularity - a.data.popularity);
-const byNew = [...games].sort((a, b) => b.data.addedDate.valueOf() - a.data.addedDate.valueOf());
 
 // Badges (docs/DESIGN.md §V2.2): New = added within 7 days and among the newest 8 games; Hot = top 10 by popularity.
 // One badge per game; the grid draws at most 12 on the page.
@@ -55,31 +54,11 @@ const mosaicItems: GridItem[] =
     ? [...mosaicGames.slice(0, 36), ...navCategoryItems, ...mosaicGames.slice(36)]
     : mosaicGames;
 
-// Rows: Popular, New, then one row per top-8 category (15 tiles each).
-const popularRow = byPopularity.slice(0, 15).map((g) => ({ title: g.data.title, slug: g.data.slug }));
-const newRow = byNew.slice(0, 15).map((g) => ({ title: g.data.title, slug: g.data.slug }));
 // "Top games" in the text card: the five most popular published games.
 const topGames = byPopularity.slice(0, 5).map((g) => ({ title: g.data.title, slug: g.data.slug }));
 const topEight = published
   .filter((c) => c.navOrder !== null && c.navOrder <= 8)
   .sort((a, b) => (a.navOrder ?? 0) - (b.navOrder ?? 0));
-const categoryRows = topEight.map((c) => ({
-  category: c,
-  games: byPopularity
-    .filter((g) => g.data.categories.includes(c.slug))
-    .slice(0, 15)
-    .map((g) => ({ title: g.data.title, slug: g.data.slug })),
-}));
-
-// Browse by category: every published category.
-const browseItems: GridItem[] = published.map((c) => ({
-  kind: 'category' as const,
-  slug: c.slug,
-  shortName: c.shortName,
-  emoji: c.emoji,
-  imageSlug: pictures.get(c.slug),
-}));
-
 // Popular categories list in the text block: one line each, taken from the category intro.
 const firstSentence = (text: string): string => text.split(/(?<=\.)\s/)[0];
 const popularLinks = topEight.map((c) => ({ slug: c.slug, name: c.name, emoji: c.emoji, line: firstSentence(c.intro) }));
@@ -153,16 +132,7 @@ const faqPage = {
 
   <RecentlyPlayed />
 
-  {popularRow.length > 0 && <GameRow title="Popular games" seeAllHref="/popular-games" games={popularRow} />}
-  {newRow.length > 0 && <GameRow title="New games" seeAllHref="/new-games" games={newRow} />}
-  {categoryRows.filter((r) => r.games.length > 0).map((r) => (
-    <GameRow title={r.category.name} seeAllHref={`/${r.category.slug}`} games={r.games} />
-  ))}
-
-  <section class="browse" aria-labelledby="browse-heading">
-    <h2 id="browse-heading" class="block-heading">Browse by category</h2>
-    <GameGrid items={browseItems} mode="uniform" uniformSize="S" wide={true} label="All categories" />
-  </section>
+  <MoreRows />
 
   <SeoCard label="About Playzoni" wide>
     <div class="about-intro">
@@ -254,14 +224,6 @@ const faqPage = {
 </BaseLayout>
 
 <style>
-  .browse {
-    margin: var(--s-6) 0;
-  }
-  .block-heading {
-    margin: 0 0 var(--s-3);
-    color: var(--c-ink);
-    font: var(--t-h2);
-  }
 
   /* Text card layout (DESIGN §V2.11): centred intro, then two columns from 1024px, then the FAQ. */
   .about-intro {

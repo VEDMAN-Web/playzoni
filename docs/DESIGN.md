@@ -191,3 +191,9 @@ Owner feedback on the R28 build. Implemented directly in the code by the planner
 - On grid pages every block inside `main` (mosaic, rows, "Browse by category", text card) is exactly as wide as the tile grid's whole columns and centred, so all left and right edges line up (`global.css`, CSS `round()`; older browsers keep the old layout).
 - "Browse by category" uses the `wide` grid (2-cell columns that stretch to the full width).
 - Home text card: intro block left-aligned; paragraphs in the text card are justified (with hyphenation) from 600px up, left-aligned on phones. Top games are cards in the same style and width as the category cards.
+
+### V2.13 Endless rows, rows on category pages, search panel (R35, 11 Nov 2026 — done by the planner)
+- **Endless rows:** every game row (home and category pages) starts with 15 tiles; near its end it adds the next 15 from `/games-index.json` until the whole list is shown (`GameRow` `more` = popular | new | cat:<slug>). `/games-index.json` now also has `added` and `cats`. Added tiles look like GameTile (hover name, played badge).
+- **Category pages:** below the grid and pager, the same block as the home page (`MoreRows`): Popular games, New games, one row per top-8 category except the current one, then "Browse by category".
+- **Search panel:** 8 small wrapping category chips (30px, 11px text, never cut off) + a dark "All categories ›" chip; search box 48px. "Popular this week" and search results grow endlessly as the panel scrolls (12 at a time; tall screens are topped up).
+- **Forgiving search** (`src/lib/fuzzy-search.ts`): typos (1–3 by word length, swaps included), sounds-like spellings, words run together ("tiktaktoe"), letters in order with gaps, several words in any order, and category words (`CATEGORY_WORDS`, incl. common misspellings). Popular games always follow the results ("More popular games"); with no match a friendly line + "Try these popular games". Enter stays in the panel.

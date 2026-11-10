@@ -1,18 +1,23 @@
 ---
 import GameTile from './GameTile.astro';
+import '../styles/client-tiles.css';
 
 // Horizontal game row (DESIGN §Rows, header from §V2.11). Scroll-snap track of plain S tiles; the name shows on hover
 // and focus only (R27). The header holds the title on the left and, on the right, a "See all" pill plus (desktop
 // 1024px+, JS on) two round arrow buttons. The arrows never sit on top of the tiles. They fade out at the start and end
 // of the row. Without JS it is a plain swipe/scroll row (the arrows stay hidden).
+// Endless rows (DESIGN §V2.13): with `more` set, the row loads the next 15 games from /games-index.json each time the
+// visitor scrolls near its end, until every game in that list is shown. `more` = "popular" (most popular first),
+// "new" (newest first) or "cat:<slug>" (that category, most popular first). Games already in the row are skipped.
 interface Props {
   title: string;
   seeAllHref?: string;
   games: { title: string; slug: string }[];
   eagerCount?: number;
+  more?: string;
 }
 
-const { title, seeAllHref, games, eagerCount = 0 } = Astro.props;
+const { title, seeAllHref, games, eagerCount = 0, more } = Astro.props;
 const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 ---
 <section class="row" aria-labelledby={headingId}>
@@ -33,7 +38,7 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
       </button>
     </div>
   </div>
-  <div class="row-track" data-row-track>
+  <div class="row-track" data-row-track data-more={more}>
     {games.map((g, i) => (
       <div class="row-item">
         <GameTile title={g.title} slug={g.slug} size="S" eager={i < eagerCount} />
@@ -163,6 +168,26 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 </style>
 
 <script>
+  import { loadIndex, rowTile, type IndexGame } from '../lib/render-tiles';
+  import { applyPlayedBadges } from '../lib/played-badge';
+
+  const BATCH = 15;
+  // The list a row draws from, in the same order the server used for its first 15 tiles.
+  const listFor = (more: string, index: IndexGame[]): IndexGame[] => {
+    if (more === 'popular') return index;
+    if (more === 'new') {
+      return index
+        .map((g, i) => ({ g, i }))
+        .sort((a, b) => (b.g.added ?? '').localeCompare(a.g.added ?? '') || a.i - b.i)
+        .map((x) => x.g);
+    }
+    if (more.startsWith('cat:')) {
+      const slug = more.slice(4);
+      return index.filter((g) => g.cats?.includes(slug));
+    }
+    return [];
+  };
+
   // Shows the arrows on desktop (1024px and up), scrolls the row by most of its width, and disables an arrow at the
   // start or end of the row. Rows that fit on screen get no arrows.
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -189,10 +214,51 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
       });
     };
 
+    // Endless loading: when the visitor is within about three tiles of the end, add the next batch.
+    const more = track.dataset.more;
+    let loading = false;
+    let done = !more;
+    const loadMore = async (): Promise<void> => {
+      if (done || loading || !more) return;
+      if (track.scrollLeft + track.clientWidth < track.scrollWidth - 3 * 110) return;
+      loading = true;
+      const shown = new Set(
+        [...track.querySelectorAll<HTMLElement>('[data-slug]')].map((el) => el.dataset.slug ?? ''),
+      );
+      const next = listFor(more, await loadIndex()).filter((g) => !shown.has(g.slug)).slice(0, BATCH);
+      if (next.length === 0) {
+        done = true;
+      } else {
+        const batch = document.createDocumentFragment();
+        next.forEach((g) => batch.appendChild(rowTile(g)));
+        track.appendChild(batch);
+        applyPlayedBadges(track);
+      }
+      loading = false;
+      sync();
+    };
+
     sync();
+    // On very wide screens the first 15 tiles may all fit: top the row up once it comes into view.
+    if (more && 'IntersectionObserver' in window) {
+      const seen = new IntersectionObserver((entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          seen.disconnect();
+          void loadMore();
+        }
+      });
+      seen.observe(track);
+    }
     desktop.addEventListener('change', sync);
     window.addEventListener('resize', sync, { passive: true });
-    track.addEventListener('scroll', sync, { passive: true });
+    track.addEventListener(
+      'scroll',
+      () => {
+        sync();
+        void loadMore();
+      },
+      { passive: true },
+    );
     prev.addEventListener('click', () => scrollBy(-1));
     next.addEventListener('click', () => scrollBy(1));
   });

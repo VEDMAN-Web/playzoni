@@ -5,6 +5,10 @@ export interface IndexGame {
   slug: string;
   title: string;
   thumb: string;
+  /** Date added, YYYY-MM-DD. */
+  added?: string;
+  /** Category slugs, primary first. */
+  cats?: string[];
 }
 
 let cached: Promise<IndexGame[]> | null = null;
@@ -46,6 +50,25 @@ export function gameTile(game: IndexGame, withTitle: boolean): HTMLElement {
     link.appendChild(title);
   }
   return link;
+}
+
+// A row tile added by an endless row (GameRow `more`): the same S tile, plus the name that slides up on hover and
+// keyboard focus (2 lines, "…"), like the tiles drawn by GameTile. Styles: client-tiles.css (.pz-row-item, .pz-name).
+export function rowTile(game: IndexGame): HTMLElement {
+  const item = document.createElement('div');
+  item.className = 'pz-row-item';
+  const link = gameTile(game, false);
+  link.removeAttribute('aria-label');
+  const img = link.querySelector('img');
+  if (img) img.alt = '';
+  const name = document.createElement('span');
+  name.className = 'pz-name';
+  const text = document.createElement('span');
+  text.textContent = game.title;
+  name.appendChild(text);
+  link.appendChild(name);
+  item.appendChild(link);
+  return item;
 }
 
 // A small clock (our own line drawing) for the "Played today" pill.
