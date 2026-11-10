@@ -106,10 +106,12 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
       <GameGrid items={railLeft} mode="uniform" uniformSize="S" label="Related games" />
     </aside>
 
-    <div class="game-main">
-      <Player title={d.title} slug={slug!} developer={d.developer} embedUrl={d.embedUrl} aspect={d.aspect} />
+    <div class="game-main" data-pagefind-body>
+      <div data-pagefind-ignore>
+        <Player title={d.title} slug={slug!} developer={d.developer} embedUrl={d.embedUrl} aspect={d.aspect} />
+      </div>
 
-      <nav class="crumbs" aria-label="Breadcrumb">
+      <nav class="crumbs" aria-label="Breadcrumb" data-pagefind-ignore>
         <ol>
           {crumbs.map((c, i) => (
             <li>
@@ -126,7 +128,7 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
         </ol>
       </nav>
 
-      <h1 class="game-title">{d.title}</h1>
+      <h1 class="game-title" data-pagefind-meta={`image:/thumbs/${slug}/s.webp`}>{d.title}</h1>
       <p class="intro">{d.intro}</p>
 
       <section class="text-card" aria-label="About this game">
@@ -171,7 +173,7 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
         </ul>
       </nav>
 
-      <section class="more" aria-labelledby="more-games">
+      <section class="more" aria-labelledby="more-games" data-pagefind-ignore>
         <h2 id="more-games" class="block-heading">More games like this</h2>
         <GameGrid items={moreItems} mode="uniform" uniformSize="S" label="More games like this" />
       </section>

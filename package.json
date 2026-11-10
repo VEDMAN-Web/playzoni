@@ -13,7 +13,8 @@
     "validate": "tsx scripts/validate.ts && tsx scripts/test-seo.ts",
     "check": "astro check && npm run lint && npm run validate && npm run build",
     "placeholders": "tsx scripts/make-placeholders.ts",
-    "icons": "tsx scripts/make-icons.ts"
+    "icons": "tsx scripts/make-icons.ts",
+    "postbuild": "pagefind --site dist"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,7 @@
     "@eslint/js": "^10.0.1",
     "eslint": "^10.14.0",
     "eslint-plugin-astro": "^3.2.1",
+    "pagefind": "^1.6.0",
     "prettier": "^3.9.10",
     "prettier-plugin-astro": "^1.1.2",
     "sharp": "^0.35.5",

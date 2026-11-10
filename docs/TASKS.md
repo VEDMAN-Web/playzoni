@@ -115,7 +115,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: all pages render, pagination self-canonical, 4-width check.
 
 ### T2.8 — Search
-- status: todo · deps: T2.4 · model: haiku · docs: PRD §5
+- status: done · deps: T2.4 · model: haiku · docs: PRD §5
 - Do: Pagefind indexing game pages (title, intro, categories) after build (`postbuild` script). `/search` page (noindex) with Pagefind UI styled with tokens, reading `q` from the URL; no results → message + popular row. Header search submits to it.
 - Done when: searching a sample game name finds it; `/search` has noindex; Pagefind JS loads only on `/search`.
 
