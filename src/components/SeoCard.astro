@@ -1,0 +1,92 @@
+---
+// The text card (docs/DESIGN.md §V2.5): one white card, as wide as the grid, placed directly above the footer on the
+// home, category and list pages, after all tiles and rows. The page's text goes in the default slot: headings,
+// short paragraphs, bold key phrases, lists with links, and FAQ as <details>. Styles for that content are here, so
+// every page's card looks the same.
+interface Props {
+  label?: string;
+}
+
+const { label = 'About this page' } = Astro.props;
+---
+<section class="seo-card" aria-label={label}>
+  <div class="seo-inner">
+    <slot />
+  </div>
+</section>
+
+<style>
+  .seo-card {
+    box-sizing: border-box;
+    width: 100%;
+    margin: var(--s-7) 0 var(--s-5);
+    padding: var(--s-4);
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    color: var(--c-ink);
+  }
+  @media (min-width: 768px) {
+    .seo-card {
+      padding: var(--s-6);
+    }
+  }
+  .seo-inner {
+    max-width: 80ch;
+  }
+  .seo-inner > :global(:first-child) {
+    margin-top: 0;
+  }
+  .seo-card :global(h1) {
+    margin: 0 0 var(--s-3);
+    color: var(--c-ink);
+    font: var(--t-h1);
+  }
+  .seo-card :global(h2) {
+    margin: var(--s-5) 0 var(--s-2);
+    color: var(--c-ink);
+    font: var(--t-h2);
+  }
+  .seo-card :global(h3) {
+    margin: var(--s-3) 0 var(--s-1);
+    color: var(--c-ink);
+    font: var(--t-h3);
+  }
+  .seo-card :global(p) {
+    margin: 0 0 var(--s-3);
+    color: var(--c-ink-2);
+  }
+  .seo-card :global(strong) {
+    color: var(--c-ink);
+    font-weight: 800;
+  }
+  .seo-card :global(ul),
+  .seo-card :global(ol) {
+    margin: 0 0 var(--s-3);
+    padding-left: var(--s-4);
+    color: var(--c-ink-2);
+  }
+  .seo-card :global(li) {
+    margin-bottom: var(--s-1);
+  }
+  /* Links are bold and in the darker blue (contrast of at least 4.5 to 1 on white). */
+  .seo-card :global(a) {
+    color: var(--c-primary-dark);
+    font-weight: 700;
+  }
+  .seo-card :global(details) {
+    padding: var(--s-2) 0;
+    border-top: 1px solid var(--c-line);
+  }
+  .seo-card :global(summary) {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--c-ink);
+    font: var(--t-h3);
+    cursor: pointer;
+  }
+  .seo-card :global(details p) {
+    margin: 0 0 var(--s-2);
+  }
+</style>

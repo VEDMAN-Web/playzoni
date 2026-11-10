@@ -208,7 +208,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: a Playgama and a GameMonetize game auto-load on desktop and play; phones still use cover + overlay; Lighthouse (planner runs it) TBT ≤ 200 ms before the game starts.
 
 ### TP.4 — SEO card and footer
-- status: todo · deps: TP.1 · model: haiku · docs: DESIGN §V2.5 §V2.6
+- status: done · deps: TP.1 · model: haiku · docs: DESIGN §V2.5 §V2.6
 - Do: move home/category/list SEO text into the full-width white card just above the footer; rebuild the footer as specified; add empty `social` URLs to `data/brand.json`.
 - Done when: footer matches §V2.6 at 390 and 1280; one H1 per page still; `npm run check` passes.
 

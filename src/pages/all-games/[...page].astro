@@ -5,6 +5,7 @@ import Footer from '../../components/Footer.astro';
 import GameGrid from '../../components/GameGrid.astro';
 import TitleTile from '../../components/TitleTile.astro';
 import Pagination from '../../components/Pagination.astro';
+import SeoCard from '../../components/SeoCard.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import { getPublishedGames } from '../../lib/games';
 import { pageCount } from '../../lib/paging';
@@ -89,11 +90,6 @@ const jsonLd = [
   <GameGrid items={[]} mode="uniform" navBox={true} label="All games A to Z">
     <Fragment slot="lead">
       <TitleTile crumbs={crumbs} h1={h1} />
-      {isFirst && (
-        <p class="intro">
-          Every game on Playzoni, listed from A to Z. Jump to a letter, or scroll down the list. Each game plays free in your browser.
-        </p>
-      )}
       {groups.length > 0 && (
         <nav class="letters" aria-label="Jump to a letter">
           {groups.map((g) => (
@@ -124,17 +120,20 @@ const jsonLd = [
 
   <Pagination basePath={basePath} pageNumber={pageNumber} pages={pages} />
 
+  {isFirst && (
+    <SeoCard label="About the A to Z list">
+      <h2>About this list</h2>
+      <p>
+        Every game on Playzoni, listed from A to Z. Jump to a letter, or scroll down the list. Each game plays free in your browser.
+      </p>
+    </SeoCard>
+  )}
+
   <JsonLd data={jsonLd} />
   <Footer slot="footer" />
 </BaseLayout>
 
 <style>
-  .intro {
-    grid-column: 1 / -1;
-    max-width: 72ch;
-    margin: 0 0 var(--s-2);
-    color: var(--c-ink-2);
-  }
   .letters {
     grid-column: 1 / -1;
     display: flex;

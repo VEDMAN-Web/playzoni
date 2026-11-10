@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 import GameGrid, { type GridItem } from '../components/GameGrid.astro';
 import GameRow from '../components/GameRow.astro';
 import RecentlyPlayed from '../components/RecentlyPlayed.astro';
+import SeoCard from '../components/SeoCard.astro';
 import JsonLd from '../components/JsonLd.astro';
 import { pickBadges } from '../lib/badges';
 import { getPublishedGames } from '../lib/games';
@@ -51,6 +52,8 @@ const mosaicItems: GridItem[] =
 // Rows: Popular, New, then one row per top-8 category (15 tiles each).
 const popularRow = byPopularity.slice(0, 15).map((g) => ({ title: g.data.title, slug: g.data.slug }));
 const newRow = byNew.slice(0, 15).map((g) => ({ title: g.data.title, slug: g.data.slug }));
+// "Top games" in the text card: the five most popular published games.
+const topGames = byPopularity.slice(0, 5).map((g) => ({ title: g.data.title, slug: g.data.slug }));
 const topEight = published
   .filter((c) => c.navOrder !== null && c.navOrder <= 8)
   .sort((a, b) => (a.navOrder ?? 0) - (b.navOrder ?? 0));
@@ -111,13 +114,14 @@ const organization = {
     <GameGrid items={browseItems} mode="uniform" uniformSize="S" label="All categories" />
   </section>
 
-  <section class="seo-text">
+  <SeoCard label="About Playzoni">
     <h1>Free Online Games on Playzoni</h1>
 
     <h2>Play instantly on any device</h2>
     <p>
-      Playzoni is a place to play free online games in your browser. Pick a game, press Play, and it starts straight away.
-      There is nothing to download and no account to make, so you can move from one game to the next in seconds.
+      Playzoni is a place to play <strong>free online games</strong> in your browser. Pick a game, press Play, and it starts
+      straight away. There is <strong>nothing to download</strong> and <strong>no account</strong> to make, so you can move
+      from one game to the next in seconds.
     </p>
     <p>
       Every game runs on phones, tablets, laptops and desktop computers. On a phone you tap the screen to play. On a
@@ -127,7 +131,7 @@ const organization = {
 
     <h2>Popular categories</h2>
     <p>Browse the main categories below, or use the search button to find a game by name.</p>
-    <ul class="category-list">
+    <ul>
       {popularLinks.map((c) => (
         <li>
           <a href={`/${c.slug}`}>{c.name}</a>: {c.line}
@@ -135,11 +139,22 @@ const organization = {
       ))}
     </ul>
 
+    {topGames.length > 0 && (
+      <>
+        <h2>Top games</h2>
+        <ul>
+          {topGames.map((g) => (
+            <li><a href={`/game/${g.slug}`}>{g.title}</a></li>
+          ))}
+        </ul>
+      </>
+    )}
+
     <h2>How we pick games</h2>
     <p>
-      We choose games that load quickly, work well with touch screens and keyboards, and stay fun for more than a few
-      seconds. Each game is played and checked on a phone and on a desktop computer before it goes live. We write our own
-      description, controls and tips for every game, so the text you read on Playzoni is ours.
+      We choose games that <strong>load quickly</strong>, work well with touch screens and keyboards, and stay fun for more
+      than a few seconds. Each game is played and checked on a phone and on a desktop computer before it goes live. We write
+      our own description, controls and tips for every game, so the text you read on Playzoni is ours.
     </p>
     <p>
       If a game does not work well on the devices we test, we do not publish it. Games that have not been checked are not
@@ -149,7 +164,21 @@ const organization = {
       The Popular games row is sorted by popularity, and the New games row shows the games added most recently. Each
       category row shows its most popular games first, so you can start with the games other players pick most often.
     </p>
-  </section>
+
+    <h2>Questions and answers</h2>
+    <details>
+      <summary>Are the games free?</summary>
+      <p>Yes. Every game is free to play in your browser, with nothing to download and no account to make.</p>
+    </details>
+    <details>
+      <summary>Do I need to install anything?</summary>
+      <p>No. Pick a game and press Play. It opens inside the page.</p>
+    </details>
+    <details>
+      <summary>How are the games chosen?</summary>
+      <p>Each game is played and checked on a phone and on a desktop computer before it goes live, and we write our own text for it.</p>
+    </details>
+  </SeoCard>
 
   <JsonLd data={[website, organization]} />
   <Footer slot="footer" />
@@ -163,32 +192,5 @@ const organization = {
     margin: 0 0 var(--s-3);
     color: var(--c-ink);
     font: var(--t-h2);
-  }
-  .seo-text {
-    max-width: 72ch;
-    margin: var(--s-7) auto 0;
-    padding: var(--s-5) var(--gutter);
-    box-sizing: content-box;
-    color: var(--c-ink);
-  }
-  .seo-text h1 {
-    margin: 0 0 var(--s-3);
-    font: var(--t-h1);
-  }
-  .seo-text h2 {
-    margin: var(--s-5) 0 var(--s-2);
-    font: var(--t-h2);
-  }
-  .seo-text p {
-    margin: 0 0 var(--s-3);
-    color: var(--c-ink-2);
-  }
-  .category-list {
-    margin: 0 0 var(--s-3);
-    padding-left: var(--s-4);
-    color: var(--c-ink-2);
-  }
-  .category-list li {
-    margin-bottom: var(--s-1);
   }
 </style>
