@@ -5,7 +5,7 @@ Updated by the build agent after every task. The reviewer reads this first.
 - Last updated: 10 Nov 2026
 - Phase: 2 (T1.6 added after the design change; Phase 2 starts now)
 - Preview URL: — (after T5.5)
-- Next task: T2.6 (recently played, favourites, like/dislike). T2.5 (player) is marked sonnet and is not started.
+- Next task: T2.5 (player). Next task T2.5 is marked for Sonnet — switch model with /model and say continue.
 
 ## Current task
 (none — T2.4 finished)
