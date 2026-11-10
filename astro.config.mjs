@@ -41,5 +41,9 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      // Keep every script in its own file: inline scripts are blocked by the Content-Security-Policy.
+      assetsInlineLimit: 0,
+    },
   },
 });

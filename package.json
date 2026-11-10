@@ -11,10 +11,12 @@
     "preview": "astro preview",
     "lint": "eslint .",
     "validate": "tsx scripts/validate.ts && tsx scripts/test-seo.ts",
-    "check": "astro check && npm run lint && npm run validate && npm run build",
+    "check": "astro check && npm run lint && npm run validate && npm run headers:check && npm run build",
     "placeholders": "tsx scripts/make-placeholders.ts",
     "icons": "tsx scripts/make-icons.ts",
-    "postbuild": "pagefind --site dist && tsx scripts/sitemap-check.ts"
+    "postbuild": "pagefind --site dist && tsx scripts/sitemap-check.ts",
+    "headers": "tsx scripts/headers-check.ts",
+    "headers:check": "tsx scripts/headers-check.ts --check"
   },
   "repository": {
     "type": "git",

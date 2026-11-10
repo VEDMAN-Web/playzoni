@@ -133,7 +133,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: built sitemap contains every indexable page and no noindex page (script check in validate).
 
 ### T3.2 — Headers and redirects
-- status: todo · deps: T2.5 · model: haiku · docs: SEO-PLAN §Technical, PRD §10
+- status: done · deps: T2.5 · model: haiku · docs: SEO-PLAN §Technical, PRD §10
 - Do: `public/_headers` with security headers, cache rules, CSP (`default-src 'self'`; script/style/img/connect for self + Cloudflare analytics; `frame-src 'self'` + provider domains listed in `src/lib/providers.ts`). `public/_redirects` with `/index.html / 301` style basics only.
 - Done when: `npx wrangler pages dev dist` (dev-only, via npx) serves pages with headers; sample game still plays (CSP allows it).
 

@@ -39,22 +39,27 @@ const popular = [...games]
 </BaseLayout>
 
 <script is:inline src="/pagefind/pagefind-ui.js"></script>
-<script is:inline>
+<script>
+  // Typed view of the global that pagefind-ui.js (loaded just above) defines.
+  type PagefindUIOptions = Record<string, unknown>;
+  type PagefindUIClass = new (options: PagefindUIOptions) => { triggerSearch: (query: string) => void };
+  const PagefindUIGlobal = (window as unknown as { PagefindUI?: PagefindUIClass }).PagefindUI;
+
   window.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('search');
-    const unavailable = document.querySelector('[data-search-unavailable]');
+    const unavailable = document.querySelector<HTMLElement>('[data-search-unavailable]');
     if (!container) return;
-    if (typeof PagefindUI === 'undefined') {
+    if (!PagefindUIGlobal) {
       if (unavailable) unavailable.hidden = false;
       return;
     }
-    const ui = new PagefindUI({
+    const ui = new PagefindUIGlobal({
       element: '#search',
       showImages: true,
       showSubResults: false,
       resetStyles: false,
       // The site uses addresses without .html (the canonical URLs), so strip it from result links.
-      processResult: function (result) {
+      processResult: function (result: { url: string }) {
         result.url = result.url.replace(/\.html$/, '');
         return result;
       },
@@ -67,7 +72,7 @@ const popular = [...games]
     if (query) ui.triggerSearch(query);
 
     // "No results": show the message (from Pagefind) and a popular games row under it.
-    const popular = document.querySelector('[data-popular]');
+    const popular = document.querySelector<HTMLElement>('[data-popular]');
     if (popular) {
       const update = function () {
         const message = container.querySelector('.pagefind-ui__message');
