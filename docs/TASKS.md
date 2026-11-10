@@ -85,7 +85,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: on a temporary page `/dev-grid` (delete it at the end of the task) 24 sample tiles show the mosaic pattern; no gaps; no horizontal overflow at 4 widths; reduced-motion disables transforms.
 
 ### T2.2 — Home page
-- status: todo · deps: T2.1 · model: haiku · docs: PRD §6, SEO-PLAN §Templates §Schema, DESIGN §Content blocks
+- status: done · deps: T2.1 · model: haiku · docs: PRD §6, SEO-PLAN §Templates §Schema, DESIGN §Content blocks
 - Do: build `/` exactly in PRD §6 order. About block text: write original ~350 words (H1 "Free Online Games on Playzoni", H2s: "Play instantly on any device", "Popular categories" with 8 linked categories and one line each, "How we pick games" — real process: every game is played and checked on phone and desktop before it goes live). JSON-LD WebSite + Organization.
 - Done when: one H1; JSON-LD present; 4-width check; Lighthouse mobile SEO = 100 on local preview.
 

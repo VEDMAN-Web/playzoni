@@ -2,13 +2,194 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import GameGrid, { type GridItem } from '../components/GameGrid.astro';
+import GameRow from '../components/GameRow.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { getPublishedGames } from '../lib/games';
+import { categories } from '../lib/categories';
 
+// Home page in the order of docs/PRD.md §6. Recently played (T2.6) goes between the mosaic and the rows.
 const title = 'Playzoni — Play Free Online Games Instantly';
 const description =
   'Play free online games instantly on Playzoni. No download and no sign-up needed. Browse action, car, puzzle, sports and more browser games.';
+
+const showAll = import.meta.env.PUBLIC_INCLUDE_SAMPLES === 'true';
+const games = await getPublishedGames();
+const minGames = showAll ? 1 : 12;
+const gamesIn = (slug: string) => games.filter((g) => g.data.categories.includes(slug));
+const published = categories.filter((c) => gamesIn(c.slug).length >= minGames);
+
+const byPopularity = [...games].sort((a, b) => b.data.popularity - a.data.popularity);
+const byNew = [...games].sort((a, b) => b.data.addedDate.valueOf() - a.data.addedDate.valueOf());
+
+// "New" when added within 14 days; "Hot" for the top 20 by popularity. At most one badge.
+const DAY = 24 * 60 * 60 * 1000;
+const now = Date.now();
+const hotSlugs = new Set(byPopularity.slice(0, 20).map((g) => g.data.slug));
+const badgeFor = (slug: string, addedDate: Date): 'New' | 'Hot' | undefined => {
+  if (now - addedDate.valueOf() <= 14 * DAY) return 'New';
+  if (hotSlugs.has(slug)) return 'Hot';
+  return undefined;
+};
+
+const gameItem = (g: (typeof games)[number]): GridItem => ({
+  kind: 'game',
+  title: g.data.title,
+  slug: g.data.slug,
+  featured: g.data.featured,
+  badge: badgeFor(g.data.slug, g.data.addedDate),
+});
+
+// Mosaic: up to 90 popular games. The nav categories go in after tile 36 (DESIGN §Category tile).
+const mosaicGames: GridItem[] = byPopularity.slice(0, 90).map(gameItem);
+const navCategoryItems: GridItem[] = published
+  .filter((c) => c.navOrder !== null)
+  .sort((a, b) => (a.navOrder ?? 0) - (b.navOrder ?? 0))
+  .map((c) => ({ kind: 'category' as const, slug: c.slug, shortName: c.shortName, emoji: c.emoji }));
+const mosaicItems: GridItem[] =
+  mosaicGames.length > 36
+    ? [...mosaicGames.slice(0, 36), ...navCategoryItems, ...mosaicGames.slice(36)]
+    : mosaicGames;
+
+// Rows: Popular, New, then one row per top-8 category (15 tiles each).
+const popularRow = byPopularity.slice(0, 15).map((g) => ({ title: g.data.title, slug: g.data.slug }));
+const newRow = byNew.slice(0, 15).map((g) => ({ title: g.data.title, slug: g.data.slug }));
+const topEight = published
+  .filter((c) => c.navOrder !== null && c.navOrder <= 8)
+  .sort((a, b) => (a.navOrder ?? 0) - (b.navOrder ?? 0));
+const categoryRows = topEight.map((c) => ({
+  category: c,
+  games: byPopularity
+    .filter((g) => g.data.categories.includes(c.slug))
+    .slice(0, 15)
+    .map((g) => ({ title: g.data.title, slug: g.data.slug })),
+}));
+
+// Browse by category: every published category.
+const browseItems: GridItem[] = published.map((c) => ({
+  kind: 'category' as const,
+  slug: c.slug,
+  shortName: c.shortName,
+  emoji: c.emoji,
+}));
+
+// Popular categories list in the text block: one line each, taken from the category intro.
+const firstSentence = (text: string): string => text.split(/(?<=\.)\s/)[0];
+const popularLinks = topEight.map((c) => ({ slug: c.slug, name: c.name, line: firstSentence(c.intro) }));
+
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Playzoni',
+  url: 'https://playzoni.com',
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: 'https://playzoni.com/search?q={search_term_string}',
+    'query-input': 'required name=search_term_string',
+  },
+};
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'SparkBeta Tech',
+  url: 'https://playzoni.com',
+  logo: 'https://playzoni.com/icon-512.png',
+};
 ---
-<BaseLayout title={title} description={description} canonicalPath="/">
+<BaseLayout title={title} description={description} canonicalPath="/" mainClass="has-grid">
   <Header slot="header" />
-  <h1>Playzoni — coming soon</h1>
+
+  <GameGrid items={mosaicItems} mode="mosaic" navSpacer={true} eagerCount={6} label="Popular and featured games" />
+
+  {popularRow.length > 0 && <GameRow title="Popular games" seeAllHref="/popular-games" games={popularRow} />}
+  {newRow.length > 0 && <GameRow title="New games" seeAllHref="/new-games" games={newRow} />}
+  {categoryRows.filter((r) => r.games.length > 0).map((r) => (
+    <GameRow title={r.category.name} seeAllHref={`/${r.category.slug}`} games={r.games} />
+  ))}
+
+  <section class="browse" aria-labelledby="browse-heading">
+    <h2 id="browse-heading" class="block-heading">Browse by category</h2>
+    <GameGrid items={browseItems} mode="uniform" uniformSize="S" label="All categories" />
+  </section>
+
+  <section class="seo-text">
+    <h1>Free Online Games on Playzoni</h1>
+
+    <h2>Play instantly on any device</h2>
+    <p>
+      Playzoni is a place to play free online games in your browser. Pick a game, press Play, and it starts straight away.
+      There is nothing to download and no account to make, so you can move from one game to the next in seconds.
+    </p>
+    <p>
+      Every game runs on phones, tablets, laptops and desktop computers. On a phone you tap the screen to play. On a
+      computer you use the mouse and keyboard, as the game asks. Games open inside the page, and you can switch to full
+      screen when you want more room.
+    </p>
+
+    <h2>Popular categories</h2>
+    <p>Browse the main categories below, or use the search button to find a game by name.</p>
+    <ul class="category-list">
+      {popularLinks.map((c) => (
+        <li>
+          <a href={`/${c.slug}`}>{c.name}</a>: {c.line}
+        </li>
+      ))}
+    </ul>
+
+    <h2>How we pick games</h2>
+    <p>
+      We choose games that load quickly, work well with touch screens and keyboards, and stay fun for more than a few
+      seconds. Each game is played and checked on a phone and on a desktop computer before it goes live. We write our own
+      description, controls and tips for every game, so the text you read on Playzoni is ours.
+    </p>
+    <p>
+      If a game does not work well on the devices we test, we do not publish it. Games that have not been checked are not
+      shown, even when they are popular elsewhere.
+    </p>
+    <p>
+      The Popular games row is sorted by popularity, and the New games row shows the games added most recently. Each
+      category row shows its most popular games first, so you can start with the games other players pick most often.
+    </p>
+  </section>
+
+  <JsonLd data={[website, organization]} />
   <Footer slot="footer" />
 </BaseLayout>
+
+<style>
+  .browse {
+    margin: var(--s-6) 0;
+  }
+  .block-heading {
+    margin: 0 0 var(--s-3);
+    color: var(--c-ink);
+    font: var(--t-h2);
+  }
+  .seo-text {
+    max-width: 72ch;
+    margin: var(--s-7) auto 0;
+    padding: var(--s-5) var(--gutter);
+    box-sizing: content-box;
+    color: var(--c-ink);
+  }
+  .seo-text h1 {
+    margin: 0 0 var(--s-3);
+    font: var(--t-h1);
+  }
+  .seo-text h2 {
+    margin: var(--s-5) 0 var(--s-2);
+    font: var(--t-h2);
+  }
+  .seo-text p {
+    margin: 0 0 var(--s-3);
+    color: var(--c-ink-2);
+  }
+  .category-list {
+    margin: 0 0 var(--s-3);
+    padding-left: var(--s-4);
+    color: var(--c-ink-2);
+  }
+  .category-list li {
+    margin-bottom: var(--s-1);
+  }
+</style>
