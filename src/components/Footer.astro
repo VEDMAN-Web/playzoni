@@ -1,8 +1,10 @@
 ---
-import { categories } from '../lib/categories';
+import { getPublishedCategories } from '../lib/published';
 
 // Popular categories: the first eight nav categories.
-const popular = categories
+// Only published categories are linked (at least 12 games).
+const published = await getPublishedCategories();
+const popular = published
   .filter((c) => c.navOrder !== null && c.navOrder <= 8)
   .sort((a, b) => (a.navOrder ?? 0) - (b.navOrder ?? 0));
 

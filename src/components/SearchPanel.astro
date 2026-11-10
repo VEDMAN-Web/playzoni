@@ -1,16 +1,10 @@
 ---
-import { getPublishedGames } from '../lib/games';
-import { categories } from '../lib/categories';
+import { getPublishedCategories } from '../lib/published';
 
 // Search panel (DESIGN §Header). Slides in from the left. Holds the search
 // input and every published category as a chip. Results come in T2.8.
 // The category links are in the HTML, hidden until the panel opens.
-const showAll = import.meta.env.PUBLIC_INCLUDE_SAMPLES === 'true';
-const games = await getPublishedGames();
-// Live site: a category shows at 12 published games. With samples on (preview only): any category with a game.
-const minGames = showAll ? 1 : 12;
-const published = categories
-  .filter((c) => games.filter((g) => g.data.categories.includes(c.slug)).length >= minGames)
+const published = (await getPublishedCategories())
   .sort((a, b) => (a.navOrder ?? 99) - (b.navOrder ?? 99) || a.name.localeCompare(b.name));
 ---
 <div class="backdrop" data-search-backdrop></div>

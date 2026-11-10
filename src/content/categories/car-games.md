@@ -30,11 +30,11 @@ Car games are easy to group by how you play them. Some focus on speed and racing
 
 ### Driving games
 
-Driving games focus on everyday road driving. You steer through traffic, handle corners and keep your speed under control. They suit players who like to explore a route rather than race against others. Browse the full list of [driving games](/driving-games).
+Driving games focus on everyday road driving. You steer through traffic, handle corners and keep your speed under control. They suit players who like to explore a route rather than race against others. Driving games are a smaller group on this site for now.
 
 ### Parking games
 
-Parking games test your precision in tight spaces. Each level sets a small target, and you line up the car without touching the edges. Take it slow at first, because the best scores come from patience rather than speed. Browse the full list of [parking games](/parking-games).
+Parking games test your precision in tight spaces. Each level sets a small target, and you line up the car without touching the edges. Take it slow at first, because the best scores come from patience rather than speed. Parking games are a smaller group on this site for now.
 
 ## Playing car games on mobile
 

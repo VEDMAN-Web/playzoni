@@ -6,18 +6,16 @@ import GameGrid, { type GridItem } from '../components/GameGrid.astro';
 import GameRow from '../components/GameRow.astro';
 import JsonLd from '../components/JsonLd.astro';
 import { getPublishedGames } from '../lib/games';
-import { categories } from '../lib/categories';
+import { publishedCategoriesFrom } from '../lib/published';
 
 // Home page in the order of docs/PRD.md §6. Recently played (T2.6) goes between the mosaic and the rows.
 const title = 'Playzoni — Play Free Online Games Instantly';
 const description =
   'Play free online games instantly on Playzoni. No download and no sign-up needed. Browse action, car, puzzle, sports and more browser games.';
 
-const showAll = import.meta.env.PUBLIC_INCLUDE_SAMPLES === 'true';
 const games = await getPublishedGames();
-const minGames = showAll ? 1 : 12;
-const gamesIn = (slug: string) => games.filter((g) => g.data.categories.includes(slug));
-const published = categories.filter((c) => gamesIn(c.slug).length >= minGames);
+// Only categories with at least 12 published games are linked.
+const published = publishedCategoriesFrom(games);
 
 const byPopularity = [...games].sort((a, b) => b.data.popularity - a.data.popularity);
 const byNew = [...games].sort((a, b) => b.data.addedDate.valueOf() - a.data.addedDate.valueOf());

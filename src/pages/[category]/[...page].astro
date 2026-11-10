@@ -7,6 +7,7 @@ import GameGrid, { type GridItem } from '../../components/GameGrid.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import { getPublishedGames } from '../../lib/games';
 import { categories } from '../../lib/categories';
+import { publishedCategoriesFrom } from '../../lib/published';
 import { PER_PAGE, pageCount } from '../../lib/paging';
 import { buildCategoryPageTitle, buildCategoryTitle, SITE_URL } from '../../lib/seo';
 
@@ -38,8 +39,10 @@ const list = games
   .sort((a, b) => b.data.popularity - a.data.popularity);
 const pageGames = list.slice((pageNumber - 1) * PER_PAGE, pageNumber * PER_PAGE);
 
-const parent = cat.parent ? categories.find((c) => c.slug === cat.parent) : undefined;
-const children = categories.filter((c) => c.parent === slug);
+// Parent and child links only when those categories are published (at least 12 games).
+const publishedSlugs = new Set(publishedCategoriesFrom(games).map((c) => c.slug));
+const parent = cat.parent && publishedSlugs.has(cat.parent) ? categories.find((c) => c.slug === cat.parent) : undefined;
+const children = categories.filter((c) => c.parent === slug && publishedSlugs.has(c.slug));
 const countOf = (s: string): number => games.filter((g) => g.data.categories.includes(s)).length;
 
 // Under 12 published games: noindex, and the page is not linked from the nav (docs/SEO-PLAN §Categories).

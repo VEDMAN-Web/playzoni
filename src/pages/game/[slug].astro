@@ -8,6 +8,7 @@ import JsonLd from '../../components/JsonLd.astro';
 import AdSlot from '../../components/AdSlot.astro';
 import { getPublishedGames } from '../../lib/games';
 import { categories } from '../../lib/categories';
+import { publishedCategoriesFrom } from '../../lib/published';
 import { relatedGames } from '../../lib/related';
 import { buildGameTitle, SITE_URL } from '../../lib/seo';
 
@@ -26,9 +27,12 @@ const d = entry.data;
 const primary = categories.find((c) => c.slug === d.categories[0]);
 const primaryName = primary?.name ?? d.categories[0];
 const countOf = (s: string): number => games.filter((g) => g.data.categories.includes(s)).length;
+// Only published categories are linked; a count of 0 is never shown.
+const publishedSlugs = new Set(publishedCategoriesFrom(games).map((c) => c.slug));
+const primaryLinked = publishedSlugs.has(d.categories[0]);
 const chips = d.categories
   .map((s) => categories.find((c) => c.slug === s))
-  .filter((c): c is NonNullable<typeof c> => c !== undefined)
+  .filter((c): c is NonNullable<typeof c> => c !== undefined && publishedSlugs.has(c.slug))
   .map((c) => ({ slug: c.slug, name: c.name, count: countOf(c.slug) }));
 
 const related = relatedGames(entry, games, 24);
@@ -44,7 +48,7 @@ const pageUrl = `${SITE_URL}/game/${slug}`;
 
 const crumbs = [
   { name: 'Home', path: '/' },
-  { name: primaryName, path: `/${d.categories[0]}` },
+  ...(primaryLinked ? [{ name: primaryName, path: `/${d.categories[0]}` }] : []),
   { name: d.title, path: `/game/${slug}` },
 ];
 
@@ -163,7 +167,7 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
             {d.developer && (
               <tr><th scope="row">Developer</th><td>{d.developer}</td></tr>
             )}
-            <tr><th scope="row">Category</th><td><a href={`/${d.categories[0]}`}>{primaryName}</a></td></tr>
+            <tr><th scope="row">Category</th><td>{primaryLinked ? <a href={`/${d.categories[0]}`}>{primaryName}</a> : primaryName}</td></tr>
             <tr><th scope="row">Platforms</th><td>{d.mobile ? 'Desktop, mobile' : 'Desktop'}</td></tr>
             {d.releaseDate && (
               <tr><th scope="row">Release date</th><td>{isoDate(d.releaseDate)}</td></tr>
