@@ -228,6 +228,19 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: `npm run check` passes (the link checker finds 0 broken links); no page in `dist/` outside `/en/` except `/`, `404`, `robots.txt`, sitemap and assets.
 
 ---
+## Phase S — SEO/AEO tooling (do now, before T5.1b continues; no code)
+### TS.1 — Install the owner's SEO, AEO and marketing skills in this project
+- status: todo · deps: — · model: haiku · docs: SEO-INTL.md (intro)
+- Do (one at a time, report each result in STATUS):
+  1. `/plugin marketplace add AgriciDaniel/claude-seo` then `/plugin install claude-seo@agricidaniel-claude-seo`, then `/seo setup`. If claude-seo is already installed, update it instead (`/plugin update claude-seo@agricidaniel-claude-seo` or reinstall).
+  2. `npx skills add coreyhaines31/marketingskills -a claude-code` (the `-a claude-code` flag matters: without it the skills land where Claude Code does not read them). Confirm `.claude/skills/` now has `ai-seo`, `programmatic-seo`, `site-architecture`, `link-building`, `seo-audit`, `ads`, `analytics`, `ab-testing`.
+  3. `claude plugin marketplace add Ryze-AI-Adgent/open-seo-mcp-skills` then `/plugin install open-seo-mcp-skills@ryze`. **Do not connect the Ryze MCP to any Google account** (Search Console, GA4, Ads) — that needs the owner's decision (Q23). The skills still work with manual data.
+  4. Restart Claude Code in the project so the skills load; list the new skills in STATUS.
+- Never paste API keys or accounts into chat or files. If a step asks for a login or a paid key, stop and write it in QUESTIONS.
+- Done when: the three packs are installed, listed in STATUS, and `npm run check` still passes (nothing in the repo changed except STATUS and, if the installer adds it, `.claude/` config).
+
+
+---
 ## Phase 5 — Content and launch
 
 ### T5.1 — QA guide for the testing team
@@ -247,6 +260,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 
 ### T5.2 — Category texts
 - status: todo · deps: T4.5 · model: haiku · docs: SEO-PLAN §Content
+- Prep (R13 leftover): re-run `npm run import:gm` with the default limit (500) to finish the GameMonetize import (it stopped at 199 on the rate limit); record the count in STATUS. Do not publish new games from it without the planner's list.
 - Do: write `src/content/categories/<slug>.md` for every category with ≥ 12 published real games, using only published games in "Top" sections. Repeatable task: run again whenever a category reaches 12.
 - Done when: validate passes; each text is original (no shared sentences between categories).
 
@@ -262,13 +276,18 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 
 ### T5.5 — Deploy
 - status: todo · deps: T3.5 · model: haiku
-- Do: add `public/ads.txt` with the GameMonetize ads.txt lines (owner copies them from GameMonetize → Publisher → My Websites → View, into `data/ads-gamemonetize.txt`; the build copies that file to `public/ads.txt`). Write `docs/DEPLOY.md` (simple steps for Vedant: connect repo in Cloudflare Pages, build command `npm run build`, output `dist`, env vars, production branch `main`, preview branch `dev`; add domain playzoni.com; www → apex redirect rule). Put the steps in QUESTIONS as "Owner action needed". After owner confirms, verify preview URL works and record it in STATUS.
+- Do: add `public/ads.txt` with the GameMonetize ads.txt lines (owner copies them from GameMonetize → Publisher → My Websites → View, into `data/ads-gamemonetize.txt`; the build copies that file to `public/ads.txt`). Write `docs/DEPLOY.md` (simple steps for Vedant: connect repo in Cloudflare Pages, build command `npm run build`, output `dist`, env vars, production branch `main`, preview branch `dev`; add domain playzoni.com; www → apex redirect rule). Put the steps in QUESTIONS as "Owner action needed". Also generate `public/icon-256.png` (256×256 from `icon.svg`, for the OneSignal default icon, T9.9) and add a DEPLOY.md owner step: "OneSignal → Settings → Web → Default icon URL = https://playzoni.com/icon-256.png". After owner confirms, verify preview URL works and record it in STATUS.
 - Done when: preview URL from `dev` loads; production waits for Vedant's merge; the planner has re-run Lighthouse mobile on the preview (home, a category, a game page) and every number in SEO-PLAN §Performance is met, or a QUESTIONS entry explains the gap.
 
 ### T5.6 — Launch SEO
 - status: todo · deps: T5.4, T5.5 · model: haiku · docs: SEO-PLAN §Launch checklist
-- Do: IndexNow key file + `scripts/indexnow.ts` (pings changed URLs after deploy); `docs/SEARCH-CONSOLE.md` owner steps; Phase 5 audit report `docs/seo-reports/<date>-phase5.md`; `/graphify .`.
+- Do: IndexNow key file + `scripts/indexnow.ts` (pings changed URLs after deploy); `docs/SEARCH-CONSOLE.md` owner steps (Google Search Console, Bing Webmaster Tools; Yandex Webmaster later with `/ru/`); Phase 5 audit report `docs/seo-reports/<date>-phase5.md`; add to QUESTIONS an owner step "Re-apply to GameDistribution as a publisher with the live URL and the first month's traffic" (they rejected us for low traffic); `/graphify .`.
 - Done when: report saved, owner steps written.
+
+### T5.7 — End-to-end test of the whole site (planner runs it)
+- status: todo · deps: T5.3, T5.5 · model: planner (Opus) · docs: —
+- Do (planner, with Playwright in the cloud on the preview URL): every page type (home, each category incl. paged, every game page, new/popular/all-games/categories, search panel + search page, favourites, profile panel, about/contact/developers/privacy/terms/cookies, 404) at 360, 390, 768, 1280, 1536, 1920: no horizontal scroll, no console errors, no broken links/images, Play loads the game iframe (desktop) and the overlay (phone), endless rows load, fuzzy search returns results + popular fallback, played badges after a play, favourites and profile work, JS-off pages readable, noindex/canonical/hreflang/JSON-LD present. Report `docs/seo-reports/<date>-e2e.md`; fixes go to REVIEW.
+- Done when: report saved and every failure is a REVIEW row.
 
 ---
 ## Phase 6 — Ads (after AdSense approval)
@@ -292,7 +311,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: sign-in with Google works on the preview; guest data merges on first sign-in; site still works with the API switched off.
 
 ---
-## Phase 8 — Languages (docs/I18N.md) — after English is indexed
+## Phase 8 — Languages (docs/I18N.md v2 + docs/SEO-INTL.md) — waves and gates in SEO-INTL §2, §9
 ### T8.1 — i18n framework, hreflang and footer language picker
 - status: todo · deps: T5.6 · model: **sonnet** · docs: I18N.md
 ### T8.2 — Country suggestion bar (`/__geo` Pages Function) and home-page language memory
@@ -300,6 +319,31 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 ### T8.3 — Translate UI strings + first 100 game pages per language (batches of 20)
 - status: todo · deps: T8.1 · model: haiku · docs: I18N.md §Translation
 
+
+### T8.4 — i18n v2: translated category slugs and per-language sitemaps with hreflang
+- status: todo · deps: T8.1 · model: **sonnet** · docs: I18N.md §URLs (v2), SEO-INTL §4
+- Do: `data/i18n/category-slugs.json` (category + fixed-page slugs per language; English = current slugs); routes use it; build fails if a published category lacks a slug in a live language; `/sitemap-<lang>.xml` per live language with `xhtml:link` alternates (self, return tags, `x-default` → English), only for pages published in both languages; `<link rel="alternate">` in HTML on home and category pages only; canonical = self; `<html lang>` per page; `public/robots.txt` lists every sitemap.
+- Done when: a script check (`npm run validate`) confirms for every alternate pair A↔B both directions exist, all codes are valid ISO 639-1, no alternate points to a 404 or noindex page; `npm run check` passes.
+
+### T8.5 — Per-language uniqueness and quality gate
+- status: todo · deps: T8.3 · model: haiku · docs: SEO-INTL §6
+- Do: extend `npm run validate`: within each language, text overlap between any two game pages warn < 40% unique, fail < 30%; no English sentences left in translated pages (simple language check on paragraphs); banned words list per language; report `docs/seo-reports/<date>-<lang>-quality.md`.
+- Done when: validate runs per language and a deliberately duplicated test page fails it.
+
+### T8.6 — Search in every language
+- status: todo · deps: T8.1 · model: **sonnet** · docs: I18N.md (last lines), DESIGN §V2.13
+- Do: `fuzzy-search.ts` — `clean()` must keep Unicode letters (today it strips everything outside a–z/0–9, which would delete Cyrillic and Devanagari): use `\p{L}\p{N}` with the `u` flag; per-language `CATEGORY_WORDS` files (`src/i18n/search-<lang>.json`) with native category words and common misspellings; Cyrillic `soundsLike` rules for `ru`; search index per language (`/<lang>/games-index.json` with translated titles where they exist).
+- Done when: tests show "машина" → car games, "jogo de carro" → car games, "juegos de coches" → car games, and English results are unchanged.
+
+### T8.7 — Search engines and IndexNow
+- status: todo · deps: T5.5 · model: haiku · docs: SEO-INTL §4
+- Do: extend T5.6's IndexNow script to every language sitemap (only changed URLs, from the `lastmod` diff); verification files/meta for Bing Webmaster and Yandex Webmaster from env values the owner provides (Q3 follow-up); per-language URL-prefix properties listed in `docs/SEARCH-CONSOLE.md`. Google does not use IndexNow (sitemaps cover it).
+- Done when: a test deploy logs a 200/202 from IndexNow for changed URLs; verification pages pass in Bing and Yandex (owner confirms).
+
+### T8.8 — AI crawlers and llms.txt
+- status: todo · deps: Q20 · model: haiku · docs: SEO-INTL §4, §5
+- Do: update `public/robots.txt` per the Q20 answer (search/answer bots allowed; training bots per answer); add `public/llms.txt` (site name, one-line description, links to home, categories, new, popular, about, per language once live).
+- Done when: robots.txt validates (no blocked Googlebot/Bingbot/YandexBot/OAI-SearchBot/Claude-SearchBot/PerplexityBot); llms.txt reachable.
 ---
 ## Phase 9 — Growth and retention (docs/GROWTH.md) — after launch
 Starts only after the site is live (**after T5.6**) and only when the planner moves it up (R30). Anything that needs cookie consent waits for **T6.1** (ads + consent) — never load a cookie-based or ad-related script before that consent exists.
@@ -422,3 +466,116 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
   4. Update the `/cookies` and `/privacy` pages: list both tags, what they do, and that they load only after consent. The site stays general-audience, not directed at children (PRD §11).
 - Always: mobile-first (360px+); pages readable with JS off (no tags); design tokens; no dark patterns (GROWTH "Not allowed": no trick questions in consent); no invented numbers; `npm run check` passes; check at 360/390/768/1280 (nothing visible changes).
 - Done when: on the preview, with consent refused or not given, the Network tab shows no request to Google Ads or Microsoft (bat.bing.com); with consent given both load and fire on `play_start`; Lighthouse TBT and CLS unchanged before consent.
+
+---
+## Phase 10 — Admin panel (docs/ADMIN.md) — starts after Phase 5 launch (T5.6)
+- Shared rules for every task: follow ADMIN.md exactly; anonymous data only (no IP stored, no fingerprinting); honour "Do not measure me", GPC and consent; every admin screen works at 390/768/1280/1440; no invented numbers ("—" when empty); `npm run check` passes; screenshots in `docs/screens/T10.x/`.
+### T10.1 — D1 database, migrations and Pages Functions scaffold
+- status: todo · deps: T5.5 · model: **sonnet** · docs: ADMIN §2, §4
+- Do: `wrangler.toml` binding for D1 (`DB`) and R2 (`UPLOADS`) — created by the owner in the Cloudflare dashboard with the planner's steps (no wrangler runs on the Windows PC, R12); `migrations/0001_init.sql` with every table in ADMIN §4; `functions/api/_lib/` (db helpers, JSON responses, validation); a migration check script in `npm run check` (SQL parses, tables match ADMIN §4).
+- Done when: migrations apply on the preview D1; check passes.
+### T10.2 — Tracking script (`src/lib/track.ts`)
+- status: todo · deps: T10.1 · model: **sonnet** · docs: ADMIN §3
+- Do: anonymous ID + session ID, batching, sendBeacon every 10 s and on `pagehide`, the event list in ADMIN §3 (tile impressions sampled with IntersectionObserver), engaged time counts only while the tab is visible, opt-out switch in the profile panel, GPC/consent gate. < 3 KB gz.
+- Done when: unit tests for batching/session rules; Lighthouse shows no CLS/LCP change; bundle size checked in `npm run check`.
+### T10.3 — Collection endpoint `/api/e`
+- status: todo · deps: T10.1 · model: **sonnet** · docs: ADMIN §3, §7
+- Do: validate events against the dictionary, add country/region/device from the request (no IP stored), bot filter, rate limit, insert into `events`/`sessions`. Mark T9.3 as replaced by T10.2–T10.3.
+- Done when: test requests with bad events are rejected; good batches appear in D1.
+### T10.4 — Rollups (Cron Trigger)
+- status: todo · deps: T10.3 · model: **sonnet** · docs: ADMIN §4
+- Do: hourly + nightly jobs filling every `daily_*` table and `retention`; delete raw events older than 90 days.
+- Done when: a seeded test day produces the expected rollup numbers (unit test with fixed input).
+### T10.5 — Admin app shell + Cloudflare Access
+- status: todo · deps: T10.1, Q24 · model: **sonnet** · docs: ADMIN §1, §2, §6
+- Do: `admin/` Astro app (separate Pages project `admin.playzoni.com`), sidebar/top bar/date-range picker per ADMIN §6, Access JWT check middleware for `/api/admin/*`, `team` roles, sign-out. Owner sets up Access with the planner's steps.
+- Done when: only allowed emails get in; role limits enforced server-side; layout pixel-matches the approved design at 390/1280/1440.
+### T10.6 — Dashboard + Realtime screens
+- status: todo · deps: T10.4, T10.5 · model: **sonnet** · docs: ADMIN §5 (1, 2)
+- Done when: every KPI matches a SQL check on seeded data; empty states show "—".
+### T10.7 — Games table + game detail stats
+- status: todo · deps: T10.6 · model: haiku · docs: ADMIN §5 (3)
+### T10.8 — Game edit + category edit via GitHub commits
+- status: todo · deps: T10.7 · model: **sonnet** · docs: ADMIN §2 (rebuild), §5 (4, 5)
+- Do: GitHub App (owner creates, planner guides), commits to `dev` only, same zod validation as the build, audit log entry per save.
+- Done when: an edit in admin produces one commit on `dev` that passes `npm run check`.
+### T10.9 — Instant controls: `/api/config`, home layout, game flags, banners, settings
+- status: todo · deps: T10.5 · model: **sonnet** · docs: ADMIN §2 (instant), §5 (6, 14, 15)
+- Do: site reads `/api/config` (edge cache 60 s) and applies hero order, hidden games, featured, row order per language, banners/notices, feature flags; JS-off pages keep the built defaults; replaces hand-edited `popularity` for the hero list (keep `popularity` as fallback).
+- Done when: changing the hero order in admin changes the live preview within ~1 min without a rebuild; no CLS.
+### T10.10 — Search insights, Acquisition, Engagement screens
+- status: todo · deps: T10.6 · model: haiku · docs: ADMIN §5 (7, 8, 9)
+### T10.11 — Content & SEO screen
+- status: todo · deps: T10.6 · model: haiku · docs: ADMIN §5 (10)
+### T10.12 — Ads screen (with Phase 11)
+- status: todo · deps: T10.6, T11.6 · model: haiku · docs: ADMIN §5 (11), ADS-DATA §7
+### T10.13 — Push screen (with T9.9)
+- status: todo · deps: T10.6, T9.9 · model: haiku · docs: ADMIN §5 (12)
+- Done when: an alert can be composed and scheduled; a third alert in one week is refused.
+### T10.14 — Experiments screen (with T9.7)
+- status: todo · deps: T10.9, T9.7 · model: **sonnet** · docs: ADMIN §5 (13)
+### T10.15 — Team, roles and audit log
+- status: todo · deps: T10.5 · model: haiku · docs: ADMIN §5 (16, 17)
+### T10.16 — CSV exports and admin end-to-end tests
+- status: todo · deps: T10.6–T10.15 · model: **sonnet** · docs: ADMIN §5
+- Do: CSV export on every table; Playwright tests for login gate, each screen at 390 and 1440, one edit flow, one instant control.
+- Done when: all admin tests pass in `npm run check` (admin suite).
+---
+## Phase 11 — Ads and audience data (docs/ADS-DATA.md) — after AdSense approval (T6.1) and Phase 10 tracking
+- Shared rules for every task: never fingerprint, never store raw IPs, never sell or share visitor data, never infer age/gender/income; every slot reserved (no CLS), labelled "Advertisement", never in/over the player or in panels; mobile-first; `npm run check`; check at 360/390/768/1280; no invented numbers.
+### T11.1 — Geo + device context endpoint
+- status: todo · deps: T8.2 · model: haiku · docs: ADS-DATA §2
+- Do: extend `/__geo` (Pages Function) to return `{ country, region, timezone, isEU, connection: 'slow'|'ok' }` from `request.cf` (no IP in the response or logs; `Cache-Control: private, no-store`). Client helper `src/lib/context.ts` caches it in sessionStorage and adds device type, screen bucket, touch, `effectiveType`.
+- Done when: unit test for the mapping; response never contains the IP; works with JS off (pages unchanged).
+
+### T11.2 — AdSlot v2: all placements reserved
+- status: todo · deps: T6.1 · model: **sonnet** · docs: ADS-DATA §4
+- Do: `AdSlot` takes `id` (G1–G4, M1–M2, H1–H3), `size`, `devices`; reserves the exact box at every width; renders the "Advertisement" label; renders nothing when ads are off; places G1/G2 in the game-page right column, G3 under the player bar, G4/M2 in related grids, M1 under the phone cover, H1–H3 on home/category/list pages exactly as ADS-DATA §4.
+- Done when: CLS ≤ 0.05 on game, home and category pages with ads on (Lighthouse mobile + desktop on the preview); no slot overlaps the player at any width; screenshots in `docs/screens/T11.2/`.
+
+### T11.3 — Consent and privacy messaging
+- status: todo · deps: T6.1 · model: haiku · docs: ADS-DATA §8
+- Do: Google certified CMP (owner turns it on in AdSense Privacy & messaging: GDPR + US states); read consent state (TCF API) before requesting ads; honour Global Privacy Control; profile panel switch "Do not measure me" (stops Phase 10 events); update /privacy and /cookies texts with the real list of tags.
+- Done when: from an EU test location no ad request is personalised and no non-essential storage happens before consent; GPC on → no personalised ads.
+
+### T11.4 — Ad rules engine
+- status: todo · deps: T11.1, T11.2, T11.3, Q18, Q19, Q22 · model: **sonnet** · docs: ADS-DATA §5, §6
+- Do: `src/lib/ad-rules.ts` (pure, unit-tested) returns which slots load and with which flags from `{country, consent, device, connection, pageType, sessionDepth, gameCategories}`, exactly per ADS-DATA §5 and the Q18/Q19/Q22 answers; RU/BY → house promos; non-personalised flag where required; `data-tag-for-age-treatment="1"` on child-category games; frequency caps; slow connection → G1/M1 only.
+- Done when: unit tests cover every rule row; a test page shows the decided slots for fake contexts.
+
+### T11.5 — House promos for empty or blocked slots
+- status: todo · deps: T11.2 · model: haiku · docs: ADS-DATA §3, GROWTH (promo in unfilled slots), T9.8
+- Do: when a slot is blocked by rules or unfilled, show our own promo in the same box (Favourites, Add to home screen, a featured game) — merge with T9.8, do not build twice.
+- Done when: no empty white boxes on the preview with ads off or blocked.
+
+### T11.6 — Ad measurement and placement A/B tests
+- status: todo · deps: T11.4, Phase 10 tracking, T9.7 · model: **sonnet** · docs: ADS-DATA §7
+- Do: events `ad_request`, `ad_impression`, `ad_viewable` (IntersectionObserver ≥50% for 1s), `ad_click` per slot; daily rollups by country/device/page type; AdSense Management API pull for real earnings (owner connects; token only as a Cloudflare secret); admin "Ads" screen (Phase 10) shows RPM per country/slot; A/B framework runs one placement test at a time with the keep/kill rule in ADS-DATA §7.
+- Done when: admin shows per-slot impressions/viewability and real earnings for a test day; one A/B test can be started and stopped from admin.
+
+---
+## Phase 12 — International SEO and AEO (docs/SEO-INTL.md) — runs alongside Phase 8 waves
+### T12.1 — Market keyword research per language (report only)
+- status: todo · deps: TS.1, T8.1 · model: **sonnet** · docs: SEO-INTL §3
+- Do: for each wave-1 language run `keyword-research` (native seeds from SEO-INTL §3, local autocomplete) and `competitor-gap` against the top 3 local game portals (find them with the skill; do not assume); output `docs/seo-research/keywords-<lang>.md`: category names and slugs to use, title/H1 patterns, 30 long-tail targets, local FAQ questions. Never translate English keywords word-for-word.
+- Done when: one file per wave-1 language with sources/dates for every number.
+
+### T12.2 — Localized templates per language
+- status: todo · deps: T12.1, T8.4 · model: haiku · docs: SEO-INTL §3, §6; SEO-PLAN §Templates
+- Do: title/meta/H1 templates per language from the keyword files; market-specific intro sentence per category page; per-language home row order from admin (Phase 10) or a JSON fallback.
+- Done when: validate checks title length and keyword presence per language.
+
+### T12.3 — AEO answer blocks and checks
+- status: todo · deps: T5.3 · model: haiku · docs: SEO-INTL §5
+- Do: validate rule: every game page starts with a 2-sentence answer (what it is, goal, free in browser), has a controls table and 3–5 natural-question FAQ; category pages have a short "best <x> games" list with one-line reasons; "Updated" date shown when content changes.
+- Done when: validate fails a page without the answer block.
+
+### T12.4 — Monthly international SEO + AI-visibility report
+- status: todo · deps: T8.7 · model: **sonnet** · docs: SEO-INTL §8
+- Do: monthly: `seo-hreflang` audit on the live site, `rank-tracking` per language, `ai-visibility` with 20 prompts per live language across ChatGPT, Perplexity, Google AI Overview/AI Mode, Copilot (manual checks are fine without Ryze); save `docs/seo-reports/<date>-intl.md` with fixes listed in QUESTIONS or REVIEW.
+- Done when: first report exists after wave 0 has 6 weeks of data.
+
+### T12.5 — Wave gate check
+- status: todo · deps: T12.4 · model: haiku · docs: SEO-INTL §9
+- Do: before starting a new wave, write the gate numbers (from GSC/Bing/Yandex, real data only) in STATUS and stop for the planner's go-ahead.
+- Done when: STATUS shows the gate table for the wave.

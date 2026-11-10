@@ -14,12 +14,6 @@ Answer: —
 
 ## Open
 
-### Q17 — Player block sizes in V2.10 are not exactly 16:9   (R28, asked 11 Nov 2026, by build agent)
-Question: V2.10 says the player is 7×4 cells (754×424) and 9×5 cells (974×534) "exactly 16:9", with the bar inside. 754×424 is 16:9, but 974×534 is not (16:9 at 974 wide is 548 high), and the control bar (64px) needs room too. What I built: the game frame is exactly 16:9 (754×424 up to 1599px; 974×548 from 1600px) and the bar sits directly below it, so the player block takes one more grid row than the frame (5 rows, 6 from 1600px). The ad strip moves one row down (row 6 / 7).
-Options: A) Keep this (recommended; the frame is always 16:9, nothing is cropped) B) Put the bar on top of the bottom of the frame so the block is exactly 7×4 / 9×5 cells (the game loses about 64px of height)
-Blocking: nothing
-Answer: **A — keep it** (planner, 11 Nov 2026). The frame stays exactly 16:9 and the bar sits below it, like Poki. V2.10 is corrected: the 9×5 figure was wrong; the player block is 5 rows (6 from 1600px) including the bar.
-
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later
@@ -29,7 +23,7 @@ Answer: —
 ### Q2 — Game provider publisher accounts   (T4.2–T4.4, owner action)
 Question: Please sign up as a **publisher** (website owner) at GameDistribution, GameMonetize and Playgama Partners using the company email, and share the feed URLs privately in the `.env` file (not in chat or git).
 Blocking: T4.2, T4.3, T4.4
-Answer: —
+Answer: partly (11 Nov 2026). GameMonetize and Playgama: signed up, feeds working. GameDistribution: rejected for low traffic — re-apply after launch (T5.6). **Still needed from owner:** the GameMonetize ads.txt lines (GameMonetize → Publisher → My Websites → View) pasted into `data/ads-gamemonetize.txt` (T5.5).
 
 ### Q3 — Domain and Cloudflare   (T5.5, owner action)
 Question: Is playzoni.com bought, and where? We need it on a Cloudflare account (free plan) for hosting and DNS.
@@ -38,6 +32,7 @@ Answer: —
 
 ### Q4 — Legal page text   (T2.9, owner action)
 Question: Privacy, Terms and Cookie texts must come from you or a legal template service you trust. Until then the pages say "being finalised" and are hidden from Google.
+Planner draft (for a lawyer to check): Privacy Policy draft https://claude.ai/artifact/Mr14GXmgeiw2jRfTcMbHjH — blanks to fill: Grievance Officer name, privacy email, game-provider policy links, effective date. It must also be updated for: tracking (ADMIN §3), ads and consent (ADS-DATA §8), OneSignal alerts (T9.9), accounts 18+ rule (ACCOUNTS.md — lawyer to confirm).
 Blocking: going live with ads (T6.1)
 Answer: —
 
@@ -51,7 +46,55 @@ Question: Who in the team will play-test games and fill the QA notes? About 3 mi
 Blocking: T5.3
 Answer: —
 
+### Q18 — Personalised ads or contextual ads?   (ADS-DATA §1, §5, asked 11 Nov 2026, by planner)
+Question: Children use game sites, and India (from May 2027), Brazil (ECA Digital) and the USA (COPPA, since Apr 2026) restrict profiling minors for ads; the EU needs consent. Personalised ads usually pay more.
+Options: A) Contextual (non-personalised) ads everywhere at launch; revisit per market after a lawyer's advice (recommended) B) Personalised ads where consent exists (EU) and in the US for general audiences, contextual in India/Brazil — only after a lawyer confirms in writing
+Also: which categories count as "aimed at young children" (child ad treatment)? Planner suggestion: dress-up for kids, colouring, educational, baby/pet care.
+Blocking: T11.4
+Answer: —
+
+### Q19 — Russia   (SEO-INTL §2, ADS-DATA §6, asked 11 Nov 2026, by planner)
+Question: Google ads do not pay for Russian visitors, and Yandex (70% of Russian search) has its own games portal. Build `/ru/` at all, and how do we earn there?
+Options: A) Not now — revisit after waves 1–2 (recommended) B) Build `/ru/` for reach, house promos only C) Build `/ru/` and apply to Yandex Advertising Network after a legal check (sanctions, payments to India)
+Blocking: wave 2 Russian, T11.4 (RU rule)
+Answer: —
+
+### Q20 — AI training crawlers   (SEO-INTL §4, asked 11 Nov 2026, by planner)
+Question: Search/answer bots (ChatGPT search, Claude search, Perplexity, Bing, Google, Yandex) will be allowed. Should training-only bots (GPTBot, ClaudeBot, Google-Extended) also be allowed? Blocking them does not change search rankings.
+Options: A) Allow all except Bytespider and CCBot (recommended — more presence in AI answers) B) Block all training bots
+Blocking: T8.8
+Answer: —
+
+### Q21 — Native-language reviewers   (SEO-INTL §6, owner action, asked 11 Nov 2026)
+Question: Each language needs a native speaker to check ≥10% of pages before launch and spot-check monthly. Use freelancers (e.g. via Upwork/Fiverr) or your own contacts? The planner will quote a price range per language when wave 1 starts.
+Blocking: wave 1 go-live
+Answer: —
+
+### Q22 — Mobile anchor ad and vignette ads   (ADS-DATA §4, asked 11 Nov 2026, by planner)
+Question: These two Google Auto ads formats often earn the most, but PRD §11 says no sticky ads on mobile. Test them?
+Options: A) A/B test both on 50% of visitors, keep only if revenue per session rises and play time per session falls ≤5% (recommended) B) Never use them
+Blocking: T11.4
+Answer: —
+
+### Q23 — Connect the Ryze MCP to Google accounts?   (SEO-INTL §5, §10, asked 11 Nov 2026, by planner)
+Question: The open-seo-mcp-skills pack works best through Ryze's hosted connector, which asks for access to Search Console, Analytics and Ads. It is a third-party company.
+Options: A) No for now — use the skills with manual data and Google's own tools (recommended) B) Yes, read-only access after launch
+Blocking: nothing
+Answer: —
+
+### Q24 — Admin panel approvals   (ADMIN §2, §6, asked 11 Nov 2026, by planner)
+Question: The admin panel needs three new parts: (1) uPlot chart library (free, MIT), (2) Cloudflare Access for Google sign-in (free up to 50 users), (3) a GitHub App so admin edits become commits on `dev`. The planner will also show you a clickable design of the dashboard before building.
+Options: A) Approve all three (recommended) B) Discuss first
+Blocking: T10.5
+Answer: —
+
 ## Answered
+
+### Q17 — Player block sizes in V2.10 are not exactly 16:9   (R28, asked 11 Nov 2026, by build agent)
+Question: V2.10 says the player is 7×4 cells (754×424) and 9×5 cells (974×534) "exactly 16:9", with the bar inside. 754×424 is 16:9, but 974×534 is not (16:9 at 974 wide is 548 high), and the control bar (64px) needs room too. What I built: the game frame is exactly 16:9 (754×424 up to 1599px; 974×548 from 1600px) and the bar sits directly below it, so the player block takes one more grid row than the frame (5 rows, 6 from 1600px). The ad strip moves one row down (row 6 / 7).
+Options: A) Keep this (recommended; the frame is always 16:9, nothing is cropped) B) Put the bar on top of the bottom of the frame so the block is exactly 7×4 / 9×5 cells (the game loses about 64px of height)
+Blocking: nothing
+Answer: **A — keep it** (planner, 11 Nov 2026). The frame stays exactly 16:9 and the bar sits below it, like Poki. V2.10 is corrected: the 9×5 figure was wrong; the player block is 5 rows (6 from 1600px) including the bar.
 
 ### Q16 — Shape of the category title tile   (TP.2, asked 12 Nov 2026, by build agent)
 Question: DESIGN §V2.3 says "1×4 white title tile". Everywhere else the design writes width × height (S = 1×1, "6×1 ad strip", "6×4 player"), so I built it 1 cell wide and 4 cells tall: it sits in the first column under the nav box, with the breadcrumbs and a smaller H1 inside. The text says it replaces the old "4×1" tile, which could also mean it should stay wide (4 across, 1 high). Which one do you want?
