@@ -30,6 +30,12 @@
     ],
     "stickman": [
       "stickman-games"
+    ],
+    "hypercasual": [
+      "arcade-games"
+    ],
+    "girls": [
+      "dress-up-games"
     ]
   },
   "pg": {
@@ -140,6 +146,298 @@
     ],
     "zombie": [
       "zombie-games"
+    ],
+    "matching": [
+      "puzzle-games"
+    ],
+    "logic": [
+      "puzzle-games"
+    ],
+    "brain": [
+      "puzzle-games"
+    ],
+    "merge": [
+      "puzzle-games"
+    ],
+    "blocks": [
+      "puzzle-games"
+    ],
+    "hidden-object": [
+      "puzzle-games"
+    ],
+    "number": [
+      "puzzle-games"
+    ],
+    "math": [
+      "puzzle-games"
+    ],
+    "sudoku": [
+      "puzzle-games"
+    ],
+    "maze": [
+      "puzzle-games"
+    ],
+    "intelligence": [
+      "puzzle-games"
+    ],
+    "unblock-puzzles": [
+      "puzzle-games"
+    ],
+    "watermelon": [
+      "puzzle-games"
+    ],
+    "management": [
+      "simulation-games"
+    ],
+    "cozy": [
+      "simulation-games"
+    ],
+    "tycoon": [
+      "simulation-games"
+    ],
+    "decoration": [
+      "simulation-games"
+    ],
+    "crafting": [
+      "simulation-games"
+    ],
+    "farm": [
+      "simulation-games"
+    ],
+    "construction": [
+      "simulation-games"
+    ],
+    "doctor": [
+      "simulation-games"
+    ],
+    "hospital": [
+      "simulation-games"
+    ],
+    "surgery": [
+      "simulation-games"
+    ],
+    "physics": [
+      "skill-games"
+    ],
+    "running": [
+      "skill-games"
+    ],
+    "runner": [
+      "skill-games"
+    ],
+    "ball": [
+      "skill-games"
+    ],
+    "drawing": [
+      "skill-games"
+    ],
+    "flappy-bird": [
+      "skill-games"
+    ],
+    "survival": [
+      "action-games"
+    ],
+    "pve": [
+      "action-games"
+    ],
+    "ragdoll": [
+      "action-games"
+    ],
+    "ninja": [
+      "action-games"
+    ],
+    "army": [
+      "action-games"
+    ],
+    "battle-royale": [
+      "action-games"
+    ],
+    "tower-defense": [
+      "strategy-games"
+    ],
+    "war": [
+      "strategy-games"
+    ],
+    "car-racing": [
+      "car-games",
+      "racing-games"
+    ],
+    "drifting": [
+      "car-games",
+      "driving-games"
+    ],
+    "bus": [
+      "driving-games"
+    ],
+    "truck": [
+      "driving-games"
+    ],
+    "monster-truck": [
+      "driving-games"
+    ],
+    "tractor": [
+      "driving-games"
+    ],
+    "taxi": [
+      "driving-games"
+    ],
+    "train": [
+      "driving-games"
+    ],
+    "motorbike": [
+      "bike-games"
+    ],
+    "dirt-bike": [
+      "bike-games"
+    ],
+    "bicycle": [
+      "bike-games"
+    ],
+    "first-person-shooter": [
+      "shooting-games"
+    ],
+    "gun": [
+      "shooting-games"
+    ],
+    "sniper": [
+      "shooting-games"
+    ],
+    "tanks": [
+      "shooting-games"
+    ],
+    "archery": [
+      "shooting-games"
+    ],
+    "hunting": [
+      "shooting-games"
+    ],
+    "rpg": [
+      "adventure-games"
+    ],
+    "escape": [
+      "adventure-games"
+    ],
+    "point-and-click": [
+      "adventure-games"
+    ],
+    "parkour": [
+      "platform-games"
+    ],
+    "fashion": [
+      "dress-up-games"
+    ],
+    "make-up": [
+      "dress-up-games"
+    ],
+    "make-over": [
+      "dress-up-games"
+    ],
+    "hair": [
+      "dress-up-games"
+    ],
+    "princess-dress-up": [
+      "dress-up-games"
+    ],
+    "food": [
+      "cooking-games"
+    ],
+    "restaurant": [
+      "cooking-games"
+    ],
+    "cake": [
+      "cooking-games"
+    ],
+    "pizza": [
+      "cooking-games"
+    ],
+    "ice-cream": [
+      "cooking-games"
+    ],
+    "cards": [
+      "card-games"
+    ],
+    "words": [
+      "word-games"
+    ],
+    "scrabble": [
+      "word-games"
+    ],
+    "scary": [
+      "horror-games"
+    ],
+    "pvp": [
+      "multiplayer-games"
+    ],
+    "1v1": [
+      "two-player-games"
+    ],
+    "co-op": [
+      "two-player-games"
+    ],
+    "snake": [
+      "arcade-games"
+    ],
+    "bubble": [
+      "bubble-shooter-games"
+    ],
+    "pop-it": [
+      "clicker-games"
+    ],
+    "fidget-spinner": [
+      "clicker-games"
+    ],
+    "penalty": [
+      "soccer-games"
+    ],
+    "world-cup": [
+      "soccer-games"
+    ],
+    "golf": [
+      "sports-games"
+    ],
+    "mini-golf": [
+      "sports-games"
+    ],
+    "pool": [
+      "sports-games"
+    ],
+    "bowling": [
+      "sports-games"
+    ],
+    "cricket": [
+      "sports-games"
+    ],
+    "hockey": [
+      "sports-games"
+    ],
+    "baseball": [
+      "sports-games"
+    ],
+    "american-football": [
+      "sports-games"
+    ],
+    "skateboarding": [
+      "sports-games"
+    ],
+    "fishing": [
+      "sports-games"
+    ],
+    "boxing": [
+      "fighting-games",
+      "sports-games"
+    ],
+    "wrestling": [
+      "fighting-games",
+      "sports-games"
+    ],
+    "checkers": [
+      "board-games"
+    ],
+    "backgammon": [
+      "board-games"
+    ],
+    "battleship": [
+      "board-games"
     ]
   },
   "gp": {}
