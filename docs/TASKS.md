@@ -213,7 +213,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: footer matches §V2.6 at 390 and 1280; one H1 per page still; `npm run check` passes.
 
 ### TP.5 — Poki-style URLs with a language folder
-- status: todo · deps: TP.3 · model: **sonnet** · docs: SEO-PLAN §URLs (v2)
+- status: cancelled (owner kept our URLs, SEO-PLAN §URLs final) — do not do · deps: TP.3 · model: **sonnet** · docs: SEO-PLAN §URLs (v2)
 - Do: move every page to the v2 paths (`/en/g/<slug>`, `/en/<category>`, `/en/…`), home stays `/`. Update every internal link, canonical, breadcrumb JSON-LD, sitemap, `WebSite` SearchAction (`/en/search?q=`), robots/noindex lists, Pagefind, `games-index.json`, favourites/recently-played links, and the tests. Add `<html lang="en">` everywhere (already) — no hreflang yet.
 - Done when: `npm run check` passes (the link checker finds 0 broken links); no page in `dist/` outside `/en/` except `/`, `404`, `robots.txt`, sitemap and assets.
 

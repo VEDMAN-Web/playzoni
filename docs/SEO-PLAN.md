@@ -76,16 +76,14 @@ Full taxonomy (`data/categories.json`). `parent` builds breadcrumbs and "related
 | horror-games | Horror Games | adventure-games |
 | 3d-games | 3D Games | — |
 
-## §URLs (v2, 11 Nov 2026 — Poki-style, with a language folder)
-- Base: `https://playzoni.com` (apex). `www` → apex 301 (Cloudflare rule, owner step). No trailing slash.
-- Home: `/` (English). Everything else lives under a language folder so Hindi/Spanish/etc. can be added later without changing any URL:
-  - Game: `/en/g/<slug>` (e.g. `/en/g/bubble-blast`)
-  - Category: `/en/<category-slug>` (e.g. `/en/car-games`), pages `/en/car-games/2`
-  - Lists: `/en/new-games`, `/en/popular-games`, `/en/all-games`, `/en/categories`
-  - Static: `/en/about`, `/en/developers`, `/en/contact`, `/en/privacy`, `/en/terms`, `/en/cookies`
-  - Search `/en/search`, favourites `/en/favourites`
-- Old paths (`/game/<slug>`, `/<category>`, `/about`…) are not public yet, so no redirects are needed; just make sure nothing links to them.
-- Slugs never change after launch. Lowercase, hyphens, ASCII only.
+## §URLs (final, 11 Nov 2026 — owner chose to keep ours)
+- Base: `https://playzoni.com` (apex). `www` → apex 301 (Cloudflare rule, owner step). No trailing slash. Astro: `trailingSlash: 'never'`, `build.format: 'file'`.
+- English lives at the root:
+  - Game: `/game/<slug>` · Category: `/<category-slug>` (keyword in the URL, e.g. `/car-games`), pages `/car-games/2`
+  - Lists: `/new-games`, `/popular-games`, `/all-games`, `/categories` · Static: `/about`, `/developers`, `/contact`, `/privacy`, `/terms`, `/cookies`
+- Later languages (Phase 3) get their own folder with the same paths: `/hi/game/<slug>`, `/es/car-games`… plus `hreflang` (English root = `x-default`). No English URL changes when languages are added.
+- Why this beats Poki's pattern for us: category URLs carry the full search phrase ("car-games" vs Poki's "/en/car"), URLs are shorter, and no rework is needed now.
+- Slugs never change after launch. If one must change, add a 301 in `public/_redirects`. Lowercase, hyphens, ASCII only.
 
 ## §Templates (titles, meta, headings)
 Hard limits: title ≤ 60 chars, meta description 120–155 chars, exactly one H1 per page.
