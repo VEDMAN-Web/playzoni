@@ -5,7 +5,7 @@ Updated by the build agent after every task. The reviewer reads this first.
 - Last updated: 10 Nov 2026
 - Phase: 3 (T3.1 done)
 - Preview URL: — (after T5.5)
-- Next task: T3.3 (full content validator) — model: sonnet; stop and ask Vedant before it
+- Next task: T3.3 (full content validator). Next task T3.3 is marked for Sonnet — switch model with /model and say continue.
 
 ## Current task
 (none — T3.2 finished)
