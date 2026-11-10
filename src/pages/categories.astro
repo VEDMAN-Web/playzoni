@@ -8,7 +8,7 @@ import SeoCard from '../components/SeoCard.astro';
 import JsonLd from '../components/JsonLd.astro';
 import { getPublishedGames } from '../lib/games';
 import { publishedCategoriesFrom } from '../lib/published';
-import { popularSlugIn } from '../lib/category-image';
+import { categoryPictures } from '../lib/category-image';
 import { SITE_URL } from '../lib/seo';
 
 // All categories: one tile per published category, with its game count. Only categories with
@@ -23,12 +23,13 @@ const crumbs = [
 
 const games = await getPublishedGames();
 const published = publishedCategoriesFrom(games);
+const pictures = categoryPictures(games, published);
 const items: GridItem[] = published.map((c) => ({
   kind: 'category',
   slug: c.slug,
   shortName: c.shortName,
   emoji: c.emoji,
-  imageSlug: popularSlugIn(games, c.slug),
+  imageSlug: pictures.get(c.slug),
 }));
 
 const url = (path: string): string => `${SITE_URL}${path}`;

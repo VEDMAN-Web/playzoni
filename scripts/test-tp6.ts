@@ -1,7 +1,7 @@
 // Self-test for the TP.6 pure helpers: hover preview plan, preview fields and the category picture pick.
 // (docs/DESIGN.md §V2.8). The browser parts (hover, played badge, search panel) are checked by hand and with screenshots.
 
-import { popularSlugIn } from '../src/lib/category-image';
+import { categoryPictures, popularSlugIn } from '../src/lib/category-image';
 import { MAX_SCREENSHOTS, parseScreenshots, previewFields, previewPlan } from '../src/lib/preview';
 import { finish, same } from './test-kit';
 
@@ -29,6 +29,14 @@ function testCategoryPicture(): void {
   same(popularSlugIn(games, 'action'), 'b', 'the most popular action game');
   same(popularSlugIn(games, 'car'), 'c', 'the most popular car game');
   same(popularSlugIn(games, 'sports'), undefined, 'a category with no game has no picture (emoji fallback)');
+  same(popularSlugIn(games, 'action', new Set(['b'])), 'a', 'a game taken by another category is skipped');
+  same(popularSlugIn(games, 'puzzle', new Set(['d'])), 'd', 'if every game is taken the category keeps its own best');
+
+  // R33: two categories with the same top game get different pictures.
+  const cats = [{ slug: 'puzzle', name: 'Puzzle', navOrder: 1 }, { slug: 'two', name: '2 Player', navOrder: 2 }, { slug: 'solo', name: 'Solo', navOrder: null }];
+  const shared = [game('top', ['puzzle', 'two'], 90), game('next', ['two'], 40), game('only', ['solo'], 5)];
+  same([...categoryPictures(shared, cats)], [['puzzle', 'top'], ['two', 'next'], ['solo', 'only']], 'no picture is used twice');
+  same([...categoryPictures(shared, [...cats].reverse())], [['puzzle', 'top'], ['two', 'next'], ['solo', 'only']], 'the result does not depend on the list order');
 }
 
 testPlan();

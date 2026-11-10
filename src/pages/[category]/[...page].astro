@@ -1,5 +1,5 @@
 ---
-import { popularSlugIn } from '../../lib/category-image';
+import { categoryPictures } from '../../lib/category-image';
 import { previewFields } from '../../lib/preview';
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -81,12 +81,14 @@ const chipCells = Math.max(
     [...(parent ? [parent] : []), ...children].reduce((sum, c) => sum + c.name.length * 8 + 56, 0) / 110,
   ),
 );
+// The same picture for a category on every page: computed from the full published list (R33).
+const pictures = categoryPictures(games, publishedCategoriesFrom(games));
 const relatedCategoryItems: GridItem[] = [...(parent ? [parent] : []), ...children].map((c) => ({
   kind: 'category',
   slug: c.slug,
   shortName: c.shortName,
   emoji: c.emoji,
-  imageSlug: popularSlugIn(games, c.slug),
+  imageSlug: pictures.get(c.slug),
 }));
 const gridItems: GridItem[] =
   isFirst && gameItems.length > 30 && relatedCategoryItems.length > 0
