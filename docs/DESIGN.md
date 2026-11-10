@@ -163,3 +163,14 @@ Tile hover/press, tile load-in, floating nav bar slide, search panel slide-in (2
 - Data lives in localStorage only (`storage.ts`): per game `{slug, firstPlayed, lastPlayed, plays, seconds}`. Time played = seconds the game page is visible (`visibilitychange`) after Play/auto-load, counted in 5-second steps, capped at 4 hours per session.
 - A small text link at the bottom: "Clear my history" (asks to confirm inside the panel, not with a browser dialog).
 - Sign-in with Google/Apple and cloud sync are **Phase 2** (needs a server and privacy work). Do not build them now.
+
+### V2.10 Poki sizing (R28, 11 Nov 2026 — overrides the sizes in V2.2, V2.3, V2.4 and the category tile size)
+Owner feedback: everything on desktop looks too big (nav box, category tiles, tiles). Poki uses small 94px cells and fills the whole screen width with more columns.
+- **Cell size `--cell` = 94px at every width.** Gap `--gap`: 12px (<480), 16px (≥480). So S = 94, L = 204, XL = 314.
+- **Grid width:** no 10-column cap. The grid fills the window width minus the page gutter (`auto-fill`, `justify-content: center`), max content width 1800px. At 1440px wide that is about 12–13 columns.
+- **Nav box (≥1024): 2×1 cells (204×94)**, white, radius 16, tile shadow. Logo (height 26px) on the top line, left-aligned with 14px padding; under it a row of icon buttons (40×40, icons 22px): search, favourites, and (after TP.7) profile. Nothing else inside. The nav spacer becomes 2×1 too. The floating bar after 160px scroll is unchanged.
+- **Category tiles everywhere (home mosaic, "Browse by category", /categories, game page chips area): 2×1 cells (204×94).** Image or icon on the left: **56×56, radius 12**; name on the right, UPPERCASE, 13px, weight 800, ink, max 2 lines. If the emoji fallback is used, the emoji sits on a 56×56 rounded square in `--c-bg` at 28px — never a big circle. Padding 12px.
+- **Title tile on category pages:** 3×1 (314×94). H1 at 20px/24px 800, max 2 lines; breadcrumbs 12px above it. If the H1 needs more than 2 lines, the tile spans 4×1.
+- **Game page player (≥1024):** 7×4 cells (754×424, exactly 16:9) from 1024 to 1599px wide; **9×5 cells (974×534)** at 1600px and wider. Ad block 3×3 (314×314, holds a 300×250 ad), ad strip under the player 7×1 / 9×1. Everything else in V2.4 stays (no empty gaps, nav box column 1, related tiles around).
+- **Phones and tablets (<1024):** only the cell size changes (94px); the top bar, player cover and overlay stay as they are.
+- Badges stay 22px below 480px and 26px from 480px (they are now relatively larger on 94px tiles — that is intended, same as Poki).
