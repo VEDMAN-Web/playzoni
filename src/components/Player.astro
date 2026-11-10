@@ -85,15 +85,11 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
     border-radius: var(--r-card) var(--r-card) 0 0;
     background: var(--c-player-bg);
   }
-  @media (min-width: 1024px) {
+  /* From 1060px the player sits in the tile grid (src/pages/game/[slug].astro): the frame is exactly 16:9 and
+     fills the 7x4 (9x5 from 1600px) cells; the bar hangs below it in the next grid row (R28, Q17). */
+  @media (min-width: 1060px) {
     .player {
-      height: 100%;
       margin: 0;
-    }
-    .player-frame {
-      flex: 1 1 auto;
-      min-height: 0;
-      aspect-ratio: auto;
     }
   }
 

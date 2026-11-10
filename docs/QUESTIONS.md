@@ -14,6 +14,12 @@ Answer: —
 
 ## Open
 
+### Q17 — Player block sizes in V2.10 are not exactly 16:9   (R28, asked 11 Nov 2026, by build agent)
+Question: V2.10 says the player is 7×4 cells (754×424) and 9×5 cells (974×534) "exactly 16:9", with the bar inside. 754×424 is 16:9, but 974×534 is not (16:9 at 974 wide is 548 high), and the control bar (64px) needs room too. What I built: the game frame is exactly 16:9 (754×424 up to 1599px; 974×548 from 1600px) and the bar sits directly below it, so the player block takes one more grid row than the frame (5 rows, 6 from 1600px). The ad strip moves one row down (row 6 / 7).
+Options: A) Keep this (recommended; the frame is always 16:9, nothing is cropped) B) Put the bar on top of the bottom of the frame so the block is exactly 7×4 / 9×5 cells (the game loses about 64px of height)
+Blocking: nothing
+Answer: —
+
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later

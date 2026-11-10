@@ -116,9 +116,9 @@ main {
 }
 
 @media (min-width: 1024px) {
-  /* One centred block of ten cells (§V2.2). */
+  /* The grid fills the window width, up to 1800px (§V2.10). */
   main {
-    max-width: calc(10 * var(--cell) + 9 * var(--gap) + 2 * var(--gutter));
+    max-width: var(--content-max);
     margin-inline: auto;
     padding-top: calc(var(--cell) + 2 * var(--gap));
   }

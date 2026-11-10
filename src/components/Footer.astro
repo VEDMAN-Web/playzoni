@@ -98,7 +98,7 @@ const year = new Date().getFullYear();
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--s-5) var(--s-4);
-    max-width: calc(10 * var(--cell) + 9 * var(--gap));
+    max-width: calc(var(--content-max) - 2 * var(--gutter));
     margin: 0 auto;
   }
   .brand {
@@ -187,7 +187,7 @@ const year = new Date().getFullYear();
     text-decoration: none;
   }
   .copy {
-    max-width: calc(10 * var(--cell) + 9 * var(--gap));
+    max-width: calc(var(--content-max) - 2 * var(--gutter));
     margin: var(--s-5) auto 0;
     color: var(--c-ink-2);
     font: var(--t-small);

@@ -1,68 +1,72 @@
 ---
-// Category tile (DESIGN §Category tile). 2 cells wide, 1 cell tall. Whole tile is a link.
+// Category tile (DESIGN §V2.10): 2 cells wide (204px), 1 cell tall. A 56px rounded square with the emoji on the left, the
+// name in UPPERCASE on the right (13px, 800, at most 2 lines). Whole tile is a link.
 interface Props {
   slug: string;
   shortName: string;
   emoji: string;
-  count?: number;
 }
 
-const { slug, shortName, emoji, count } = Astro.props;
+const { slug, shortName, emoji } = Astro.props;
 ---
 <a class="cat-tile" href={`/${slug}`}>
   <span class="emoji" aria-hidden="true">{emoji}</span>
-  <span class="label">
-    <span class="name">{shortName} Games</span>
-    {count !== undefined && <span class="count">{count} {count === 1 ? 'game' : 'games'}</span>}
-  </span>
+  <span class="name">{shortName}<span class="sr-only"> games</span></span>
 </a>
 
 <style>
   .cat-tile {
     display: flex;
     align-items: center;
-    gap: var(--s-3);
+    gap: 12px;
     box-sizing: border-box;
     height: 100%;
-    padding: var(--s-2) var(--s-3);
+    padding: 12px;
     border-radius: var(--r-tile);
     background: var(--c-surface);
     box-shadow: var(--sh-tile);
     color: var(--c-ink);
     text-decoration: none;
-    transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+    transition: transform 180ms var(--ease-tile), box-shadow 180ms var(--ease-tile);
   }
-  .cat-tile:hover,
-  .cat-tile:focus-visible {
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: var(--sh-tile-hover);
-    color: var(--c-ink);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .cat-tile:hover,
+    .cat-tile:focus-visible {
+      transform: translateY(-4px) scale(1.04);
+      box-shadow: var(--sh-tile-hover);
+      color: var(--c-ink);
+      text-decoration: none;
+    }
   }
   .emoji {
     display: grid;
     flex: 0 0 auto;
     place-items: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
     background: var(--c-bg);
-    font: var(--t-h2);
-  }
-  .label {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+    font-size: 28px;
+    line-height: 1;
   }
   .name {
+    display: -webkit-box;
+    min-width: 0;
     overflow: hidden;
-    font: var(--t-h3);
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font: 800 13px/16px var(--font-sans);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
   }
-  .count {
-    color: var(--c-ink-2);
-    font: var(--t-small);
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
   @media (prefers-reduced-motion: reduce) {
     .cat-tile:hover,

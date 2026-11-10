@@ -6,10 +6,11 @@ interface Props {
   crumbs: { name: string; path: string }[];
   h1: string;
   /** Width in cells from 1024px: 3 on category and list pages, 2 on the categories page. */
-  span?: 2 | 3;
+  span?: 2 | 3 | 4;
 }
 
-const { crumbs, h1, span = 3 } = Astro.props;
+// A title of more than about 48 characters needs more than two lines in a 3-cell tile, so it gets 4 cells (DESIGN §V2.10).
+const { crumbs, h1, span = h1.length > 48 ? 4 : 3 } = Astro.props;
 ---
 <div class={`title-tile span-${span}`}>
   <nav class="crumbs" aria-label="Breadcrumb">
@@ -65,7 +66,7 @@ const { crumbs, h1, span = 3 } = Astro.props;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: var(--s-4);
+      padding: 10px 16px;
       box-sizing: border-box;
       border-radius: var(--r-card);
       background: var(--c-surface);
@@ -74,13 +75,21 @@ const { crumbs, h1, span = 3 } = Astro.props;
     .title-tile.span-2 {
       grid-column: span 2;
     }
+    .title-tile.span-4 {
+      grid-column: span 4;
+    }
     .page-title {
+      display: -webkit-box;
       margin: 0;
-      font: var(--t-h2);
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      font: 800 20px/24px var(--font-sans);
       overflow-wrap: anywhere;
     }
     .crumbs ol {
-      margin: 0 0 var(--s-1);
+      margin: 0 0 2px;
+      font: 600 12px/14px var(--font-sans);
     }
   }
 </style>

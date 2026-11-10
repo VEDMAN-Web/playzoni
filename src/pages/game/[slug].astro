@@ -200,8 +200,8 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
 </BaseLayout>
 
 <style>
-  /* ---- Where the player and the ad blocks sit in the tile grid (§V2.4) ---- */
-  /* Phones and tablets: the player is the full width, the tiles follow below it. */
+  /* ---- Where the player and the ad blocks sit in the tile grid (§V2.4, sizes from §V2.10) ---- */
+  /* Phones, tablets and narrow windows: the player is the full width, the tiles follow below it. */
   .player-cell {
     grid-column: 1 / -1;
     min-width: 0;
@@ -210,33 +210,39 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
     display: none;
     min-width: 0;
   }
-  /* Desktop: column 1 is the nav box and tiles; the player takes the next columns, four rows tall. */
-  @media (min-width: 1024px) {
+  /* From 1060px (at least 9 columns, even with a scrollbar): the nav box takes columns 1-2 of row 1; the player is 7x4
+     cells (754x424, exactly 16:9) starting at column 3; the bar hangs below the frame in a fifth row, then the 7x1 ad strip. Tiles fill the rest. */
+  @media (min-width: 1060px) {
     .player-cell {
-      grid-column: 2 / -1;
-      grid-row: 1 / span 4;
+      grid-column: 3 / span 7;
+      grid-row: 1 / span 5;
     }
     .ad-cell-strip {
       display: block;
-      grid-column: 2 / -1;
-      grid-row: 5;
+      grid-column: 3 / span 7;
+      grid-row: 6;
     }
   }
-  /* From 8 columns (1215px) the player is exactly 6 cells wide and the strip matches it. */
-  @media (min-width: 1215px) {
-    .player-cell {
-      grid-column: 2 / span 6;
-    }
-    .ad-cell-strip {
-      grid-column: 2 / span 6;
-    }
-  }
-  /* From 9 columns (1361px) there is room for the 2x2 ad block to the right of the player. */
-  @media (min-width: 1361px) {
+  /* From 1352px (12 columns) there is room for the 3x3 ad block to the right of the player. */
+  @media (min-width: 1352px) {
     .ad-cell-side {
       display: block;
-      grid-column: 8 / span 2;
-      grid-row: 1 / span 2;
+      grid-column: 10 / span 3;
+      grid-row: 1 / span 3;
+    }
+  }
+  /* From 1600px the player grows to 9x5 cells (974x534); the ad block moves to columns 12-14, the strip is 9x1. */
+  @media (min-width: 1600px) {
+    .player-cell {
+      grid-column: 3 / span 9;
+      grid-row: 1 / span 6;
+    }
+    .ad-cell-strip {
+      grid-column: 3 / span 9;
+      grid-row: 7;
+    }
+    .ad-cell-side {
+      grid-column: 12 / span 3;
     }
   }
 

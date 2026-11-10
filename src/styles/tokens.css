@@ -69,15 +69,15 @@
   --ease-tile: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* §V2.2 Grid — cell size and gap */
-  --cell: 94px;
+  --cell: 94px; /* R28 / DESIGN §V2.10: the same cell size at every width */
   --gap: 12px;
+  --content-max: 1800px;
 }
 
 /* 480px and up */
 @media (min-width: 480px) {
   :root {
     --gutter: 16px;
-    --cell: 110px;
     --gap: 16px;
   }
 }
@@ -93,6 +93,5 @@
 @media (min-width: 1024px) {
   :root {
     --gutter: 24px;
-    --cell: 130px;
   }
 }

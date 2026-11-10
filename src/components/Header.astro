@@ -91,8 +91,8 @@ const { box = true } = Astro.props;
       display: block;
       position: absolute;
       top: var(--gap);
-      left: calc(max(0px, (100% - (10 * var(--cell) + 9 * var(--gap) + 2 * var(--gutter))) / 2) + var(--gutter));
-      width: var(--cell);
+      left: calc(max(0px, (100% - var(--content-max)) / 2) + var(--gutter));
+      width: calc(2 * var(--cell) + var(--gap));
       height: var(--cell);
       z-index: 5;
     }
