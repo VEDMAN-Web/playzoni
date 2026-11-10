@@ -53,5 +53,9 @@ const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
       <slot />
     </main>
     <slot name="footer" />
+    <script>
+      import { startTileMotion } from '../lib/tile-motion';
+      startTileMotion();
+    </script>
   </body>
 </html>

@@ -193,7 +193,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 390px and 1280px of the pages you changed and save them in `docs/screens/<task>/` (commit them, PNG ≤ 300 KB each) so the planner can compare with Poki.
 
 ### TP.1 — Background, tokens, tile sizes and badges
-- status: todo · deps: T4.6 · model: **sonnet** · docs: DESIGN §V2.1 §V2.2
+- status: done · deps: T4.6 · model: **sonnet** · docs: DESIGN §V2.1 §V2.2
 - Do: new gradient + original SVG pattern; new `--cell`/`--gap` values; S/L/XL sizes and the new home pattern; icon badges with the new rules; tile hover/press/load-in motion.
 - Done when: home at 390/768/1280 shows the new look; never more than 12 badges per page; no horizontal scroll; `npm run check` passes.
 

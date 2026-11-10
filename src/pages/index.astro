@@ -6,6 +6,7 @@ import GameGrid, { type GridItem } from '../components/GameGrid.astro';
 import GameRow from '../components/GameRow.astro';
 import RecentlyPlayed from '../components/RecentlyPlayed.astro';
 import JsonLd from '../components/JsonLd.astro';
+import { pickBadges } from '../lib/badges';
 import { getPublishedGames } from '../lib/games';
 import { publishedCategoriesFrom } from '../lib/published';
 
@@ -21,22 +22,19 @@ const published = publishedCategoriesFrom(games);
 const byPopularity = [...games].sort((a, b) => b.data.popularity - a.data.popularity);
 const byNew = [...games].sort((a, b) => b.data.addedDate.valueOf() - a.data.addedDate.valueOf());
 
-// "New" when added within 14 days; "Hot" for the top 20 by popularity. At most one badge.
-const DAY = 24 * 60 * 60 * 1000;
-const now = Date.now();
-const hotSlugs = new Set(byPopularity.slice(0, 20).map((g) => g.data.slug));
-const badgeFor = (slug: string, addedDate: Date): 'New' | 'Hot' | undefined => {
-  if (now - addedDate.valueOf() <= 14 * DAY) return 'New';
-  if (hotSlugs.has(slug)) return 'Hot';
-  return undefined;
-};
+// Badges (docs/DESIGN.md §V2.2): New = added within 7 days and among the newest 8 games; Hot = top 10 by popularity.
+// One badge per game; the grid draws at most 12 on the page.
+const badges = pickBadges(
+  games.map((g) => ({ slug: g.data.slug, addedDate: g.data.addedDate, popularity: g.data.popularity })),
+  Date.now(),
+);
 
 const gameItem = (g: (typeof games)[number]): GridItem => ({
   kind: 'game',
   title: g.data.title,
   slug: g.data.slug,
   featured: g.data.featured,
-  badge: badgeFor(g.data.slug, g.data.addedDate),
+  badge: badges.get(g.data.slug),
 });
 
 // Mosaic: up to 90 popular games. The nav categories go in after tile 36 (DESIGN §Category tile).
@@ -98,7 +96,7 @@ const organization = {
 <BaseLayout title={title} description={description} canonicalPath="/" mainClass="has-grid">
   <Header slot="header" />
 
-  <GameGrid items={mosaicItems} mode="mosaic" navSpacer={true} eagerCount={1} label="Popular and featured games" />
+  <GameGrid items={mosaicItems} mode="mosaic" navSpacer={true} xlFirst={true} eagerCount={1} label="Popular and featured games" />
 
   <RecentlyPlayed />
 

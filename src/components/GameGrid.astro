@@ -1,21 +1,23 @@
 ---
 import GameTile from './GameTile.astro';
 import CategoryTile from './CategoryTile.astro';
+import type { BadgeKind } from '../lib/badges';
+import { capBadges, placeItems } from '../lib/mosaic';
 
-// Game grid (DESIGN §Grid). Two modes:
-// - mosaic: sizes repeat every 18 tiles. Positions 1 and 10 are L (3x3), 4, 7 and 14 are M (2x2),
-//   the rest are S (1x1). Featured games fill the L slots first. Below 480px, L is drawn as M (CSS).
-// - uniform: every tile is the same size (S, or M when uniformSize is 'M').
-// Category tiles are 2x1 and take one slot in order. The nav spacer goes first on pages that
-// have the floating nav box (DESIGN §Header). The optional "lead" slot comes right after the
-// spacer (for example the title tile on category pages).
+// Game grid (docs/DESIGN.md §V2.2). Tile sizes: S = 1x1, L = 2x2, XL = 3x3. Two modes:
+// - mosaic (home, category page 1): after the nav box, positions 3 and 16 of every 24 tiles are L, the rest S.
+//   Featured games fill the L slots first. With xlFirst, the first featured game is XL (3x3 from 1024px, 2x2 below).
+// - uniform (rows, related, lists): every tile has the same size (S, or L when uniformSize is 'L').
+// Category tiles are 2x1 and take one slot in order. At most 12 badges are drawn on one grid (see capBadges).
+// The nav spacer goes first on pages that have the floating nav box. The optional "lead" slot comes right
+// after the spacer (for example the title tile on category pages).
 
 export interface GridGame {
   kind: 'game';
   title: string;
   slug: string;
   featured?: boolean;
-  badge?: 'New' | 'Hot';
+  badge?: BadgeKind;
 }
 export interface GridCategory {
   kind: 'category';
@@ -29,46 +31,16 @@ export type GridItem = GridGame | GridCategory;
 interface Props {
   items: GridItem[];
   mode?: 'mosaic' | 'uniform';
-  uniformSize?: 'S' | 'M';
+  uniformSize?: 'S' | 'L';
   navSpacer?: boolean;
   eagerCount?: number;
   label?: string;
+  xlFirst?: boolean;
 }
 
-const { items, mode = 'mosaic', uniformSize = 'S', navSpacer = false, eagerCount = 6, label = 'Games' } = Astro.props;
+const { items, mode = 'mosaic', uniformSize = 'S', navSpacer = false, eagerCount = 6, label = 'Games', xlFirst = false } = Astro.props;
 
-const LARGE_SLOTS = [1, 10];
-const MEDIUM_SLOTS = [4, 7, 14];
-const CYCLE = 18;
-
-function mosaicSize(position: number): 'S' | 'M' | 'L' {
-  const p = ((position - 1) % CYCLE) + 1;
-  if (LARGE_SLOTS.includes(p)) return 'L';
-  if (MEDIUM_SLOTS.includes(p)) return 'M';
-  return 'S';
-}
-
-const isFeatured = (item: GridItem): boolean => item.kind === 'game' && item.featured === true;
-
-// Mosaic: featured games go into L slots first, everything else keeps its order.
-const featuredQueue = mode === 'mosaic' ? items.filter(isFeatured) : [];
-const restQueue = mode === 'mosaic' ? items.filter((item) => !isFeatured(item)) : [...items];
-
-type Placed = { item: GridItem; size: 'S' | 'M' | 'L' | 'CAT' };
-const placed: Placed[] = [];
-for (let position = 1; placed.length < items.length; position++) {
-  const slot = mode === 'mosaic' ? mosaicSize(position) : uniformSize;
-  let next: GridItem | undefined;
-  if (mode === 'mosaic' && slot === 'L' && featuredQueue.length > 0) {
-    next = featuredQueue.shift();
-  } else if (restQueue.length > 0) {
-    next = restQueue.shift();
-  } else {
-    next = featuredQueue.shift();
-  }
-  if (!next) break;
-  placed.push({ item: next, size: next.kind === 'category' ? 'CAT' : slot });
-}
+const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
 ---
 <div class={`grid grid-${mode}`} role="group" aria-label={label}>
   {navSpacer && <div class="nav-spacer" aria-hidden="true"></div>}
@@ -117,28 +89,24 @@ for (let position = 1; placed.length < items.length; position++) {
     grid-column: span 1;
     grid-row: span 1;
   }
-  .cell-m {
+  .cell-l {
     grid-column: span 2;
     grid-row: span 2;
   }
-  .cell-l {
-    grid-column: span 3;
-    grid-row: span 3;
+  /* XL is 3x3 from 1024px; on smaller screens it is drawn as L so it does not fill the width. */
+  .cell-xl {
+    grid-column: span 2;
+    grid-row: span 2;
   }
-  /* Below 480px, L is drawn as M so it does not fill the full width. */
-  @media (max-width: 479px) {
-    .cell-l {
-      grid-column: span 2;
-      grid-row: span 2;
+  @media (min-width: 1024px) {
+    .cell-xl {
+      grid-column: span 3;
+      grid-row: span 3;
     }
   }
   .cell-cat {
     grid-column: span 2;
     grid-row: span 1;
-  }
-  .grid-uniform .cell-m {
-    grid-column: span 2;
-    grid-row: span 2;
   }
   @media (max-width: 479px) {
     .nav-spacer {
