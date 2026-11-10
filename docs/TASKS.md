@@ -52,7 +52,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: `npm run check` passes; `getPublishedGames()` returns 24 with the flag on and 0 with it off.
 
 ### T1.3 — Base layout and SEO components
-- status: todo · deps: T1.2 · model: haiku · docs: SEO-PLAN §Templates §Schema §Technical
+- status: done · deps: T1.2 · model: haiku · docs: SEO-PLAN §Templates §Schema §Technical
 - Do: `BaseLayout.astro` (html lang en, head, header/footer slots), `Seo.astro` (props: title, description, canonicalPath, ogImage, noindex) that enforces length limits by throwing at build time, `JsonLd.astro` (props: object or array → one `<script type="application/ld+json">`). Head also: viewport, theme-color, manifest, favicons, font preload, Cloudflare Web Analytics beacon only if `PUBLIC_CF_ANALYTICS_TOKEN` is set. `src/lib/seo.ts`: title builders for each page type exactly as §Templates (with the > 60 fallbacks).
 - Done when: unit-style check script `scripts/test-seo.ts` (run inside `validate`) confirms the 3 title fallbacks for a 20-, 45- and 70-char title; a test page renders canonical `https://playzoni.com/...` with no trailing slash.
 

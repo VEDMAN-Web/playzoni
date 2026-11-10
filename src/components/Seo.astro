@@ -1,0 +1,34 @@
+---
+import { SITE_NAME, assertDescription, assertTitle, canonicalUrl } from '../lib/seo';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  ogImage?: string;
+  noindex?: boolean;
+}
+
+const { title, description, canonicalPath, ogImage = '/og/default.png', noindex = false } = Astro.props;
+
+// Build fails here if a page breaks the length rules (docs/SEO-PLAN.md §Templates).
+assertTitle(title);
+assertDescription(description);
+
+const canonical = canonicalUrl(canonicalPath);
+const image = new URL(ogImage, 'https://playzoni.com').toString();
+---
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex ? <meta name="robots" content="noindex,follow" /> : null}
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={image} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={image} />
