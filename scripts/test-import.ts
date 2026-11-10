@@ -212,7 +212,8 @@ async function testFetcher(): Promise<void> {
 }
 
 async function testSample(tmp: string): Promise<void> {
-  const paths: ImportPaths = { ...SAMPLE_PATHS, stagingDir: join(tmp, 'staging'), thumbsDir: join(tmp, 'thumbs') };
+  // Own empty content folder: the real src/content/games must not change which slugs are free.
+  const paths: ImportPaths = { ...SAMPLE_PATHS, stagingDir: join(tmp, 'staging'), thumbsDir: join(tmp, 'thumbs'), contentGamesDir: join(tmp, 'no-content') };
   const report = await runSample({ paths, fetchOptions: { retryDelayMs: 1, retries: 1 } });
   same(
     [report.imported.length, report.duplicates.length, report.failed.length, report.invalid.length, report.unmapped.length, report.withoutCategory.length],

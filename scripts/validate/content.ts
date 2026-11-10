@@ -120,6 +120,8 @@ export function validateContent(paths: ContentPaths): string[] {
     }
 
     const controls = asObject(data.controls);
+    if (asString(controls.desktop).trim() === '') add(file, 'missing-field', 'controls.desktop is empty');
+    if (asString(controls.mobile).trim() === '') add(file, 'missing-field', 'controls.mobile is empty');
     const text = [title, description, intro, asString(controls.desktop), asString(controls.mobile), body]
       .concat(faq.map((f) => `${asString(asObject(f).q)} ${asString(asObject(f).a)}`))
       .join('\n');

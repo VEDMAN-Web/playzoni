@@ -22,8 +22,9 @@ const games = defineCollection({
     addedDate: z.coerce.date(),
     updatedDate: z.coerce.date(),
     description: z.string().max(155),
-    intro: z.string().min(1),
-    controls: z.object({ desktop: z.string().min(1), mobile: z.string().min(1) }),
+    // Empty for drafts (T4.5); the validator requires text before a game is published.
+    intro: z.string(),
+    controls: z.object({ desktop: z.string(), mobile: z.string() }),
     featured: z.boolean().default(false),
     popularity: z.number(),
     status: z.enum(['draft', 'published']),
