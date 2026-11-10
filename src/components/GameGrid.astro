@@ -136,3 +136,54 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
     grid-column: span 1;
   }
 </style>
+
+<script>
+  // R32: on mosaic grids the last row must be full. This measures the tiles and hides trailing ones that leave
+  // empty cells in the last row (src/lib/mosaic-fit.ts). Runs on load and when the window is resized.
+  import { tilesToHide, type Box } from '../lib/mosaic-fit';
+
+  function fitMosaic(grid: HTMLElement): void {
+    for (const el of grid.querySelectorAll<HTMLElement>('[data-fit-hidden]')) {
+      el.hidden = false;
+      el.removeAttribute('data-fit-hidden');
+    }
+    const styles = getComputedStyle(grid);
+    const cell = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell'));
+    const gap = parseFloat(styles.columnGap);
+    const cols = styles.gridTemplateColumns.split(' ').filter((t) => t.length > 0).length;
+    if (!(cell > 0) || !(gap >= 0) || cols < 1) return;
+
+    const origin = grid.getBoundingClientRect();
+    const tiles: HTMLElement[] = [];
+    const boxes: Box[] = [];
+    for (const el of Array.from(grid.children) as HTMLElement[]) {
+      if (el.hidden) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) continue;
+      tiles.push(el);
+      boxes.push({
+        x: Math.round((r.left - origin.left) / (cell + gap)),
+        y: Math.round((r.top - origin.top) / (cell + gap)),
+        w: Math.round((r.width + gap) / (cell + gap)),
+        h: Math.round((r.height + gap) / (cell + gap)),
+        hideable: el.classList.contains('cell') && !el.classList.contains('cell-nav'),
+      });
+    }
+    for (const i of tilesToHide(boxes, cols)) {
+      tiles[i].hidden = true;
+      tiles[i].setAttribute('data-fit-hidden', '');
+    }
+  }
+
+  function fitAll(): void {
+    for (const grid of document.querySelectorAll<HTMLElement>('.grid-mosaic')) fitMosaic(grid);
+  }
+
+  let frame = 0;
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(fitAll);
+  });
+  fitAll();
+</script>
+
