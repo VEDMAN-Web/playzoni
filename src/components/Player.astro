@@ -243,6 +243,9 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
   }
   /* Narrow phones: the five 44px buttons touch, so the title keeps room and nothing runs past the bar. */
   @media (max-width: 399px) {
+    .bar-text {
+      display: none;
+    }
     .player-bar {
       gap: var(--s-2);
     }
