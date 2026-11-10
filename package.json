@@ -17,7 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/VEDMAN-Web/playzoni.git"
   },
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/VEDMAN-Web/playzoni/issues"
   },
