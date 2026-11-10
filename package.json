@@ -18,6 +18,7 @@
     "import:pg": "tsx --env-file-if-exists=.env scripts/import/pg.ts",
     "publish": "tsx scripts/publish.ts",
     "shortlist": "tsx scripts/shortlist.ts",
+    "unmapped:report": "tsx scripts/unmapped-report.ts",
     "icons": "tsx scripts/make-icons.ts",
     "postbuild": "pagefind --site dist && tsx scripts/sitemap-check.ts && tsx scripts/validate-dist.ts",
     "headers": "tsx scripts/headers-check.ts",

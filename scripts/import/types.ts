@@ -39,6 +39,8 @@ export interface StagingGame {
   mobile: boolean;
   /** Our category slugs, first = primary. Empty when no provider category could be mapped. */
   categories: string[];
+  /** The provider's own category or genre names as the feed gave them (for the unmapped report, R14). */
+  providerCategories?: string[];
   tags: string[];
   developer?: string;
   releaseDate?: string;

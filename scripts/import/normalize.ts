@@ -94,6 +94,7 @@ function toStaging(planned: Planned): StagingGame {
     height: game.height,
     mobile: game.mobile,
     categories,
+    providerCategories: game.providerCategories,
     tags,
     ...(developer && developer.toLowerCase() !== 'unknown' ? { developer } : {}),
     ...(game.releaseDate ? { releaseDate: game.releaseDate } : {}),
