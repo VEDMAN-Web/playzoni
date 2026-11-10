@@ -90,6 +90,8 @@
 
 main {
   padding-top: calc(56px + 2 * var(--gap));
+  padding-inline: var(--gutter);
+  box-sizing: border-box;
 }
 
 @media (min-width: 1024px) {

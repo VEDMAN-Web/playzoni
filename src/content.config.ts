@@ -35,7 +35,10 @@ const games = defineCollection({
 // Category SEO text: markdown body only; slug = filename.
 const categories = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/categories' }),
-  schema: z.object({}),
+  schema: z.object({
+    // FAQ shown on the category page and used for FAQPage markup (2-5 items).
+    faq: z.array(z.object({ q: z.string().min(1), a: z.string().min(1) })).max(5).default([]),
+  }),
 });
 
 export const collections = { games, categories };

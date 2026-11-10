@@ -1,0 +1,356 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import GameGrid, { type GridItem } from '../../components/GameGrid.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import { getPublishedGames } from '../../lib/games';
+import { categories } from '../../lib/categories';
+import { PER_PAGE, pageCount } from '../../lib/paging';
+import { buildCategoryPageTitle, buildCategoryTitle, SITE_URL } from '../../lib/seo';
+
+// One page per category, plus /<slug>/2, /<slug>/3 … when a category has more than 60 games.
+export async function getStaticPaths() {
+  const games = await getPublishedGames();
+  return categories.flatMap((c) => {
+    const count = games.filter((g) => g.data.categories.includes(c.slug)).length;
+    const pages = pageCount(count);
+    return Array.from({ length: pages }, (_, i) => ({
+      params: { category: c.slug, page: i === 0 ? undefined : String(i + 1) },
+      props: { slug: c.slug, pageNumber: i + 1, pages, count },
+    }));
+  });
+}
+
+interface Props {
+  slug: string;
+  pageNumber: number;
+  pages: number;
+  count: number;
+}
+
+const { slug, pageNumber, pages, count } = Astro.props;
+const cat = categories.find((c) => c.slug === slug)!;
+const games = await getPublishedGames();
+const list = games
+  .filter((g) => g.data.categories.includes(slug))
+  .sort((a, b) => b.data.popularity - a.data.popularity);
+const pageGames = list.slice((pageNumber - 1) * PER_PAGE, pageNumber * PER_PAGE);
+
+const parent = cat.parent ? categories.find((c) => c.slug === cat.parent) : undefined;
+const children = categories.filter((c) => c.parent === slug);
+const countOf = (s: string): number => games.filter((g) => g.data.categories.includes(s)).length;
+
+// Under 12 published games: noindex, and the page is not linked from the nav (docs/SEO-PLAN §Categories).
+const indexable = count >= 12;
+const isFirst = pageNumber === 1;
+const canonicalPath = isFirst ? `/${slug}` : `/${slug}/${pageNumber}`;
+const pageTitle = isFirst ? buildCategoryTitle(cat.name) : buildCategoryPageTitle(cat.name, pageNumber);
+
+// Page 2 and later need their own description (no two pages share one). The first that fits 120–155 chars is used.
+const pageDescriptionOptions = [
+  `Page ${pageNumber} of ${cat.name} to play free online. Pick a game and press Play to start. No download is needed on any device.`,
+  `Page ${pageNumber} of ${cat.name} to play free online. Pick a game and press Play to start. No download is needed, and every game is free to play in your browser.`,
+];
+const pageDescription = isFirst
+  ? cat.description
+  : (pageDescriptionOptions.find((d) => d.length >= 120 && d.length <= 155) ?? pageDescriptionOptions[0]);
+
+// Mosaic on page 1 (featured games fill the large slots). After the first 30 game tiles, the
+// parent and child categories go in (DESIGN §Category tile).
+const gameItems: GridItem[] = pageGames.map((g) => ({
+  kind: 'game',
+  title: g.data.title,
+  slug: g.data.slug,
+  featured: g.data.featured,
+}));
+const relatedCategoryItems: GridItem[] = [...(parent ? [parent] : []), ...children].map((c) => ({
+  kind: 'category',
+  slug: c.slug,
+  shortName: c.shortName,
+  emoji: c.emoji,
+}));
+const gridItems: GridItem[] =
+  isFirst && gameItems.length > 30 && relatedCategoryItems.length > 0
+    ? [...gameItems.slice(0, 30), ...relatedCategoryItems, ...gameItems.slice(30)]
+    : gameItems;
+
+// Category text and FAQ live in src/content/categories/<slug>.md (first page only).
+const entry = (await getCollection('categories')).find((e) => e.id === slug);
+const faq = entry?.data.faq ?? [];
+const { Content } = entry ? await render(entry) : { Content: null };
+
+const pageHref = (n: number): string => (n === 1 ? `/${slug}` : `/${slug}/${n}`);
+const url = (path: string): string => `${SITE_URL}${path}`;
+
+const crumbs = [
+  { name: 'Home', path: '/' },
+  ...(parent ? [{ name: parent.name, path: `/${parent.slug}` }] : []),
+  { name: cat.name, path: `/${slug}` },
+];
+
+const collectionLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: cat.h1,
+  url: url(canonicalPath),
+  description: pageDescription,
+};
+const itemListLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: pageGames.slice(0, 20).map((g, i) => ({
+    '@type': 'ListItem',
+    position: (pageNumber - 1) * PER_PAGE + i + 1,
+    url: url(`/game/${g.data.slug}`),
+    name: g.data.title,
+  })),
+};
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.name,
+    item: url(c.path),
+  })),
+};
+const faqLd =
+  faq.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faq.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      }
+    : null;
+const jsonLd = [collectionLd, itemListLd, breadcrumbLd, ...(faqLd && isFirst ? [faqLd] : [])];
+---
+<BaseLayout title={pageTitle} description={pageDescription} canonicalPath={canonicalPath} noindex={!indexable}>
+  <Header slot="header" />
+
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <ol>
+      {crumbs.map((c, i) => (
+        <li>
+          {i === crumbs.length - 1 ? (
+            <span aria-current="page">{c.name}</span>
+          ) : (
+            <>
+              <a href={c.path}>{c.name}</a>
+              <span aria-hidden="true">›</span>
+            </>
+          )}
+        </li>
+      ))}
+    </ol>
+  </nav>
+
+  <h1 class="page-title">{cat.h1}{isFirst ? '' : ` — Page ${pageNumber}`}</h1>
+
+  {(parent || children.length > 0) && (
+    <nav class="related" aria-label="Related categories">
+      <ul class="chips">
+        {parent && (
+          <li><a class="chip" href={`/${parent.slug}`}>{parent.name} <span class="count">{countOf(parent.slug)}</span></a></li>
+        )}
+        {children.map((c) => (
+          <li><a class="chip" href={`/${c.slug}`}>{c.name} <span class="count">{countOf(c.slug)}</span></a></li>
+        ))}
+      </ul>
+    </nav>
+  )}
+
+  {pageGames.length > 0 ? (
+    <GameGrid
+      items={gridItems}
+      mode={isFirst ? 'mosaic' : 'uniform'}
+      uniformSize="S"
+      eagerCount={6}
+      label={`${cat.name} games`}
+    />
+  ) : (
+    <p class="empty">No games in this category yet.</p>
+  )}
+
+  {pages > 1 && (
+    <nav class="pager" aria-label="Pagination">
+      {pageNumber > 1 && <a class="pager-link" href={pageHref(pageNumber - 1)} rel="prev">‹ Previous</a>}
+      <ol class="pager-pages">
+        {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+          <li>
+            {n === pageNumber ? (
+              <span class="pager-link is-current" aria-current="page">{n}</span>
+            ) : (
+              <a class="pager-link" href={pageHref(n)}>{n}</a>
+            )}
+          </li>
+        ))}
+      </ol>
+      {pageNumber < pages && <a class="pager-link" href={pageHref(pageNumber + 1)} rel="next">Next ›</a>}
+    </nav>
+  )}
+
+  {isFirst && Content && (
+    <section class="text-card">
+      <Content />
+    </section>
+  )}
+
+  {isFirst && faq.length > 0 && (
+    <section class="faq" aria-labelledby="faq-heading">
+      <h2 id="faq-heading">FAQ</h2>
+      {faq.map((f) => (
+        <details>
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </section>
+  )}
+
+  <JsonLd data={jsonLd} />
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    list-style: none;
+    margin: var(--s-4) 0 var(--s-2);
+    padding: 0;
+    color: var(--c-ink-2);
+    font: var(--t-small);
+  }
+  .crumbs li {
+    display: inline-flex;
+    gap: var(--s-1);
+    align-items: center;
+  }
+  .crumbs a {
+    color: var(--c-ink-2);
+  }
+  .page-title {
+    margin: 0 0 var(--s-3);
+    color: var(--c-ink);
+    font: var(--t-h1);
+  }
+  .related {
+    margin: 0 0 var(--s-4);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+    height: 36px;
+    padding: 0 var(--s-3);
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    font: var(--t-small);
+    text-decoration: none;
+  }
+  .chip::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+  }
+  .chip:hover {
+    border-color: var(--c-primary);
+    color: var(--c-primary);
+    text-decoration: none;
+  }
+  .count {
+    color: var(--c-ink-2);
+  }
+  .empty {
+    color: var(--c-ink-2);
+  }
+  .pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-2);
+    margin: var(--s-6) 0;
+  }
+  .pager-pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .pager-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 var(--s-3);
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    font: var(--t-small);
+    text-decoration: none;
+  }
+  .pager-link.is-current {
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+  }
+  .text-card,
+  .faq {
+    max-width: 72ch;
+    margin: var(--s-6) auto 0;
+    padding: var(--s-5) var(--s-5);
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+    color: var(--c-ink);
+  }
+  .text-card :global(h2),
+  .faq h2 {
+    margin: 0 0 var(--s-2);
+    font: var(--t-h2);
+  }
+  .text-card :global(h3) {
+    margin: var(--s-4) 0 var(--s-1);
+    font: var(--t-h3);
+  }
+  .text-card :global(p),
+  .text-card :global(li) {
+    color: var(--c-ink-2);
+  }
+  .faq details {
+    border-top: 1px solid var(--c-line);
+    padding: var(--s-2) 0;
+  }
+  .faq summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    font: var(--t-h3);
+    cursor: pointer;
+  }
+  .faq p {
+    margin: 0 0 var(--s-2);
+    color: var(--c-ink-2);
+  }
+</style>

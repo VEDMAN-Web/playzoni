@@ -90,7 +90,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: one H1; JSON-LD present; 4-width check; Lighthouse mobile SEO = 100 on local preview.
 
 ### T2.3 — Category pages
-- status: todo · deps: T2.1 · model: haiku · docs: PRD §5, SEO-PLAN §Categories §Templates §Schema §Content, DESIGN §Content blocks
+- status: done · deps: T2.1 · model: haiku · docs: PRD §5, SEO-PLAN §Categories §Templates §Schema §Content, DESIGN §Content blocks
 - Do: `src/pages/[category]/[...page].astro` (or equivalent) for every category: H1 at top, mosaic grid (page 1) / uniform grid (page ≥ 2), 60 games per page sorted by popularity, child + parent chips, pagination links, then the category's markdown text (if file exists) in a text card, FAQ. Noindex + excluded from nav when < 12 published games. JSON-LD CollectionPage + ItemList + BreadcrumbList (+ FAQPage if FAQ exists). Write `src/content/categories/` text **only** for `car-games` now (as the template example, 400–900 words, §Content template, may mention only sample games for "Top" section with a TODO comment `<!-- replace in T5.2 -->`).
 - Done when: `/car-games` renders with all parts; a < 12 category has `noindex`; page 2 exists when > 60 games (test by temporarily setting per-page to 10, then set back to 60).
 
