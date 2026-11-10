@@ -175,7 +175,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 
 ### T4.5 — Publish script and launch shortlist
 - status: todo · deps: T4.1 · model: haiku · docs: PRD §10, SEO-PLAN §Strategy
-- Do: `npm run publish -- --slugs a,b` copies staging → `src/content/games/<slug>.md` as `status: draft` with fields filled from staging, empty text fields. `npm run shortlist`: takes all staging games and writes `docs/seo-research/game-candidates.csv` (`slug,title,source,mobile,categories,providerRank`) sorted by the provider's own popularity order (mobile-ready first). Leave space for a `volume` column; it is filled later by the owner's SEO team from Google Keyword Planner. Owner picks the launch 300 from this file.
+- Do: change the T4.1 import so thumbnails and og images go to `data/staging/thumbs/<slug>/` (gitignored). `npm run publish -- --slugs a,b` copies staging → `src/content/games/<slug>.md` as `status: draft` with fields filled from staging, empty text fields, **and copies that game's images into `public/thumbs/<slug>/`**. Game page uses `ogImage=/thumbs/<slug>/og.png` when the file exists, else the default (Q13). `npm run shortlist`: takes all staging games and writes `docs/seo-research/game-candidates.csv` (`slug,title,source,mobile,categories,providerRank`) sorted by the provider's own popularity order (mobile-ready first). Leave space for a `volume` column; it is filled later by the owner's SEO team from Google Keyword Planner. Owner picks the launch 300 from this file.
 - Done when: both commands work on sample staging data.
 
 ---

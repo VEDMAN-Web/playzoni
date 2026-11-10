@@ -14,12 +14,6 @@ Answer: —
 
 ## Open
 
-### Q13 — Per-game og image and where thumbnails go   (T4.1, asked 11 Nov 2026, by build agent)
-Question: (1) The import now makes public/thumbs/<slug>/og.png (1200x630) for every game, but the game page still uses the default og image. Should a task wire it in (the game page passes ogImage=/thumbs/<slug>/og.png)? (2) The task says thumbnails go straight into public/thumbs/<slug>/, so every imported game, published or not, would ship in dist/. With hundreds of candidates that is a lot of files. Should the import write to data/staging/thumbs/<slug>/ and npm run publish copy only the chosen games into public/thumbs/?
-Options: (1) A) wire it in as part of T4.5. B) a separate small task later. (2) A) keep as written. B) staging first, copy on publish (build agent recommends B).
-Blocking: none now. Please answer before T4.5 starts if possible.
-Answer: —
-
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later
@@ -52,6 +46,13 @@ Blocking: T5.3
 Answer: —
 
 ## Answered
+
+### Q13 — Per-game og image and where thumbnails go   (T4.1, asked 11 Nov 2026, by build agent)
+Question: (1) The import now makes public/thumbs/<slug>/og.png (1200x630) for every game, but the game page still uses the default og image. Should a task wire it in (the game page passes ogImage=/thumbs/<slug>/og.png)? (2) The task says thumbnails go straight into public/thumbs/<slug>/, so every imported game, published or not, would ship in dist/. With hundreds of candidates that is a lot of files. Should the import write to data/staging/thumbs/<slug>/ and npm run publish copy only the chosen games into public/thumbs/?
+Options: (1) A) wire it in as part of T4.5. B) a separate small task later. (2) A) keep as written. B) staging first, copy on publish (build agent recommends B).
+Blocking: none now. Please answer before T4.5 starts if possible.
+Answer (planner): (1) A — wire it in as part of T4.5 (game page passes `ogImage=/thumbs/<slug>/og.png` when that file exists, else the default). (2) B — import writes to `data/staging/thumbs/<slug>/` (gitignored); `npm run publish` copies only chosen games into `public/thumbs/<slug>/`. T4.5 text updated.
+
 
 ### Q11 — Speed budget on the home and game pages   (T3.4 blocked, asked 11 Nov 2026, by build agent)
 Question: After the speed fixes, the home page scores 93 for performance (budget 95) and its largest image shows at about 2.6 s (budget 2.0 s). Car games and a game page show their largest image at 2.2–2.4 s. These numbers come from a test server on this computer, with placeholder images of about 4 KB. Should the budget be checked on the live Cloudflare Pages preview (needs Q3), or should the numbers be accepted for now?
