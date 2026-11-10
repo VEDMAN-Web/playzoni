@@ -75,3 +75,30 @@
     }
   }
 }
+
+/* Floating nav box and page space (DESIGN §Header). */
+.nav-spacer {
+  grid-column: span 3;
+  grid-row: span 1;
+}
+
+@media (max-width: 1023px) {
+  .nav-spacer {
+    display: none;
+  }
+}
+
+main {
+  padding-top: calc(56px + 2 * var(--gap));
+}
+
+@media (min-width: 1024px) {
+  main {
+    padding-top: calc(var(--cell) + 2 * var(--gap));
+  }
+
+  /* Pages with a grid start with the nav-spacer item instead. */
+  main.has-grid {
+    padding-top: var(--gap);
+  }
+}

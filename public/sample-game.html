@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex" />
     <title>Sample game</title>
     <style>
-      html, body { margin: 0; height: 100%; background: #14121F; color: #FFFFFF; font-family: system-ui, sans-serif; overflow: hidden; }
+      html, body { margin: 0; height: 100%; background: #0B1A2E; color: #FFFFFF; font-family: system-ui, sans-serif; overflow: hidden; }
       #label { position: absolute; top: 8px; left: 0; right: 0; text-align: center; font-size: 14px; opacity: 0.8; pointer-events: none; }
       canvas { display: block; width: 100%; height: 100%; touch-action: none; }
     </style>
@@ -32,7 +32,7 @@
           ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.beginPath();
           ctx.arc(x, y, r + (boost > 0 ? 6 : 0), 0, Math.PI * 2);
-          ctx.fillStyle = '#FF5A36';
+          ctx.fillStyle = '#1F7AFF';
           ctx.fill();
           requestAnimationFrame(step);
         }

@@ -14,6 +14,12 @@ Answer: —
 
 ## Open
 
+### Q9 — Manifest and theme colour   (T1.6, asked 10 Nov 2026, by build agent)
+Question: DESIGN §Brand says the manifest `theme_color` is `--c-primary` (blue), but the new DESIGN §Colours says the `theme-color` meta and manifest `theme_color` are `--c-bg` (light blue). I followed §Colours, so both are #E3F1FF. Is that right?
+Options: A) Yes, use the light blue (what is built now) B) No, use the primary blue #1F7AFF
+Blocking: nothing (a one-line change in data/brand.json and public/site.webmanifest)
+Answer: —
+
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later

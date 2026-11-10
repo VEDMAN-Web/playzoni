@@ -10,17 +10,18 @@ const ROOT = join(import.meta.dirname, '..');
 const PUBLIC = join(ROOT, 'public');
 const brand = JSON.parse(readFileSync(join(ROOT, 'data', 'brand.json'), 'utf8')) as {
   themeColor: string;
+  primaryColor: string;
   backgroundColor: string;
 };
 
-const INK = '#1D1A2F';
+const INK = '#0E2440';
 const WHITE = '#FFFFFF';
 const FONT_FILE = join(ROOT, 'node_modules', '@fontsource-variable', 'nunito', 'files', 'nunito-latin-wght-normal.woff2');
 
 // Circle + play triangle only (used for favicons and app icons).
 const iconSvg = [
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
-  `<circle cx="256" cy="256" r="256" fill="${brand.themeColor}"/>`,
+  `<circle cx="256" cy="256" r="256" fill="${brand.primaryColor}"/>`,
   `<path d="M196 150 L196 362 L370 256 Z" fill="${WHITE}"/>`,
   '</svg>',
 ].join('');
@@ -36,7 +37,7 @@ function logoSvg(): string {
     `text{font-family:"Nunito Logo",Nunito,Arial,sans-serif;font-weight:900;font-size:100px;fill:${INK};}`,
     '</style></defs>',
     '<text x="0" y="96">playz</text>',
-    `<circle cx="289" cy="72" r="32" fill="${brand.themeColor}"/>`,
+    `<circle cx="289" cy="72" r="32" fill="${brand.primaryColor}"/>`,
     `<path d="M281 58 L281 86 L302 72 Z" fill="${WHITE}"/>`,
     '<text x="323" y="96">ni</text>',
     '</svg>',

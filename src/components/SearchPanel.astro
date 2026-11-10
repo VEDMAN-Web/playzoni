@@ -1,0 +1,203 @@
+---
+import { getPublishedGames } from '../lib/games';
+import { categories } from '../lib/categories';
+
+// Search panel (DESIGN §Header). Slides in from the left. Holds the search
+// input and every published category as a chip. Results come in T2.8.
+// The category links are in the HTML, hidden until the panel opens.
+const showAll = import.meta.env.PUBLIC_INCLUDE_SAMPLES === 'true';
+const games = await getPublishedGames();
+// Live site: a category shows at 12 published games. With samples on (preview only): any category with a game.
+const minGames = showAll ? 1 : 12;
+const published = categories
+  .filter((c) => games.filter((g) => g.data.categories.includes(c.slug)).length >= minGames)
+  .sort((a, b) => (a.navOrder ?? 99) - (b.navOrder ?? 99) || a.name.localeCompare(b.name));
+---
+<div class="backdrop" data-search-backdrop></div>
+<aside id="search-panel" class="panel" role="dialog" aria-modal="true" aria-label="Search and categories" aria-hidden="true" data-search-panel>
+  <div class="panel-head">
+    <button class="icon-btn" type="button" aria-label="Close search" data-search-close>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+    </button>
+    <form class="panel-form" action="/search" method="get" role="search">
+      <label class="sr-only" for="panel-search">Search games</label>
+      <input id="panel-search" class="search-input" type="search" name="q" placeholder="Search games" autocomplete="off" data-search-input />
+    </form>
+  </div>
+  <h2 class="panel-title">Categories</h2>
+  <ul class="chips">
+    {published.map((c) => (
+      <li><a class="chip" href={`/${c.slug}`}><span aria-hidden="true">{c.emoji}</span> {c.name}</a></li>
+    ))}
+  </ul>
+  <div class="panel-results" data-search-results></div>
+</aside>
+
+<style>
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(14, 36, 64, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 200ms ease-out, visibility 0s linear 200ms;
+  }
+  .backdrop.is-open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 200ms ease-out, visibility 0s linear 0s;
+  }
+  .panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 60;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    padding: var(--s-4) var(--gutter) var(--s-6);
+    background: var(--c-surface);
+    transform: translateX(-100%);
+    visibility: hidden;
+    /* Visibility waits for the slide-out to finish when closing, and changes at once when opening, so the input can take focus. */
+    transition: transform 240ms ease-out, visibility 0s linear 240ms;
+  }
+  @media (min-width: 768px) {
+    .panel {
+      width: 400px;
+      border-radius: 0 var(--r-card) var(--r-card) 0;
+    }
+  }
+  .panel.is-open {
+    transform: none;
+    visibility: visible;
+    transition: transform 240ms ease-out, visibility 0s linear 0s;
+  }
+  .panel-head {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+  .panel-form {
+    flex: 1;
+    margin: 0;
+  }
+  .search-input {
+    width: 100%;
+    height: 48px;
+    box-sizing: border-box;
+    padding: 0 var(--s-4);
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-pill);
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font: var(--t-body);
+  }
+  .search-input::placeholder {
+    color: var(--c-ink-2);
+  }
+  .panel-title {
+    margin: var(--s-5) 0 var(--s-3);
+    font: var(--t-h3);
+    color: var(--c-ink);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+    height: 36px;
+    padding: 0 var(--s-3);
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    font: var(--t-small);
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  /* Extends the tap area to 44px without changing the visible 36px chip. */
+  .chip::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+  }
+  .chip:hover {
+    border-color: var(--c-primary);
+    color: var(--c-primary);
+    text-decoration: none;
+  }
+  .icon-btn {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: none;
+    color: var(--c-ink);
+    padding: 0;
+    cursor: pointer;
+  }
+  .icon-btn:hover {
+    color: var(--c-primary);
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  // Opens and closes the search panel. Escape, the close button and a click on the
+  // backdrop all close it. Focus goes into the input on open and back to the
+  // search button on close.
+  const openBtn = document.querySelector<HTMLAnchorElement>('[data-search-open]');
+  const panel = document.querySelector<HTMLElement>('[data-search-panel]');
+  const backdrop = document.querySelector<HTMLElement>('[data-search-backdrop]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-search-close]');
+  const input = document.querySelector<HTMLInputElement>('[data-search-input]');
+
+  function isOpen(): boolean {
+    return panel?.classList.contains('is-open') ?? false;
+  }
+
+  function setOpen(open: boolean): void {
+    panel?.classList.toggle('is-open', open);
+    backdrop?.classList.toggle('is-open', open);
+    panel?.setAttribute('aria-hidden', open ? 'false' : 'true');
+    openBtn?.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) {
+      input?.focus();
+    } else {
+      openBtn?.focus();
+    }
+  }
+
+  openBtn?.addEventListener('click', (event: MouseEvent) => {
+    // Without JS this link goes to /search. With JS the panel opens instead.
+    event.preventDefault();
+    setOpen(true);
+  });
+  closeBtn?.addEventListener('click', () => setOpen(false));
+  backdrop?.addEventListener('click', () => setOpen(false));
+  document.addEventListener('keydown', (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && isOpen()) setOpen(false);
+  });
+</script>

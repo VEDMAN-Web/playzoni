@@ -1,60 +1,45 @@
 ---
-import { getPublishedGames } from '../lib/games';
-import categories from '../../data/categories.json';
-import CategoryNav from './CategoryNav.astro';
-import SearchBox from './SearchBox.astro';
+import SearchPanel from './SearchPanel.astro';
 
-interface Props {
-  activeSlug?: string;
-}
-
-const { activeSlug } = Astro.props;
-
-// With sample games on, every nav category shows (see CategoryNav).
-const showAll = import.meta.env.PUBLIC_INCLUDE_SAMPLES === 'true';
-const games = await getPublishedGames();
-const counts: Record<string, number> = {};
-for (const c of categories) {
-  counts[c.slug] = games.filter((g) => g.data.categories.includes(c.slug)).length;
-}
+// Floating nav box (DESIGN §Header): logo, search button, favourites button.
+// No full-width bar. The search button opens the SearchPanel. Without JS,
+// the search button is a plain link to /search.
 ---
-<header class="site-header">
-  <div class="bar">
+<header class="nav-wrap">
+  <nav class="nav-box" aria-label="Site">
     <a class="logo" href="/" aria-label="Playzoni home">
       <img src="/logo.svg" alt="Playzoni" width="90" height="28" />
     </a>
-    <SearchBox />
-    <a class="icon-btn" href="/favourites" aria-label="Favourites">
-      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-        <path d="M12 20.5s-7.5-4.6-7.5-10A4 4 0 0 1 12 7.8a4 4 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
-      </svg>
-    </a>
-  </div>
-  <CategoryNav activeSlug={activeSlug} showAll={showAll} counts={counts} />
+    <div class="nav-actions">
+      <a class="icon-btn" href="/search" aria-label="Search games" aria-controls="search-panel" aria-expanded="false" data-search-open>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" /><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+      </a>
+      <a class="icon-btn" href="/favourites" aria-label="Favourites">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10A4 4 0 0 1 12 7.8a4 4 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+      </a>
+    </div>
+  </nav>
+  <SearchPanel />
 </header>
 
 <style>
-  .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: var(--c-surface);
-    border-bottom: 1px solid var(--c-line);
+  .nav-wrap {
+    display: contents;
   }
-  .bar {
+  .nav-box {
+    position: fixed;
+    top: var(--gap);
+    left: var(--gutter);
+    z-index: 50;
     display: flex;
     align-items: center;
-    gap: var(--s-3);
+    gap: var(--s-2);
     height: 56px;
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 0 var(--gutter);
+    padding: 0 var(--s-3);
     box-sizing: border-box;
-  }
-  @media (min-width: 768px) {
-    .bar {
-      height: 64px;
-    }
+    background: var(--c-surface);
+    border-radius: var(--r-card);
+    box-shadow: var(--sh-tile);
   }
   .logo {
     display: inline-flex;
@@ -64,6 +49,11 @@ for (const c of categories) {
     display: block;
     height: 28px;
     width: auto;
+  }
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--s-1);
   }
   .icon-btn {
     display: inline-flex;
@@ -79,5 +69,21 @@ for (const c of categories) {
   .icon-btn:hover {
     color: var(--c-primary);
     text-decoration: none;
+  }
+  /* Desktop: 3 cells wide and 1 cell tall. Logo on top, buttons below. */
+  @media (min-width: 1024px) {
+    .nav-box {
+      display: grid;
+      grid-template-rows: auto auto;
+      justify-items: center;
+      align-content: center;
+      gap: var(--s-1);
+      width: calc(3 * var(--cell) + 2 * var(--gap));
+      height: var(--cell);
+      padding: var(--s-1) 0;
+    }
+    .nav-actions {
+      justify-self: center;
+    }
   }
 </style>

@@ -14,7 +14,7 @@ const TOTAL = 24;
 const DATE = '2026-11-10';
 
 // Brand-like background colours for the placeholder thumbnails (not used in CSS).
-const PALETTE = ['#FF5A36', '#FFC531', '#2EC4B6', '#1D1A2F', '#E24420', '#5B5670'];
+const PALETTE = ['#1F7AFF', '#FFC531', '#FF5A8A', '#0E2440', '#0F5FD6', '#50607A'];
 const THUMB_SIZES = { s: 150, m: 300, l: 600 } as const;
 
 // Every sample gets action-games or car-games + puzzle-games, plus one of these.

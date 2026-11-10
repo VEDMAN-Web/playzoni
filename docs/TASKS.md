@@ -70,7 +70,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 ## Phase 2 — Pages
 
 ### T1.6 — Light blue theme and Poki-style nav box
-- status: todo · deps: T1.5 · model: haiku · docs: DESIGN §Colours §Header §Category tile, PRD §8
+- status: done · deps: T1.5 · model: haiku · docs: DESIGN §Colours §Header §Category tile, PRD §8
 - Do:
   1. Update `tokens.css` colours to the new DESIGN §Colours values (names unchanged). Update `brand.json` theme colour, `site.webmanifest` and regenerate icons/og images if they use the old colours.
   2. Replace the header bar and the category chip row with the nav box exactly as DESIGN §Header (fixed top-left; 3×1 cells ≥1024, one line 56px below). Remove `CategoryNav` from the header. Keep `SearchBox` logic but move it into the new search panel.

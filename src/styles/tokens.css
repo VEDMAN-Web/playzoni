@@ -2,18 +2,18 @@
 
 :root {
   /* §Colours */
-  --c-bg: #FFF7EE;
+  --c-bg: #E3F1FF;
   --c-surface: #FFFFFF;
-  --c-ink: #1D1A2F;
-  --c-ink-2: #5B5670;
-  --c-line: #EDE4D8;
-  --c-primary: #FF5A36;
+  --c-ink: #0E2440;
+  --c-ink-2: #50607A;
+  --c-line: #D2E3F5;
+  --c-primary: #1F7AFF;
   --c-primary-ink: #FFFFFF;
-  --c-primary-dark: #E24420;
+  --c-primary-dark: #0F5FD6;
   --c-accent: #FFC531;
-  --c-accent-2: #2EC4B6;
-  --c-player-bg: #14121F;
-  --c-focus: #1D1A2F;
+  --c-accent-2: #FF5A8A;
+  --c-player-bg: #0B1A2E;
+  --c-focus: #0E2440;
 
   /* §Type — font */
   --font-sans: 'Nunito Variable', system-ui, sans-serif;
