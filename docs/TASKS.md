@@ -166,7 +166,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: import of the real feed creates staging entries; one game embedded on a draft page plays in the preview.
 
 ### T4.3 — GameMonetize adapter
-- status: blocked until `GM_FEED_URL` · deps: T4.1 · model: **sonnet** (first real adapter; T4.2 is deferred, so this one sets the pattern)
+- status: done · deps: T4.1 · model: **sonnet** (first real adapter; T4.2 is deferred, so this one sets the pattern)
 - Done when: same as T4.2 for GameMonetize.
 
 ### T4.4 — Playgama Partners adapter

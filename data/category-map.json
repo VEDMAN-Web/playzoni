@@ -1,6 +1,146 @@
 {
   "gd": {},
-  "gm": {},
-  "pg": {},
+  "gm": {
+    "3d": [
+      "3d-games"
+    ],
+    "adventure": [
+      "adventure-games"
+    ],
+    "arcade": [
+      "arcade-games"
+    ],
+    "clicker": [
+      "clicker-games"
+    ],
+    "multiplayer": [
+      "multiplayer-games"
+    ],
+    "puzzle": [
+      "puzzle-games"
+    ],
+    "racing": [
+      "racing-games"
+    ],
+    "shooting": [
+      "shooting-games"
+    ],
+    "sports": [
+      "sports-games"
+    ],
+    "stickman": [
+      "stickman-games"
+    ]
+  },
+  "pg": {
+    "3d": [
+      "3d-games"
+    ],
+    "action": [
+      "action-games"
+    ],
+    "adventure": [
+      "adventure-games"
+    ],
+    "arcade": [
+      "arcade-games"
+    ],
+    "basketball": [
+      "basketball-games"
+    ],
+    "bike": [
+      "bike-games"
+    ],
+    "board": [
+      "board-games"
+    ],
+    "bubble-shooter": [
+      "bubble-shooter-games"
+    ],
+    "car": [
+      "car-games"
+    ],
+    "chess": [
+      "chess-games"
+    ],
+    "clicker": [
+      "clicker-games"
+    ],
+    "cooking": [
+      "cooking-games"
+    ],
+    "dress-up": [
+      "dress-up-games"
+    ],
+    "driving": [
+      "driving-games"
+    ],
+    "fighting": [
+      "fighting-games"
+    ],
+    "horror": [
+      "horror-games"
+    ],
+    "idle": [
+      "idle-games"
+    ],
+    "io": [
+      "io-games"
+    ],
+    "mahjong": [
+      "mahjong-games"
+    ],
+    "match-3": [
+      "match-3-games"
+    ],
+    "multiplayer": [
+      "multiplayer-games"
+    ],
+    "obby": [
+      "obby-games"
+    ],
+    "parking": [
+      "parking-games"
+    ],
+    "platform": [
+      "platform-games"
+    ],
+    "puzzle": [
+      "puzzle-games"
+    ],
+    "racing": [
+      "racing-games"
+    ],
+    "shooting": [
+      "shooting-games"
+    ],
+    "simulation": [
+      "simulation-games"
+    ],
+    "skill": [
+      "skill-games"
+    ],
+    "soccer": [
+      "soccer-games"
+    ],
+    "solitaire": [
+      "solitaire-games"
+    ],
+    "sports": [
+      "sports-games"
+    ],
+    "stickman": [
+      "stickman-games"
+    ],
+    "strategy": [
+      "strategy-games"
+    ],
+    "two-player": [
+      "two-player-games"
+    ],
+    "zombie": [
+      "zombie-games"
+    ]
+  },
   "gp": {}
 }

@@ -1,7 +1,8 @@
 // Game providers and the domains their game frames load from (docs/PRD.md §10).
 // public/_headers builds the CSP `frame-src` from this list, so a new provider only needs an entry here.
-// The domains are empty until the owner has signed up as a publisher (docs/QUESTIONS.md Q2): the
-// domains come from each provider's own embed documentation, not from guesses.
+// Domains come from the embed addresses in each provider's own feed (GameMonetize: the `url` field,
+// Playgama: `gameURL` and the embed snippet), never from guesses. A provider with no accepted
+// publisher account yet has an empty list (GameDistribution, GamePix).
 
 export interface Provider {
   key: 'gd' | 'gm' | 'pg' | 'gp';
@@ -11,8 +12,8 @@ export interface Provider {
 
 export const PROVIDERS: Provider[] = [
   { key: 'gd', name: 'GameDistribution', frameDomains: [] },
-  { key: 'gm', name: 'GameMonetize', frameDomains: [] },
-  { key: 'pg', name: 'Playgama', frameDomains: [] },
+  { key: 'gm', name: 'GameMonetize', frameDomains: ['html5.gamemonetize.co'] },
+  { key: 'pg', name: 'Playgama', frameDomains: ['playgama.com'] },
   { key: 'gp', name: 'GamePix', frameDomains: [] },
 ];
 

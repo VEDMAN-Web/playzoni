@@ -61,6 +61,19 @@ export interface ImportPaths {
 
 export type ImageFetcher = (url: string) => Promise<Buffer>;
 
+// A feed entry the adapter did not turn into a RawGame, with the reason (written to data/staging/failed.txt).
+export interface SkippedEntry {
+  sourceId: string;
+  title: string;
+  reason: string;
+}
+
+// What a provider adapter returns: the games it could map and the entries it left out.
+export interface AdapterResult {
+  games: RawGame[];
+  skipped: SkippedEntry[];
+}
+
 export interface ImportOptions {
   /** Highest priority first. Used when the same title comes from two sources. */
   priority: SourceKey[];

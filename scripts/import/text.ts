@@ -45,6 +45,29 @@ export function normaliseTitle(title: string): string {
   return key === '' ? title.trim().toLowerCase() : key;
 }
 
+const NAMED_ENTITIES: Record<string, string> = {
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', ndash: '\u2013', mdash: '\u2014',
+  hellip: '\u2026', lsquo: '\u2018', rsquo: '\u2019', ldquo: '\u201C', rdquo: '\u201D',
+};
+
+// "&amp;" -> "&", "&#39;" -> "'". Unknown entities stay as they are.
+export function decodeEntities(text: string): string {
+  return text.replace(/&(#x[0-9a-f]+|#[0-9]+|[a-z]+);/gi, (match, body: string) => {
+    if (body.startsWith('#')) {
+      const code = body[1].toLowerCase() === 'x' ? parseInt(body.slice(2), 16) : parseInt(body.slice(1), 10);
+      return Number.isInteger(code) && code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : match;
+    }
+    return NAMED_ENTITIES[body.toLowerCase()] ?? match;
+  });
+}
+
+// Feed text as plain words: tags removed, entities decoded, white space collapsed.
+// Block tags (paragraph, line break, list item ...) separate words; inline tags such as <b> just vanish.
+const BLOCK_TAGS = /<\/?(br|p|div|li|ul|ol|h[1-6]|tr|td|table)\b[^>]*>/gi;
+export function plainText(html: string): string {
+  return decodeEntities(html.replace(BLOCK_TAGS, ' ').replace(/<[^>]*>/g, '')).replace(/\s+/g, ' ').trim();
+}
+
 export function aspectFrom(width: number, height: number): Aspect {
   const ratio = width / height;
   if (ratio >= ASPECT_RATIO_LIMIT) return 'landscape';

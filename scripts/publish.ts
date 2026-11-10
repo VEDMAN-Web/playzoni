@@ -6,6 +6,7 @@
 import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { parseArgs } from './import/args';
 import { readStagingGames, thumbsDirFor, type StagedFile } from './import/staging';
 import type { StagingGame } from './import/types';
 
@@ -109,18 +110,7 @@ export function publishDrafts(options: PublishOptions): PublishResult {
   return { written, problems };
 }
 
-export function parseArgs(argv: string[]): Record<string, string> {
-  const args: Record<string, string> = {};
-  for (let i = 0; i < argv.length; i++) {
-    const name = argv[i];
-    if (!name.startsWith('--')) throw new Error(`unexpected argument "${name}"`);
-    const value = argv[i + 1];
-    if (value === undefined || value.startsWith('--')) throw new Error(`${name} needs a value`);
-    args[name.slice(2)] = value;
-    i++;
-  }
-  return args;
-}
+export { parseArgs };
 
 const todayIso = (): string => new Date().toISOString().slice(0, 10);
 

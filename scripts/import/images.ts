@@ -21,6 +21,8 @@ export interface FetchOptions {
   /** Extra tries after the first one. */
   retries: number;
   retryDelayMs: number;
+  /** Extra request headers, for example Accept: image/webp for the Playgama picture server. */
+  headers?: Record<string, string>;
 }
 
 export const DEFAULT_FETCH_OPTIONS: FetchOptions = { timeoutMs: 10_000, retries: 2, retryDelayMs: 500 };
@@ -28,7 +30,7 @@ export const DEFAULT_FETCH_OPTIONS: FetchOptions = { timeoutMs: 10_000, retries:
 // A problem that another try cannot fix.
 class PermanentError extends Error {}
 
-async function fetchOnce(url: string, timeoutMs: number): Promise<Buffer> {
+async function fetchOnce(url: string, timeoutMs: number, headers?: Record<string, string>): Promise<Buffer> {
   let parsed: URL;
   try {
     parsed = new URL(url);
@@ -38,7 +40,7 @@ async function fetchOnce(url: string, timeoutMs: number): Promise<Buffer> {
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
     throw new PermanentError(`only http and https image URLs are allowed, got ${parsed.protocol}`);
   }
-  const response = await fetch(parsed, { signal: AbortSignal.timeout(timeoutMs) });
+  const response = await fetch(parsed, { headers, signal: AbortSignal.timeout(timeoutMs) });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const declared = Number(response.headers.get('content-length') ?? 0);
   if (declared > MAX_IMAGE_BYTES) throw new PermanentError(`image is ${declared} bytes, over the ${MAX_IMAGE_BYTES} limit`);
@@ -52,12 +54,12 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
 
 // Download with a timeout and `retries` more tries. The last error is thrown.
 export function createImageFetcher(options: Partial<FetchOptions> = {}): ImageFetcher {
-  const { timeoutMs, retries, retryDelayMs } = { ...DEFAULT_FETCH_OPTIONS, ...options };
+  const { timeoutMs, retries, retryDelayMs, headers } = { ...DEFAULT_FETCH_OPTIONS, ...options };
   return async (url: string): Promise<Buffer> => {
     let lastError: unknown = new Error('no attempt made');
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
-        return await fetchOnce(url, timeoutMs);
+        return await fetchOnce(url, timeoutMs, headers);
       } catch (error) {
         lastError = error;
         if (error instanceof PermanentError) break;
