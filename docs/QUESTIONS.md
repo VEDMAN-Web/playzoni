@@ -14,6 +14,17 @@ Answer: —
 
 ## Open
 
+### Q14 — Decisions the feeds left open   (T4.3, T4.4, asked 11 Nov 2026, by build agent)
+Question: The GameMonetize feed and the Playgama catalog do not give everything our data model needs, so the adapters decided as below. Please confirm or change any of them (none of this blocks work).
+(1) Playgama has no width or height: horizontal (alone or together with vertical) = landscape 800x450, the size of Playgama's own embed code; vertical only = portrait 450x800.
+(2) GameMonetize has no mobile flag: mobile is true only when the game's feed tags include Mobile (10 of 50). Playgama: mobile is true when the catalog lists Android or iOS (2552 of 2648). The play test decides later.
+(3) Playgama games with no English version (3), with a game address outside playgama.com (16) or with no screen orientation (1) are left out, and listed in data/staging/failed.txt.
+(4) Only provider category names that are exactly one of our category words are mapped (for example puzzle to puzzle-games). 152 Playgama genres and 2 GameMonetize categories (Hypercasual, Girls) are in data/staging/unmapped.txt for you to decide. Until then 171 Playgama and 8 GameMonetize staged games have no category, and npm run publish refuses them.
+(5) The staging folder holds 2648 Playgama games (969 MB of pictures, git-ignored) from a first full run that was stopped; they are kept at the owner request. A normal run now takes the top 500 in the catalog order.
+Options: say "ok", or give the change.
+Blocking: none
+Answer: —
+
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later

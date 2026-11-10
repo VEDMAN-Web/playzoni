@@ -170,7 +170,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: same as T4.2 for GameMonetize.
 
 ### T4.4 — Playgama Partners adapter
-- status: blocked until `PG_FEED_URL` · deps: T4.1 · model: haiku
+- status: done · deps: T4.1 · model: haiku
 - Done when: same as T4.2 for Playgama.
 
 ### T4.5 — Publish script and launch shortlist
