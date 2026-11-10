@@ -12,9 +12,11 @@ interface Props {
   noindex?: boolean;
   /** Set "has-grid" on pages whose first grid item is the nav spacer (DESIGN §Header). */
   mainClass?: string;
+  /** Origin of the game frame (game pages only): opens the connection early so Play starts faster. */
+  preconnect?: string;
 }
 
-const { title, description, canonicalPath, ogImage, noindex, mainClass } = Astro.props;
+const { title, description, canonicalPath, ogImage, noindex, mainClass, preconnect } = Astro.props;
 
 // Cloudflare Web Analytics beacon only when a token is set (docs/PRD.md §2).
 const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
@@ -30,6 +32,7 @@ const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preload" href={nunitoUrl} as="font" type="font/woff2" crossorigin />
+    {preconnect && <link rel="preconnect" href={preconnect} crossorigin />}
     <Seo
       title={title}
       description={description}

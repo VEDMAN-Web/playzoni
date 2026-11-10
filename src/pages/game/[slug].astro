@@ -104,9 +104,16 @@ const faqLd =
         })),
       }
     : null;
+// Opens the connection to the game provider early (R24). Skipped if the embed address is not a valid URL.
+let embedOrigin: string | undefined;
+try {
+  embedOrigin = new URL(d.embedUrl).origin;
+} catch {
+  embedOrigin = undefined;
+}
 const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
 ---
-<BaseLayout title={title} description={d.description} canonicalPath={`/game/${slug}`} ogImage={ogImage} mainClass="has-grid">
+<BaseLayout title={title} description={d.description} canonicalPath={`/game/${slug}`} ogImage={ogImage} mainClass="has-grid" preconnect={embedOrigin}>
   <Header slot="header" box={false} />
 
   <GameGrid items={tiles} mode="mosaic" navBox={true} eagerCount={0} priorityFirst={false} label="More games like this">
