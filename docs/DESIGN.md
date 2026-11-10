@@ -47,7 +47,7 @@ Text blocks max width 72ch.
 ## §Game tile (`GameTile`)
 - Square, thumbnail fills it (`object-fit: cover`), radius `--r-tile`, background `--c-surface`, shadow `--sh-tile`.
 - Sizes: S = 1×1 cell, M = 2×2, L = 3×3. Image source: S → `s.webp` (150px) with `srcset` m for 2× screens; M → `m.webp`; L → `l.webp`.
-- Title: hidden by default; on hover (desktop) and focus, a bottom gradient (`transparent → rgba(29,26,47,.85)`) slides up with the title in white `--t-tile`, 2 lines max, ellipsis. On touch devices the title is not shown on tiles (image + `alt` + `aria-label` only), except in rows where a 1-line title is shown below the tile.
+- Title: hidden by default; on hover (desktop) and focus, a bottom gradient (`transparent → rgba(29,26,47,.85)`) slides up with the title in white `--t-tile`, 2 lines max, ellipsis. On touch devices the title is not shown on tiles (image + `alt` + `aria-label` only). No title text under any tile, rows included (R27) — the hover/focus overlay is the only place the name appears.
 - Hover: `transform: translateY(-3px) scale(1.03)`, shadow `--sh-tile-hover`, 150ms ease-out. Respect `prefers-reduced-motion` (no transform).
 - Badges (top-left, pill, `--t-small`): "New" (`--c-accent`, ink text) if addedDate ≤ 14 days; "Hot" (`--c-accent-2`) if in top 20 popularity. Max one badge.
 - Whole tile is one `<a href="/game/<slug>">` with **no** `aria-label`; its accessible name comes from the title text inside it (visually hidden or overlay, but never `display:none`). The thumbnail `<img>` inside a tile has `alt=""` (the link text already names the game).
@@ -60,7 +60,7 @@ Text blocks max width 72ch.
 - No horizontal page scroll at any width.
 
 ## §Rows (`GameRow`)
-Title (`--t-h3`) left, "See all ›" link right. Tiles in one horizontal line, scroll-snap, swipe on touch, hidden scrollbar, arrow buttons on desktop (≥1024) at both ends. Tile size S on all widths (smaller, Poki-style rows), with 1-line title below.
+Title (`--t-h3`) left, "See all ›" link right. Tiles in one horizontal line, scroll-snap, swipe on touch, hidden scrollbar, arrow buttons on desktop (≥1024) at both ends. Tile size S on all widths (smaller, Poki-style rows). Row tiles are the same plain square tiles as the grid: no title under them (R27); name only in the hover/focus overlay.
 
 ## §Header (nav box — no full-width bar)
 The site has **no full-width header bar and no category chip row**. Navigation lives in a small white "nav box" that floats at the top-left, and categories appear as tiles inside the grid (§Category tile) and in the search panel.
