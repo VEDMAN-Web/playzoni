@@ -182,7 +182,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 ## Phase 5 — Content and launch
 
 ### T5.1 — QA guide for the testing team
-- status: todo · deps: T4.5 · model: haiku · docs: SEO-PLAN §Content
+- status: done · deps: T4.5 · model: haiku · docs: SEO-PLAN §Content
 - Do: `docs/QA-GUIDE.md` in very simple English (team members fill it): how to open a draft game on the preview, what to check on phone and desktop, how to fill `data/qa/<slug>.json` (with one filled example), when to mark a game "reject". Add `npm run qa:new -- <slug>` that creates the empty JSON from the template.
 - Done when: guide ≤ 1 page, example valid against a zod schema used by validate.
 

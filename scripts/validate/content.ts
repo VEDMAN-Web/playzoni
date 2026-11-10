@@ -5,6 +5,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { buildGameTitle } from '../../src/lib/seo';
+import { qaProblems } from '../qa/schema';
 import { parseFrontmatter, type FrontmatterValue } from './frontmatter';
 import {
   CATEGORY_FAQ,
@@ -31,11 +32,6 @@ export interface ContentPaths {
   qaDir: string;
   stagingDir: string;
 }
-
-const QA_KEYS = [
-  'tester', 'date', 'worksMobile', 'worksDesktop', 'orientation', 'loadSeconds',
-  'controlsDesktop', 'controlsMobile', 'goal', 'threeFacts', 'tips', 'issues',
-];
 
 const asString = (v: FrontmatterValue | undefined): string => (typeof v === 'string' ? v : '');
 const asList = (v: FrontmatterValue | undefined): FrontmatterValue[] => (Array.isArray(v) ? v : []);
@@ -136,8 +132,9 @@ export function validateContent(paths: ContentPaths): string[] {
     } else {
       try {
         const qa = JSON.parse(readFileSync(qaFile, 'utf8')) as Record<string, unknown>;
-        const missing = QA_KEYS.filter((k) => !(k in qa));
-        if (missing.length > 0) add(qaFile, 'qa-fields', `missing ${missing.join(', ')}`);
+        const problems = qaProblems(qa);
+        for (const problem of problems) add(qaFile, 'qa-fields', problem);
+        if (problems.length === 0 && qa.verdict !== 'publish') add(qaFile, 'qa-verdict', `verdict is "${String(qa.verdict)}"; a game can only be published with "publish"`);
       } catch {
         add(qaFile, 'qa-invalid', 'not valid JSON');
       }
