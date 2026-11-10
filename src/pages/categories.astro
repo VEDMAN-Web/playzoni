@@ -40,9 +40,9 @@ const jsonLd = [
 ];
 ---
 <BaseLayout title={title} description={description} canonicalPath="/categories" mainClass="has-grid">
-  <Header slot="header" />
+  <Header slot="header" box={false} />
 
-  <GameGrid items={items} mode="uniform" navSpacer={true} label="All categories">
+  <GameGrid items={items} mode="uniform" navBox={true} label="All categories">
     <Fragment slot="lead">
       <TitleTile crumbs={crumbs} h1="All Categories" />
       <p class="intro">

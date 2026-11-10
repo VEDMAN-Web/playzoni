@@ -14,6 +14,12 @@ Answer: —
 
 ## Open
 
+### Q16 — Shape of the category title tile   (TP.2, asked 12 Nov 2026, by build agent)
+Question: DESIGN §V2.3 says "1×4 white title tile". Everywhere else the design writes width × height (S = 1×1, "6×1 ad strip", "6×4 player"), so I built it 1 cell wide and 4 cells tall: it sits in the first column under the nav box, with the breadcrumbs and a smaller H1 inside. The text says it replaces the old "4×1" tile, which could also mean it should stay wide (4 across, 1 high). Which one do you want?
+Options: A) 1 wide × 4 tall, under the nav box (built now). B) 4 wide × 1 tall, beside the nav box (the old shape).
+Blocking: none. Changing it is a few lines in src/components/TitleTile.astro.
+Answer: —
+
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later

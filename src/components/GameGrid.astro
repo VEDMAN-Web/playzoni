@@ -1,6 +1,7 @@
 ---
 import GameTile from './GameTile.astro';
 import CategoryTile from './CategoryTile.astro';
+import NavBox from './NavBox.astro';
 import type { BadgeKind } from '../lib/badges';
 import { capBadges, placeItems } from '../lib/mosaic';
 
@@ -9,8 +10,8 @@ import { capBadges, placeItems } from '../lib/mosaic';
 //   Featured games fill the L slots first. With xlFirst, the first featured game is XL (3x3 from 1024px, 2x2 below).
 // - uniform (rows, related, lists): every tile has the same size (S, or L when uniformSize is 'L').
 // Category tiles are 2x1 and take one slot in order. At most 12 badges are drawn on one grid (see capBadges).
-// The nav spacer goes first on pages that have the floating nav box. The optional "lead" slot comes right
-// after the spacer (for example the title tile on category pages).
+// The nav box (1x1, desktop only) is the first grid item on pages that use it (DESIGN §V2.3). The optional "lead"
+// slot comes right after it (for example the title tile on category pages).
 
 export interface GridGame {
   kind: 'game';
@@ -32,18 +33,18 @@ interface Props {
   items: GridItem[];
   mode?: 'mosaic' | 'uniform';
   uniformSize?: 'S' | 'L';
-  navSpacer?: boolean;
+  navBox?: boolean;
   eagerCount?: number;
   label?: string;
   xlFirst?: boolean;
 }
 
-const { items, mode = 'mosaic', uniformSize = 'S', navSpacer = false, eagerCount = 6, label = 'Games', xlFirst = false } = Astro.props;
+const { items, mode = 'mosaic', uniformSize = 'S', navBox = false, eagerCount = 6, label = 'Games', xlFirst = false } = Astro.props;
 
 const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
 ---
 <div class={`grid grid-${mode}`} role="group" aria-label={label}>
-  {navSpacer && <div class="nav-spacer" aria-hidden="true"></div>}
+  {navBox && <div class="cell cell-nav"><NavBox /></div>}
   <slot name="lead" />
   {placed.map((p, i) => (
     <div class={`cell cell-${p.size.toLowerCase()}`}>
@@ -75,9 +76,16 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
     padding: 0;
     list-style: none;
   }
-  .nav-spacer {
-    grid-column: span 3;
+  /* The nav box is a desktop tile; below 1024px the top bar in Header is used and this cell is not drawn. */
+  .cell-nav {
+    display: none;
+    grid-column: span 1;
     grid-row: span 1;
+  }
+  @media (min-width: 1024px) {
+    .cell-nav {
+      display: block;
+    }
   }
   .cell {
     min-width: 0;
@@ -107,10 +115,5 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
   .cell-cat {
     grid-column: span 2;
     grid-row: span 1;
-  }
-  @media (max-width: 479px) {
-    .nav-spacer {
-      display: none;
-    }
   }
 </style>

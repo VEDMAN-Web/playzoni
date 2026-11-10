@@ -55,9 +55,9 @@ const jsonLd = [
 ];
 ---
 <BaseLayout title={title} description={description} canonicalPath={canonicalPath} mainClass="has-grid">
-  <Header slot="header" />
+  <Header slot="header" box={false} />
 
-  <GameGrid items={items} mode="uniform" uniformSize="L" navSpacer={true} eagerCount={6} label={`${name} list`}>
+  <GameGrid items={items} mode="uniform" uniformSize="L" navBox={true} eagerCount={6} label={`${name} list`}>
     <Fragment slot="lead">
       <TitleTile crumbs={crumbs} h1={h1} />
       {isFirst && <p class="intro">{intro}</p>}
@@ -78,6 +78,14 @@ const jsonLd = [
     max-width: 72ch;
     margin: 0 0 var(--s-2);
     color: var(--c-ink-2);
+  }
+  @media (min-width: 1024px) {
+    .intro {
+      grid-column: 2 / span 6;
+      grid-row: 1;
+      align-self: center;
+      margin: 0;
+    }
   }
   .empty {
     color: var(--c-ink-2);

@@ -159,14 +159,15 @@ const published = (await getPublishedCategories())
 </style>
 
 <script>
-  // Opens and closes the search panel. Escape, the close button and a click on the
-  // backdrop all close it. Focus goes into the input on open and back to the
-  // search button on close.
-  const openBtn = document.querySelector<HTMLAnchorElement>('[data-search-open]');
+  // Opens and closes the search panel. Escape, the close button and a click on the backdrop all close it.
+  // Focus goes into the input on open and back to the button that opened it on close. Any button with
+  // data-search-open opens the panel (nav box, floating bar, top bar).
+  const openBtns = document.querySelectorAll<HTMLElement>('[data-search-open]');
   const panel = document.querySelector<HTMLElement>('[data-search-panel]');
   const backdrop = document.querySelector<HTMLElement>('[data-search-backdrop]');
   const closeBtn = document.querySelector<HTMLButtonElement>('[data-search-close]');
   const input = document.querySelector<HTMLInputElement>('[data-search-input]');
+  let opener: HTMLElement | null = null;
 
   function isOpen(): boolean {
     return panel?.classList.contains('is-open') ?? false;
@@ -176,19 +177,22 @@ const published = (await getPublishedCategories())
     panel?.classList.toggle('is-open', open);
     backdrop?.classList.toggle('is-open', open);
     panel?.setAttribute('aria-hidden', open ? 'false' : 'true');
-    openBtn?.setAttribute('aria-expanded', open ? 'true' : 'false');
+    for (const btn of openBtns) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     if (open) {
       input?.focus();
     } else {
-      openBtn?.focus();
+      opener?.focus();
     }
   }
 
-  openBtn?.addEventListener('click', (event: MouseEvent) => {
-    // Without JS this link goes to /search. With JS the panel opens instead.
-    event.preventDefault();
-    setOpen(true);
-  });
+  for (const btn of openBtns) {
+    btn.addEventListener('click', (event: MouseEvent) => {
+      // Without JS these links go to /search. With JS the panel opens instead.
+      event.preventDefault();
+      opener = btn;
+      setOpen(true);
+    });
+  }
   closeBtn?.addEventListener('click', () => setOpen(false));
   backdrop?.addEventListener('click', () => setOpen(false));
   document.addEventListener('keydown', (event: KeyboardEvent) => {

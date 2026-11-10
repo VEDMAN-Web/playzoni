@@ -198,7 +198,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: home at 390/768/1280 shows the new look; never more than 12 badges per page; no horizontal scroll; `npm run check` passes.
 
 ### TP.2 — Nav box, floating nav bar, phone top bar
-- status: todo · deps: TP.1 · model: **sonnet** · docs: DESIGN §V2.3
+- status: done · deps: TP.1 · model: **sonnet** · docs: DESIGN §V2.3
 - Do: 1×1 nav box in the grid on desktop, floating bar after 160px scroll, phone top bar, title tile 1×4 on category/list pages; remove the old 3×1 box and 4×1 title tile.
 - Done when: behaviour works with mouse, keyboard and touch; works without JS (box and links still there); screenshots saved.
 

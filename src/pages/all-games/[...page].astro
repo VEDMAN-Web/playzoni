@@ -84,9 +84,9 @@ const jsonLd = [
 ];
 ---
 <BaseLayout title={title} description={description} canonicalPath={canonicalPath} mainClass="has-grid">
-  <Header slot="header" />
+  <Header slot="header" box={false} />
 
-  <GameGrid items={[]} mode="uniform" navSpacer={true} label="All games A to Z">
+  <GameGrid items={[]} mode="uniform" navBox={true} label="All games A to Z">
     <Fragment slot="lead">
       <TitleTile crumbs={crumbs} h1={h1} />
       {isFirst && (

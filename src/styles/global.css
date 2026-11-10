@@ -96,20 +96,9 @@
   }
 }
 
-/* Floating nav box and page space (DESIGN §Header). */
-.nav-spacer {
-  grid-column: span 3;
-  grid-row: span 1;
-}
-
-@media (max-width: 1023px) {
-  .nav-spacer {
-    display: none;
-  }
-}
-
+/* Page space under the top bar (§V2.3): 56px bar plus 12px. */
 main {
-  padding-top: calc(56px + 2 * var(--gap));
+  padding-top: 68px;
   padding-inline: var(--gutter);
   box-sizing: border-box;
 }
@@ -134,7 +123,7 @@ main {
     padding-top: calc(var(--cell) + 2 * var(--gap));
   }
 
-  /* Pages with a grid start with the nav-spacer item instead. */
+  /* Pages with a grid start with the nav box as the first grid item instead. */
   main.has-grid {
     padding-top: var(--gap);
   }

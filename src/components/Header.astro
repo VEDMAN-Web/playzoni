@@ -1,45 +1,76 @@
 ---
+import NavBox from './NavBox.astro';
+import NavIcon from './NavIcon.astro';
 import SearchPanel from './SearchPanel.astro';
 
-// Floating nav box (DESIGN §Header): logo, search button, favourites button.
-// No full-width bar. The search button opens the SearchPanel. Without JS,
-// the search button is a plain link to /search.
+// Site header (docs/DESIGN.md §V2.3). Three parts, each shown at its own screen size:
+// - the nav box: a 1x1 tile at the top-left of the page on desktop. Pages with a game grid put it inside the grid
+//   (GameGrid navBox); every other page gets it here (box = true).
+// - the floating bar: desktop only, slides down after 160px of scrolling (small script below).
+// - the top bar: below 1024px, a white tab hanging from the top, as wide as the grid.
+// Without JavaScript the nav box and the top bar still work as plain links; only the floating bar needs scripting.
+interface Props {
+  box?: boolean;
+}
+
+const { box = true } = Astro.props;
 ---
-<header class="nav-wrap">
-  <nav class="nav-box" aria-label="Site">
-    <a class="logo" href="/" aria-label="Playzoni home">
-      <img src="/logo.svg" alt="Playzoni" width="90" height="28" />
-    </a>
-    <div class="nav-actions">
-      <a class="icon-btn" href="/search" aria-label="Search games" aria-controls="search-panel" aria-expanded="false" data-search-open>
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" /><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
-      </a>
-      <a class="icon-btn" href="/favourites" aria-label="Favourites">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10A4 4 0 0 1 12 7.8a4 4 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
-      </a>
+<header class="site-header">
+  {box && <div class="box-slot"><NavBox /></div>}
+
+  <nav class="float-bar" aria-label="Quick links" data-float-bar>
+    <a class="logo" href="/" aria-label="Playzoni home"><img src="/logo.svg" alt="Playzoni" width="90" height="28" /></a>
+    <span class="divider" aria-hidden="true"></span>
+    <a class="fb-btn" href="/popular-games" aria-label="Popular games" data-tip="Popular"><NavIcon name="flame" /></a>
+    <a class="fb-btn" href="/new-games" aria-label="New games" data-tip="New"><NavIcon name="sparkle" /></a>
+    <a class="fb-btn" href="/categories" aria-label="All categories" data-tip="Categories"><NavIcon name="grid" /></a>
+    <a class="fb-btn" href="/search" aria-label="Search games" aria-controls="search-panel" aria-expanded="false" data-tip="Search" data-search-open><NavIcon name="search" /></a>
+    <a class="fb-btn" href="/favourites" aria-label="Favourites" data-tip="Favourites"><NavIcon name="heart" /></a>
+  </nav>
+
+  <nav class="top-bar" aria-label="Site">
+    <a class="logo" href="/" aria-label="Playzoni home"><img src="/logo.svg" alt="Playzoni" width="90" height="28" /></a>
+    <div class="top-actions">
+      <a class="fb-btn" href="/search" aria-label="Search games" aria-controls="search-panel" aria-expanded="false" data-search-open><NavIcon name="search" /></a>
+      <a class="fb-btn" href="/favourites" aria-label="Favourites"><NavIcon name="heart" /></a>
     </div>
   </nav>
+
   <SearchPanel />
 </header>
 
-<style>
-  .nav-wrap {
-    display: contents;
+<script>
+  // Floating bar: visible once the page is scrolled past 160px. Top bar: as wide as the grid's columns.
+  const SHOW_AFTER_PX = 160;
+  const bar = document.querySelector<HTMLElement>('[data-float-bar]');
+
+  function updateBar(): void {
+    bar?.classList.toggle('is-visible', window.scrollY > SHOW_AFTER_PX);
   }
-  .nav-box {
-    position: fixed;
-    top: var(--gap);
-    left: var(--gutter);
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    gap: var(--s-2);
-    height: 56px;
-    padding: 0 var(--s-3);
-    box-sizing: border-box;
-    background: var(--c-surface);
-    border-radius: var(--r-card);
-    box-shadow: var(--sh-tile);
+
+  function updateGridWidth(): void {
+    const root = document.documentElement;
+    const grid = document.querySelector<HTMLElement>('.grid');
+    if (!grid) {
+      root.style.removeProperty('--grid-w');
+      return;
+    }
+    const styles = getComputedStyle(root);
+    const cell = parseFloat(styles.getPropertyValue('--cell'));
+    const gap = parseFloat(styles.getPropertyValue('--gap'));
+    const columns = Math.max(1, Math.floor((grid.clientWidth + gap) / (cell + gap)));
+    root.style.setProperty('--grid-w', `${columns * cell + (columns - 1) * gap}px`);
+  }
+
+  window.addEventListener('scroll', updateBar, { passive: true });
+  window.addEventListener('resize', updateGridWidth);
+  updateBar();
+  updateGridWidth();
+</script>
+
+<style>
+  .site-header {
+    display: contents;
   }
   .logo {
     display: inline-flex;
@@ -50,40 +81,135 @@ import SearchPanel from './SearchPanel.astro';
     height: 28px;
     width: auto;
   }
-  .nav-actions {
-    display: flex;
-    align-items: center;
-    gap: var(--s-1);
+
+  /* Nav box for pages without a grid: sits where the grid's first cell would be. */
+  .box-slot {
+    display: none;
   }
-  .icon-btn {
+  @media (min-width: 1024px) {
+    .box-slot {
+      display: block;
+      position: absolute;
+      top: var(--gap);
+      left: calc(max(0px, (100% - (10 * var(--cell) + 9 * var(--gap) + 2 * var(--gutter))) / 2) + var(--gutter));
+      width: var(--cell);
+      height: var(--cell);
+      z-index: 5;
+    }
+  }
+
+  /* Round icon buttons shared by the floating bar and the top bar. */
+  .fb-btn {
+    position: relative;
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
     width: 44px;
     height: 44px;
-    border-radius: var(--r-pill);
+    border-radius: 12px;
     color: var(--c-ink);
     text-decoration: none;
+    transition: background-color 120ms ease-out, color 120ms ease-out;
   }
-  .icon-btn:hover {
+  .fb-btn:hover,
+  .fb-btn:focus-visible {
+    background: var(--c-bg);
     color: var(--c-primary);
     text-decoration: none;
   }
-  /* Desktop: 3 cells wide and 1 cell tall. Logo on top, buttons below. */
+
+  /* Floating bar: desktop only. Hidden above the fold, slides down after 160px of scroll. */
+  .float-bar {
+    display: none;
+  }
   @media (min-width: 1024px) {
-    .nav-box {
-      display: grid;
-      grid-template-rows: auto auto;
-      justify-items: center;
-      align-content: center;
+    .float-bar {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      z-index: 50;
+      display: flex;
+      align-items: center;
       gap: var(--s-1);
-      width: calc(3 * var(--cell) + 2 * var(--gap));
-      height: var(--cell);
-      padding: var(--s-1) 0;
+      height: 56px;
+      padding: 0 var(--s-3);
+      box-sizing: border-box;
+      border-radius: 16px;
+      background: var(--c-surface);
+      box-shadow: var(--sh-tile);
+      transform: translate(-50%, calc(-100% - 16px));
+      visibility: hidden;
+      transition: transform 220ms var(--ease-tile), visibility 0s linear 220ms;
     }
-    .nav-actions {
-      justify-self: center;
+    .float-bar.is-visible {
+      transform: translate(-50%, 0);
+      visibility: visible;
+      transition: transform 220ms var(--ease-tile), visibility 0s linear 0s;
+    }
+    .divider {
+      align-self: center;
+      width: 1px;
+      height: 28px;
+      margin: 0 var(--s-2);
+      background: var(--c-line);
+    }
+    /* Tooltip under each button (hover and keyboard focus). */
+    .float-bar .fb-btn::after {
+      content: attr(data-tip);
+      position: absolute;
+      top: calc(100% + 10px);
+      left: 50%;
+      padding: 4px var(--s-2);
+      border-radius: 8px;
+      background: var(--c-ink);
+      color: var(--c-primary-ink);
+      font: var(--t-small);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -4px);
+      transition: opacity 120ms ease-out, transform 120ms ease-out;
+    }
+    .float-bar .fb-btn:hover::after,
+    .float-bar .fb-btn:focus-visible::after {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  /* Top bar: below 1024px. A white tab hanging from the top edge, as wide as the grid. */
+  .top-bar {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: var(--grid-w, calc(100% - 2 * var(--gutter)));
+    height: 56px;
+    padding: 0 var(--s-2) 0 var(--s-4);
+    box-sizing: border-box;
+    border-radius: 0 0 16px 16px;
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    transform: translateX(-50%);
+  }
+  .top-actions {
+    display: flex;
+    gap: var(--s-1);
+  }
+  @media (min-width: 1024px) {
+    .top-bar {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .float-bar,
+    .float-bar.is-visible {
+      transition-duration: 0.01ms;
     }
   }
 </style>

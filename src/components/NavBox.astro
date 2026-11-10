@@ -1,0 +1,71 @@
+---
+import NavIcon from './NavIcon.astro';
+
+// The nav box (docs/DESIGN.md §V2.3): a 1x1 white tile on desktop (1024px and up) with the logo on top and the
+// search and favourites buttons below. It is the first item of the grid and scrolls with the page. Below 1024px it
+// is hidden; the top bar in Header takes over. Without JavaScript the search button is a plain link to /search.
+---
+<nav class="nav-box" aria-label="Site">
+  <a class="logo" href="/" aria-label="Playzoni home">
+    <img src="/logo.svg" alt="Playzoni" width="96" height="30" />
+  </a>
+  <div class="actions">
+    <a class="icon-btn" href="/search" aria-label="Search games" aria-controls="search-panel" aria-expanded="false" data-search-open>
+      <NavIcon name="search" />
+    </a>
+    <a class="icon-btn" href="/favourites" aria-label="Favourites">
+      <NavIcon name="heart" />
+    </a>
+  </div>
+</nav>
+
+<style>
+  .nav-box {
+    display: none;
+  }
+  @media (min-width: 1024px) {
+    .nav-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--s-2);
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      padding: var(--s-2);
+      border-radius: var(--r-card);
+      background: var(--c-surface);
+      box-shadow: var(--sh-tile);
+    }
+  }
+  .logo {
+    display: inline-flex;
+  }
+  .logo img {
+    display: block;
+    width: 96px;
+    height: auto;
+  }
+  .actions {
+    display: flex;
+    gap: var(--s-1);
+  }
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--r-pill);
+    color: var(--c-ink);
+    text-decoration: none;
+    transition: background-color 120ms ease-out, color 120ms ease-out;
+  }
+  .icon-btn:hover,
+  .icon-btn:focus-visible {
+    background: var(--c-bg);
+    color: var(--c-primary);
+    text-decoration: none;
+  }
+</style>

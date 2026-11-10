@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import GameGrid, { type GridItem } from '../../components/GameGrid.astro';
+import TitleTile from '../../components/TitleTile.astro';
 import JsonLd from '../../components/JsonLd.astro';
 import { getPublishedGames } from '../../lib/games';
 import { categories } from '../../lib/categories';
@@ -135,35 +136,17 @@ const faqLd =
 const jsonLd = [collectionLd, itemListLd, breadcrumbLd, ...(faqLd && isFirst ? [faqLd] : [])];
 ---
 <BaseLayout title={pageTitle} description={pageDescription} canonicalPath={canonicalPath} noindex={!indexable} mainClass="has-grid">
-  <Header slot="header" />
+  <Header slot="header" box={false} />
 
   <GameGrid
     items={gridItems}
     mode={isFirst ? 'mosaic' : 'uniform'}
     uniformSize="S"
-    navSpacer={true}
+    navBox={true}
     eagerCount={1}
     label={`${cat.name} games`}
   >
-    <div slot="lead" class="title-tile">
-      <nav class="crumbs" aria-label="Breadcrumb">
-        <ol>
-          {crumbs.map((c, i) => (
-            <li>
-              {i === crumbs.length - 1 ? (
-                <span aria-current="page">{c.name}</span>
-              ) : (
-                <>
-                  <a href={c.path}>{c.name}</a>
-                  <span aria-hidden="true">›</span>
-                </>
-              )}
-            </li>
-          ))}
-        </ol>
-      </nav>
-      <h1 class="page-title">{cat.h1}{isFirst ? '' : ` — Page ${pageNumber}`}</h1>
-    </div>
+    <TitleTile slot="lead" crumbs={crumbs} h1={`${cat.h1}${isFirst ? '' : ` — Page ${pageNumber}`}`} />
 
     {(parent || children.length > 0) && (
       <nav slot="lead" class="related" aria-label="Related categories">
@@ -222,55 +205,17 @@ const jsonLd = [collectionLd, itemListLd, breadcrumbLd, ...(faqLd && isFirst ? [
 </BaseLayout>
 
 <style>
-  .crumbs ol {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-1);
-    list-style: none;
-    margin: var(--s-4) 0 var(--s-2);
-    padding: 0;
-    color: var(--c-ink-2);
-    font: var(--t-small);
-  }
-  .crumbs li {
-    display: inline-flex;
-    gap: var(--s-1);
-    align-items: center;
-  }
-  .crumbs a {
-    color: var(--c-ink-2);
-  }
-  .page-title {
-    margin: 0 0 var(--s-3);
-    color: var(--c-ink);
-    font: var(--t-h1);
-  }
+  /* Related categories: a full-width row above the tiles on small screens; from 1024px a strip in the first row, beside the nav box. */
   .related {
     grid-column: 1 / -1;
     margin: 0 0 var(--s-2);
   }
-  /* Title tile: a full-width block on phones and tablets, a white 4x1 tile next to the nav box from 1024px (R10). */
-  .title-tile {
-    grid-column: 1 / -1;
-    min-width: 0;
-  }
   @media (min-width: 1024px) {
-    .title-tile {
-      grid-column: span 4;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: var(--s-4);
-      box-sizing: border-box;
-      border-radius: var(--r-card);
-      background: var(--c-surface);
-    }
-    .title-tile .page-title {
+    .related {
+      grid-column: 2 / -1;
+      grid-row: 1;
+      align-self: center;
       margin: 0;
-      font: var(--t-h2);
-    }
-    .title-tile .crumbs ol {
-      margin: 0 0 var(--s-1);
     }
   }
   .chips {
