@@ -155,3 +155,11 @@ Tile hover/press, tile load-in, floating nav bar slide, search panel slide-in (2
 - **All categories page and category tiles:** title tile "All Categories" is 2×1 cells. Every category tile is **2×1 cells**: white, radius 16, image on the left (square, 72% of the tile height, radius 12) and the name on the right in **UPPERCASE** 13px 800. The image is the thumbnail of that category's most popular published game (no emoji; the `emoji` field stays only as a fallback when the category has no game image).
 - **Player loading:** while the iframe loads, the dark player shows three white dots pulsing left to right (our own simple loader).
 - **Ad labels:** reserved ad blocks show the word "ADVERTISEMENT" in 10px, letter-spacing .12em, `--c-ink-2`, under the block (vertical along the right edge for the wide strip under the player).
+
+### V2.9 Player profile panel (Poki-like, **no login** in MVP)
+- Nav box/bar gets a **profile icon** (smiley in a circle, our own drawing). It opens a panel that slides in from the left like the search panel (same size, gradient background, round close button outside the edge).
+- Top card (white at 70% opacity, radius 20): a large smiley avatar (our own simple SVG), the title "Your games", the line "Saved on this device", and two stat pills: games played (controller icon + number) and time played (clock icon + "32m" / "2h 5m").
+- Below: "Ready for another round?" heading and a row of L tiles (2×2) of recently played games, each with the played badge and a small white pill "Played today" / "Played yesterday" / "Played 3 days ago" (clock icon), with a round next-arrow button to scroll the row. Then "Your favourites" as S tiles. Empty state: "Play a game and it will show up here."
+- Data lives in localStorage only (`storage.ts`): per game `{slug, firstPlayed, lastPlayed, plays, seconds}`. Time played = seconds the game page is visible (`visibilitychange`) after Play/auto-load, counted in 5-second steps, capped at 4 hours per session.
+- A small text link at the bottom: "Clear my history" (asks to confirm inside the panel, not with a browser dialog).
+- Sign-in with Google/Apple and cloud sync are **Phase 2** (needs a server and privacy work). Do not build them now.

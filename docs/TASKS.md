@@ -217,6 +217,11 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Do: everything in DESIGN §V2.8. First check both feeds for a preview video or screenshot list per game and record in STATUS what exists (field names, how many games have it); add optional `previewVideo` and `screenshots` to staging/game data only if the feeds have them (download nothing on import except what the hover needs, max 1 MB video / 4 screenshots per game; store under `public/thumbs/<slug>/`).
 - Done when: played badge appears after playing a game and reloading; hover preview works with each of the three fallbacks; search panel matches §V2.8 at 390 and 1280; `/categories` uses 2×1 image tiles; screenshots saved in `docs/screens/TP.6/`; `npm run check` passes.
 
+### TP.7 — Profile panel (local, no login)
+- status: todo · deps: TP.6 · model: haiku · docs: DESIGN §V2.9
+- Do: profile icon in nav box/bar/phone bar, profile panel, play/time tracking in `storage.ts`, "Played today" labels, clear-history with in-panel confirm.
+- Done when: playing two games and reloading shows 2 games and a time; works in a private window without errors (shows the empty state); screenshots in `docs/screens/TP.7/`; `npm run check` passes.
+
 ### TP.5 — Poki-style URLs with a language folder
 - status: cancelled (owner kept our URLs, SEO-PLAN §URLs final) — do not do · deps: TP.3 · model: **sonnet** · docs: SEO-PLAN §URLs (v2)
 - Do: move every page to the v2 paths (`/en/g/<slug>`, `/en/<category>`, `/en/…`), home stays `/`. Update every internal link, canonical, breadcrumb JSON-LD, sitemap, `WebSite` SearchAction (`/en/search?q=`), robots/noindex lists, Pagefind, `games-index.json`, favourites/recently-played links, and the tests. Add `<html lang="en">` everywhere (already) — no hreflang yet.
