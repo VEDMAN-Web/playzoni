@@ -15,7 +15,7 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
 ---
 <section class="player" aria-label={`Play ${title}`} data-player data-slug={slug} data-title={title} data-embed={embedUrl}>
   <div class={`player-frame aspect-${aspect}`} data-player-frame>
-    <img class="cover-bg" src={`/thumbs/${slug}/l.webp`} alt="" width="600" height="600" aria-hidden="true" loading="eager" decoding="async" data-player-bg />
+    <img class="cover-bg" src={`/thumbs/${slug}/l.webp`} alt="" width="600" height="600" aria-hidden="true" loading="eager" fetchpriority="high" decoding="async" data-player-bg />
     <div class="cover" data-player-cover>
       <img class="cover-thumb" src={`/thumbs/${slug}/m.webp`} alt={title} width="300" height="300" decoding="async" />
       <p class="cover-title">{title}</p>
@@ -33,19 +33,19 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
       {developer && <p class="bar-dev">{developer}</p>}
     </div>
     <div class="bar-actions">
-      <button type="button" class="icon-btn" aria-label="Favourite" title="Favourite" aria-pressed="false" hidden data-fav>
+      <button type="button" class="icon-btn" aria-label="Favourite" title="Favourite" aria-pressed="false" data-fav>
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10A4 4 0 0 1 12 7.8a4 4 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
       </button>
-      <button type="button" class="icon-btn" aria-label="Like" title="Like" aria-pressed="false" hidden data-like>
+      <button type="button" class="icon-btn" aria-label="Like" title="Like" aria-pressed="false" data-like>
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M7 11v9H4v-9h3zm2 9V10.5L12.5 4c1.4 0 2.5 1.1 2.5 2.5V10h4.6a1.5 1.5 0 0 1 1.5 1.8l-1.3 7A2 2 0 0 1 18 20H9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
       </button>
-      <button type="button" class="icon-btn flip" aria-label="Dislike" title="Dislike" aria-pressed="false" hidden data-dislike>
+      <button type="button" class="icon-btn flip" aria-label="Dislike" title="Dislike" aria-pressed="false" data-dislike>
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M7 11v9H4v-9h3zm2 9V10.5L12.5 4c1.4 0 2.5 1.1 2.5 2.5V10h4.6a1.5 1.5 0 0 1 1.5 1.8l-1.3 7A2 2 0 0 1 18 20H9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
       </button>
-      <button type="button" class="icon-btn" aria-label="Fullscreen" title="Fullscreen" hidden data-fullscreen>
+      <button type="button" class="icon-btn" aria-label="Fullscreen" title="Fullscreen" data-fullscreen>
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </button>
-      <button type="button" class="icon-btn" aria-label="Share" title="Share" hidden data-share>
+      <button type="button" class="icon-btn" aria-label="Share" title="Share" data-share>
         <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="6" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="2" /><circle cx="18" cy="6" r="2.5" fill="none" stroke="currentColor" stroke-width="2" /><circle cx="18" cy="18" r="2.5" fill="none" stroke="currentColor" stroke-width="2" /><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6" stroke="currentColor" stroke-width="2" /></svg>
       </button>
       <a class="icon-btn" href={reportHref} aria-label="Report a problem" title="Report a problem">
@@ -241,6 +241,15 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
     align-items: center;
     gap: var(--s-1);
   }
+  /* Narrow phones: the five 44px buttons touch, so the title keeps room and nothing runs past the bar. */
+  @media (max-width: 399px) {
+    .player-bar {
+      gap: var(--s-2);
+    }
+    .bar-actions {
+      gap: 0;
+    }
+  }
   .icon-btn {
     display: inline-flex;
     align-items: center;
@@ -403,7 +412,6 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
 
     // Fullscreen: the Fullscreen API where it exists, the overlay on iOS, hidden elsewhere.
     if (canFullscreen || isIos) {
-      fullscreenBtn.hidden = false;
       fullscreenBtn.addEventListener('click', () => {
         startGame();
         // On a phone the game is already full screen in the overlay.
@@ -422,7 +430,7 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
       });
     }
 
-    shareBtn.hidden = false;
+    if (!canFullscreen && !isIos) fullscreenBtn.hidden = true;
     shareBtn.addEventListener('click', () => {
       void share();
     });
@@ -434,7 +442,6 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
       likeBtn.setAttribute('aria-pressed', String(reaction === 'like'));
       dislikeBtn.setAttribute('aria-pressed', String(reaction === 'dislike'));
     }
-    for (const button of [favBtn, likeBtn, dislikeBtn]) button.hidden = false;
     paintFeedback();
     favBtn.addEventListener('click', () => {
       toggleFavourite(slug);

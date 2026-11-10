@@ -143,7 +143,7 @@ Rules: do tasks in order. Pick the first `todo` whose deps are `done`. Change `s
 - Done when: a deliberately broken copy of a sample game (in a temp test) fails with the right messages; real build passes.
 
 ### T3.4 — Performance pass
-- status: todo · deps: T2.2, T2.3, T2.4, T2.8 · model: haiku · docs: SEO-PLAN §Performance
+- status: blocked (Q11) · deps: T2.2, T2.3, T2.4, T2.8 · model: haiku · docs: SEO-PLAN §Performance
 - Do: run Lighthouse mobile on home, `/car-games`, one game page (local preview). Fix only what breaks the budget. Record scores before/after in STATUS.
 - Done when: all three pages meet every number in §Performance.
 
