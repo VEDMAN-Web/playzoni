@@ -30,15 +30,15 @@ const iconSvg = [
 function logoSvg(): string {
   const fontB64 = readFileSync(FONT_FILE).toString('base64');
   return [
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 130" role="img" aria-label="playzoni">',
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 416 130" role="img" aria-label="playzoni">',
     '<defs><style>',
     `@font-face{font-family:"Nunito Logo";font-weight:200 1000;src:url(data:font/woff2;base64,${fontB64}) format("woff2");}`,
     `text{font-family:"Nunito Logo",Nunito,Arial,sans-serif;font-weight:900;font-size:100px;fill:${INK};}`,
     '</style></defs>',
     '<text x="0" y="96">playz</text>',
-    `<circle cx="310" cy="74" r="36" fill="${brand.themeColor}"/>`,
-    `<path d="M300 58 L300 90 L326 74 Z" fill="${WHITE}"/>`,
-    '<text x="356" y="96">ni</text>',
+    `<circle cx="289" cy="72" r="32" fill="${brand.themeColor}"/>`,
+    `<path d="M281 58 L281 86 L302 72 Z" fill="${WHITE}"/>`,
+    '<text x="323" y="96">ni</text>',
     '</svg>',
   ].join('');
 }
@@ -49,7 +49,7 @@ function socialSvg(tagline: string, logo: string): string {
   return [
     '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">',
     `<rect width="1200" height="630" fill="${brand.backgroundColor}"/>`,
-    `<image x="250" y="186" width="700" height="194" href="data:image/svg+xml;base64,${logoB64}"/>`,
+    `<image x="250" y="170" width="700" height="219" href="data:image/svg+xml;base64,${logoB64}"/>`,
     `<text x="600" y="462" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="44" fill="${INK}">${tagline}</text>`,
     '</svg>',
   ].join('');
