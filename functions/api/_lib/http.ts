@@ -25,8 +25,12 @@ export async function readJson(request: Request, maxBytes = 65536): Promise<unkn
 }
 
 /** Writes are POST with JSON from the same origin (ADMIN §7). */
+// Our own Vercel copy of the site (owner, 12 Nov 2026) passes /api to this project, so its admin's saves arrive with
+// the Vercel origin. Only our own addresses are trusted; any other site is still refused.
+export const TRUSTED_ORIGINS = ['https://playzoni.vercel.app'];
+
 export function sameOrigin(request: Request): boolean {
   const origin = request.headers.get('origin');
   if (!origin) return false;
-  return origin === new URL(request.url).origin;
+  return origin === new URL(request.url).origin || TRUSTED_ORIGINS.includes(origin);
 }
