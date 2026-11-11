@@ -12,3 +12,6 @@ graphify-out/*
 # Provider catalogs downloaded by the owner (keep out of git)
 data/playgama.json
 data/feeds/
+
+# Local Cloudflare dev settings (wrangler pages dev). Never commit.
+.dev.vars

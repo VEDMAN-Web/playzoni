@@ -11,7 +11,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "lint": "eslint .",
-    "validate": "tsx scripts/validate.ts && tsx scripts/test-validate.ts && tsx scripts/test-import.ts && tsx scripts/test-publish.ts && tsx scripts/test-adapters.ts && tsx scripts/test-adapter-pg.ts && tsx scripts/test-qa.ts && tsx scripts/test-drafts.ts && tsx scripts/test-mosaic.ts && tsx scripts/test-tp6.ts && tsx scripts/test-tp7.ts && tsx scripts/test-mosaic-fit.ts && tsx scripts/test-seo.ts",
+    "validate": "tsx scripts/validate.ts && tsx scripts/test-validate.ts && tsx scripts/test-import.ts && tsx scripts/test-publish.ts && tsx scripts/test-adapters.ts && tsx scripts/test-adapter-pg.ts && tsx scripts/test-qa.ts && tsx scripts/test-drafts.ts && tsx scripts/test-mosaic.ts && tsx scripts/test-tp6.ts && tsx scripts/test-tp7.ts && tsx scripts/test-mosaic-fit.ts && tsx scripts/test-seo.ts && npm run test:admin",
     "check": "astro check && npm run lint && npm run validate && npm run headers:check && npm run build",
     "placeholders": "tsx scripts/make-placeholders.ts",
     "import:sample": "tsx --env-file-if-exists=.env scripts/import/sample.ts",
@@ -25,7 +25,8 @@
     "icons": "tsx scripts/make-icons.ts",
     "postbuild": "pagefind --site dist && tsx scripts/sitemap-check.ts && tsx scripts/validate-dist.ts",
     "headers": "tsx scripts/headers-check.ts",
-    "headers:check": "tsx scripts/headers-check.ts --check"
+    "headers:check": "tsx scripts/headers-check.ts --check",
+    "test:admin": "tsx scripts/admin/test-migrations.ts && tsx scripts/admin/test-auth.ts"
   },
   "repository": {
     "type": "git",
@@ -41,7 +42,8 @@
     "@fontsource-variable/nunito": "^5.3.0",
     "@tailwindcss/vite": "^4.3.5",
     "astro": "^7.4.8",
-    "tailwindcss": "^4.3.5"
+    "tailwindcss": "^4.3.5",
+    "uplot": "^1.6.32"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
@@ -54,7 +56,8 @@
     "sharp": "^0.35.5",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.72.2"
+    "typescript-eslint": "^8.72.2",
+    "wrangler": "^4.160.0"
   },
   "private": true
 }

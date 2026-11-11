@@ -23,6 +23,7 @@ Reference model: Poki.com (structure only — see `CLAUDE.md` "Never"). Poki wor
 | Hosting | Cloudflare Pages (static `dist/`) | Free, unlimited bandwidth, global CDN |
 | Analytics | Cloudflare Web Analytics (no cookies); GA4 only behind consent (Phase 4) | Privacy-safe |
 | Phase 2 only | Cloudflare Worker + D1 (plays, likes), Keystatic (git-based admin) | Not in MVP |
+| Admin (Phase 10, approved 11 Nov 2026) | Cloudflare Pages Functions + D1 + R2, Cloudflare Access (Google sign-in), GitHub App (content commits), `uplot` (admin charts only), `wrangler` (devDependency, local tests only) | docs/ADMIN.md |
 
 Approved runtime JS on pages: small vanilla TS islands only (search box, recently played, favourites, like button, player controls). **No React/Vue/Svelte.**
 

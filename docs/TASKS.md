@@ -471,7 +471,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 ## Phase 10 — Admin panel (docs/ADMIN.md) — starts after Phase 5 launch (T5.6)
 - Shared rules for every task: follow ADMIN.md exactly; anonymous data only (no IP stored, no fingerprinting); honour "Do not measure me", GPC and consent; every admin screen works at 390/768/1280/1440; no invented numbers ("—" when empty); `npm run check` passes; screenshots in `docs/screens/T10.x/`.
 ### T10.1 — D1 database, migrations and Pages Functions scaffold
-- status: todo · deps: T5.5 · model: **sonnet** · docs: ADMIN §2, §4
+- status: done (D1 id placeholder until the owner creates the DB) · deps: T5.5 · model: **sonnet** · docs: ADMIN §2, §4
 - Do: `wrangler.toml` binding for D1 (`DB`) and R2 (`UPLOADS`) — created by the owner in the Cloudflare dashboard with the planner's steps (no wrangler runs on the Windows PC, R12); `migrations/0001_init.sql` with every table in ADMIN §4; `functions/api/_lib/` (db helpers, JSON responses, validation); a migration check script in `npm run check` (SQL parses, tables match ADMIN §4).
 - Done when: migrations apply on the preview D1; check passes.
 ### T10.2 — Tracking script (`src/lib/track.ts`)

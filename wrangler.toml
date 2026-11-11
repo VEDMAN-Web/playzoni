@@ -1,0 +1,19 @@
+# Cloudflare Pages config for playzoni.com (static site in dist/ + Pages Functions in functions/).
+# docs/ADMIN.md §2, docs/ADMIN-SETUP.md. No secrets here: secrets are added in the Cloudflare dashboard only.
+name = "playzoni"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-10-01"
+
+# D1 database for the admin panel and visitor counts.
+# PLACEHOLDER: the owner creates the database "playzoni" in the Cloudflare dashboard (docs/ADMIN-SETUP.md step 2).
+# Then the planner pastes its "Database ID" below (an ID is not a secret). Until then local dev uses this fake ID.
+[[d1_databases]]
+binding = "DB"
+database_name = "playzoni"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+# R2 bucket for images uploaded in the admin (banners, replaced thumbnails).
+[[r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "playzoni-uploads"
