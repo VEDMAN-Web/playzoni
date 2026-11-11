@@ -259,7 +259,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: `npm run check` passes; a test QA file with all three true shows all three pills; validate catches a wrong 2-player category.
 
 ### T5.2 — Category texts
-- status: todo · deps: T4.5 · model: haiku · docs: SEO-PLAN §Content
+- status: done (R3: texts for the six categories with 12 or more published games) · deps: T4.5 · model: haiku · docs: SEO-PLAN §Content
 - Prep (R13 leftover): re-run `npm run import:gm` with the default limit (500) to finish the GameMonetize import (it stopped at 199 on the rate limit); record the count in STATUS. Do not publish new games from it without the planner's list.
 - Do: write `src/content/categories/<slug>.md` for every category with ≥ 12 published real games, using only published games in "Top" sections. Repeatable task: run again whenever a category reaches 12.
 - Done when: validate passes; each text is original (no shared sentences between categories).

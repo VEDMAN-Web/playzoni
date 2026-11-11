@@ -16,13 +16,12 @@ Car games vary a lot. Some are fast arcade races with boosts, tight corners and 
 
 ## Top car games to start with
 
-<!-- replace in T5.2: these are sample games for layout testing, not real recommendations -->
-
-- Sample Game 13: a short placeholder for checking how a game page looks.
-- Sample Game 14: another placeholder, used to check the grid and tiles.
-- Sample Game 15: a placeholder with a portrait layout.
-- Sample Game 16: a placeholder for testing related games.
-- Sample Game 17: a placeholder for checking the player.
+- Buggy Simulator Sandbox 3D: drive a buggy over open ground and try the sandbox tools.
+- Smash & Speed: a fast car game where speed and smashing both matter.
+- Street Race Master: race through city streets with quick turns and rivals.
+- Crash Test Simulator 3D: test how a car behaves when things go wrong.
+- Race On Cars in Moscow: a city race with traffic and tight corners.
+- BMG Crash Test: a crash game with simple controls and big impacts.
 
 ## Types of car games
 
