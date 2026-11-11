@@ -54,7 +54,7 @@ try {
 
   // 4. T5.1b: a real game in two-player-games without a local 2-player or invite-link play mode must fail.
   const nonSample = sample.replace(/^sample: .*\n/m, '').replace(/^slug: .*$/m, 'slug: "sample-game-99"');
-  const twoPlayer = nonSample.replace(/^categories:\n(  - .*\n)+/m, 'categories:\n  - "two-player-games"\n');
+  const twoPlayer = nonSample.replace(/^categories:\n( {2}- .*\n)+/m, 'categories:\n  - "two-player-games"\n');
   writeFileSync(join(gamesDir, 'sample-game-99.md'), twoPlayer);
   const modes = validateContent(paths).filter((e) => e.startsWith('games/sample-game-99.md:'));
   expect(modes.some((e) => e.includes(': play-mode-category:')), `two-player game without playModes should report play-mode-category, got: ${modes.join(' | ')}`);
