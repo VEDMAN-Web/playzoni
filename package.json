@@ -36,7 +36,8 @@
     "admin:dev": "wrangler pages dev dist --d1 DB=00000000-0000-0000-0000-000000000000 --r2 UPLOADS --port 8788",
     "admin:seed": "tsx scripts/admin/seed-demo.ts",
     "admin:screens": "node scripts/admin/screens.mjs",
-    "admin:e2e": "node scripts/admin/e2e-admin.mjs"
+    "admin:e2e": "node scripts/admin/e2e-admin.mjs",
+    "e2e": "node scripts/e2e/site.mjs"
   },
   "repository": {
     "type": "git",
