@@ -597,7 +597,8 @@ body.adm {
 }
 .adm-table td::before {
   content: attr(data-label);
-  flex: none;
+  flex: 0 1 auto;
+  min-width: 0;
   color: var(--c-ink-2);
   font: var(--t-label);
   letter-spacing: 0.04em;
@@ -1001,4 +1002,16 @@ body.adm {
   .adm-grid-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+
+.adm-pre {
+  max-height: 320px;
+  margin: 0;
+  padding: var(--s-3);
+  overflow: auto;
+  border-radius: var(--r-player);
+  background: var(--c-bg);
+  font: var(--t-small);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
