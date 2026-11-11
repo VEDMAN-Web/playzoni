@@ -26,7 +26,7 @@
     "qa:new": "tsx scripts/qa/new.ts",
     "images:og": "tsx scripts/import/regen-og.ts",
     "icons": "tsx scripts/make-icons.ts",
-    "postbuild": "pagefind --site dist && tsx scripts/sitemap-check.ts && tsx scripts/home-slots.ts && tsx scripts/validate-dist.ts && tsx scripts/admin/check-bundles.ts",
+    "postbuild": "pagefind --site dist && tsx scripts/clean-samples.ts && tsx scripts/sitemap-check.ts && tsx scripts/home-slots.ts && tsx scripts/validate-dist.ts && tsx scripts/admin/check-bundles.ts",
     "headers": "tsx scripts/headers-check.ts",
     "headers:check": "tsx scripts/headers-check.ts --check",
     "test:admin": "tsx scripts/admin/test-migrations.ts && tsx scripts/admin/test-auth.ts && tsx scripts/admin/test-track.ts && tsx scripts/admin/test-collect.ts && tsx scripts/admin/test-rollup.ts && tsx scripts/admin/test-content-edit.ts && tsx scripts/admin/test-controls.ts && tsx scripts/admin/test-home-feed.ts && tsx scripts/admin/test-screens.ts && tsx scripts/admin/test-endpoints.ts && tsx scripts/admin/bundle-rollup.ts --check",
