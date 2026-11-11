@@ -10,7 +10,7 @@ Updated by the build agent after every task. The reviewer reads this first.
 ## READY FOR MERGE (12 Nov 2026, 04:30 IST, planner)
 - dev at 4bb7aba. RELAY R1 to R7 done (R2, R3 by the build chat; R1, R4, R5, R6, R50, R51 by the planner after the build chat stopped).
 - Tests: `npm run check` passes; `npm run e2e` 1,205 checks with samples off (only failure R51, now fixed) and 1,249 checks with samples on, 0 failures.
-- Plain production build: 119 game pages (95 quick + 24 sample pages removed by R2 = 95 live games), no drafts, every page noindex until `PUBLIC_LAUNCH=true`, robots.txt Disallow: /.
+- Production build (samples off): 95 game pages, all quick (the 24 sample games appear only in local builds where .env turns samples on), no drafts, every page noindex until `PUBLIC_LAUNCH=true`, robots.txt Disallow: /.
 - Open: R43 only (needs the owner: Cloudflare Access login before launch, separate Production D1).
 - The planner merges dev into main at the 08:30 check after re-testing the live preview.
 
