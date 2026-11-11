@@ -73,7 +73,7 @@ const adminConfigEnabled = import.meta.env.PUBLIC_ADMIN_CONFIG_ENABLED === 'true
       startTilePreview();
       applyPlayedBadges();
       // T5.10: on the home page, the visitor's played games move to the first small tiles (no JS: nothing moves).
-      if (location.pathname === '/') applyYourGames();
+      if (location.pathname === '/') void applyYourGames();
     </script>
     {trackingEnabled && <Tracking />}
     {adminConfigEnabled && <AdminConfig />}
