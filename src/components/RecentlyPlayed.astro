@@ -42,6 +42,8 @@ import '../styles/client-tiles.css';
       for (const game of games) track.appendChild(gameTile(game, false));
       section.hidden = false;
       applyPlayedBadges(track);
+      // Popular and New rows listen for this and drop the games shown here (GameRow `dedupe`).
+      document.dispatchEvent(new CustomEvent('pz:recent-ready'));
     });
   }
 </script>

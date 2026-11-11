@@ -15,9 +15,11 @@ interface Props {
   games: { title: string; slug: string }[];
   eagerCount?: number;
   more?: string;
+  /** Rows marked `dedupe` (Popular, New) never show a game that is in another such row or in "Recently played". */
+  dedupe?: boolean;
 }
 
-const { title, seeAllHref, games, eagerCount = 0, more } = Astro.props;
+const { title, seeAllHref, games, eagerCount = 0, more, dedupe = false } = Astro.props;
 const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 ---
 <section class="row" aria-labelledby={headingId}>
@@ -38,7 +40,7 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
       </button>
     </div>
   </div>
-  <div class="row-track" data-row-track data-more={more}>
+  <div class="row-track" data-row-track data-more={more} data-dedupe={dedupe ? '' : undefined}>
     {games.map((g, i) => (
       <div class="row-item">
         <GameTile title={g.title} slug={g.slug} size="S" eager={i < eagerCount} />
@@ -172,6 +174,17 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
   import { applyPlayedBadges } from '../lib/played-badge';
 
   const BATCH = 15;
+  let dedupeQueue: Promise<void> = Promise.resolve();
+  // Slugs shown in "Recently played" and in the other dedupe rows (Popular, New), so those rows stay different.
+  const takenElsewhere = (track: HTMLElement): Set<string> => {
+    const taken = new Set<string>();
+    const others = document.querySelectorAll<HTMLElement>('[data-recent-track], [data-row-track][data-dedupe]');
+    for (const other of others) {
+      if (other === track) continue;
+      for (const el of other.querySelectorAll<HTMLElement>('[data-slug]')) taken.add(el.dataset.slug ?? '');
+    }
+    return taken;
+  };
   // The list a row draws from, in the same order the server used for its first 15 tiles.
   const listFor = (more: string, index: IndexGame[]): IndexGame[] => {
     if (more === 'popular') return index;
@@ -218,25 +231,46 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
     const more = track.dataset.more;
     let loading = false;
     let done = !more;
-    const loadMore = async (): Promise<void> => {
+    const isDedupe = track.hasAttribute('data-dedupe');
+    const loadMore = async (force = false): Promise<void> => {
       if (done || loading || !more) return;
-      if (track.scrollLeft + track.clientWidth < track.scrollWidth - 3 * 110) return;
+      if (!force && track.scrollLeft + track.clientWidth < track.scrollWidth - 3 * 110) return;
       loading = true;
       const shown = new Set(
         [...track.querySelectorAll<HTMLElement>('[data-slug]')].map((el) => el.dataset.slug ?? ''),
       );
-      const next = listFor(more, await loadIndex()).filter((g) => !shown.has(g.slug)).slice(0, BATCH);
+      const taken = isDedupe ? takenElsewhere(track) : new Set<string>();
+      const want = force ? Math.max(0, BATCH - shown.size) : BATCH;
+      const next = listFor(more, await loadIndex())
+        .filter((g) => !shown.has(g.slug) && !taken.has(g.slug))
+        .slice(0, want);
       if (next.length === 0) {
-        done = true;
+        if (!force) done = true;
       } else {
         const batch = document.createDocumentFragment();
         next.forEach((g) => batch.appendChild(rowTile(g)));
         track.appendChild(batch);
         applyPlayedBadges(track);
+        // For the admin tracking (ADMIN.md §3, row_more).
+        document.dispatchEvent(new CustomEvent('pz:row-more', { detail: { row: more, count: next.length } }));
       }
       loading = false;
       sync();
     };
+
+    // "Recently played" filled in: drop its games from this row, then top the row back up to 15.
+    // Rows take turns (Popular first, then New), so two rows never grab the same game at the same moment.
+    if (isDedupe) {
+      document.addEventListener('pz:recent-ready', () => {
+        dedupeQueue = dedupeQueue.then(async () => {
+          const taken = takenElsewhere(track);
+          for (const el of [...track.querySelectorAll<HTMLElement>('[data-slug]')]) {
+            if (taken.has(el.dataset.slug ?? '')) (el.closest('.row-item, .pz-row-item') ?? el).remove();
+          }
+          await loadMore(true);
+        });
+      });
+    }
 
     sync();
     // On very wide screens the first 15 tiles may all fit: top the row up once it comes into view.

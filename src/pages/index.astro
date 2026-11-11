@@ -330,12 +330,21 @@ const faqPage = {
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  /* Top 5 in two columns, numbered down then across (1 2 3 | 4 5), like the category cards above (owner, 11 Nov). */
   .about-side .top-list {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--s-2);
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+  @media (min-width: 600px) {
+    .about-side .top-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(3, auto);
+      grid-auto-flow: column;
+    }
   }
   .about-side .top-list li {
     margin: 0;

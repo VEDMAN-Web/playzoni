@@ -25,8 +25,11 @@ const byNew = [...games].sort(
   (a, b) => b.data.addedDate.valueOf() - a.data.addedDate.valueOf() || b.data.popularity - a.data.popularity,
 );
 
+// Popular and New never repeat each other (owner, 11 Nov): New skips Popular's first 15. In the browser the rows
+// also skip games in "Recently played" and keep each other's endless loads apart (GameRow `dedupe`).
 const popularRow = toRow(byPopularity);
-const newRow = toRow(byNew);
+const inPopular = new Set(popularRow.map((g) => g.slug));
+const newRow = toRow(byNew.filter((g) => !inPopular.has(g.data.slug)));
 const categoryRows = published
   .filter((c) => c.navOrder !== null && c.navOrder <= 8 && c.slug !== excludeCategory)
   .sort((a, b) => (a.navOrder ?? 0) - (b.navOrder ?? 0))
@@ -41,8 +44,8 @@ const browseItems: GridItem[] = published.map((c) => ({
   imageSlug: pictures.get(c.slug),
 }));
 ---
-{popularRow.length > 0 && <GameRow title="Popular games" seeAllHref="/popular-games" games={popularRow} more="popular" />}
-{newRow.length > 0 && <GameRow title="New games" seeAllHref="/new-games" games={newRow} more="new" />}
+{popularRow.length > 0 && <GameRow title="Popular games" seeAllHref="/popular-games" games={popularRow} more="popular" dedupe />}
+{newRow.length > 0 && <GameRow title="New games" seeAllHref="/new-games" games={newRow} more="new" dedupe />}
 {categoryRows.map((r) => (
   <GameRow title={r.category.name} seeAllHref={`/${r.category.slug}`} games={r.games} more={`cat:${r.category.slug}`} />
 ))}
