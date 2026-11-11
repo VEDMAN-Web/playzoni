@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from './Header.astro';
 import Footer from './Footer.astro';
+import { SITE_NAME, SITE_URL } from '../lib/seo';
 
 // Layout for plain text pages (about, developers, contact, legal): one white text card
 // (DESIGN §Content blocks) with the page's only H1.
@@ -14,9 +15,21 @@ interface Props {
 }
 
 const { title, description, canonicalPath, h1, noindex = false } = Astro.props;
+
+// Every page carries JSON-LD (CLAUDE.md "Always"); a text page is a WebPage inside the site.
+const webPage = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: h1,
+  description,
+  url: `${SITE_URL}${canonicalPath}`,
+  isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
+};
 ---
 <BaseLayout title={title} description={description} canonicalPath={canonicalPath} noindex={noindex}>
   <Header slot="header" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(webPage)} />
 
   <article class="text-card">
     <h1>{h1}</h1>

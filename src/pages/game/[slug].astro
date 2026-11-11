@@ -239,7 +239,15 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
   /* Phones, tablets and narrow windows: the player is the full width, the tiles follow below it. */
   .player-cell {
     grid-column: 1 / -1;
+    grid-row: 1;
     min-width: 0;
+  }
+  /* The grid's rows are one tile tall (94px), so below 1060px the first row is sized by the player instead; otherwise
+     the player overflows its row and the tiles below cover its lower part and the bar (e2e, 12 Nov 2026). */
+  @media (max-width: 1059px) {
+    :global(.grid:has(> .player-cell)) {
+      grid-template-rows: auto;
+    }
   }
   .ad-cell {
     display: none;

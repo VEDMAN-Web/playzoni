@@ -78,6 +78,7 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
     display: flex;
     flex-direction: column;
     margin: 0 0 var(--s-3);
+    container-type: inline-size; /* the compact bar below follows the player's width, not the screen's */
   }
   .player-frame {
     position: relative;
@@ -334,14 +335,21 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
     gap: var(--s-1);
   }
   /* Narrow phones: the five 44px buttons touch, so the title keeps room and nothing runs past the bar. */
-  @media (max-width: 399px) {
+  @container (max-width: 479px) {
     .bar-text {
+      display: none;
+    }
+    /* The cover above already shows the game's picture; without it the six 44px buttons fit from 360px (e2e). */
+    .bar-icon {
       display: none;
     }
     .player-bar {
       gap: var(--s-2);
+      padding: 0 var(--s-2);
     }
     .bar-actions {
+      flex: 1;
+      justify-content: space-between;
       gap: 0;
     }
   }

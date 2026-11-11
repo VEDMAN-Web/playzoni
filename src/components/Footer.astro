@@ -208,6 +208,7 @@ const year = new Date().getFullYear();
   .col a {
     position: relative;
     display: inline-block;
+    min-width: 44px; /* e2e: short links such as "Terms" keep a 44px tap target */
     color: var(--c-ink);
     font: 700 15px/36px var(--font-sans);
     text-decoration: none;

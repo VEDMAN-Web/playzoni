@@ -11,8 +11,10 @@ const { chromium, devices } = createRequire(import.meta.url)('playwright');
 const ROOT = join(import.meta.dirname, '..', '..');
 const BASE = (process.argv[2] ?? 'http://localhost:4321').replace(/\/$/, '');
 const WIDTHS = [360, 390, 768, 1280, 1536, 1920];
-const DATE = new Date().toISOString().slice(0, 10);
+const DATE = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Kolkata' }); // India date, as in RELAY
 const SHOTS = join(ROOT, 'docs', 'screens', 'e2e');
+// Pages that are always noindex by design (personal lists), so they carry no JSON-LD.
+const NO_JSONLD = new Set(['/search', '/favourites']);
 mkdirSync(SHOTS, { recursive: true });
 
 const results = []; // { page, width, check, ok, detail }
@@ -55,7 +57,8 @@ async function checkPage(browser, path, width, links) {
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => {
-    if (m.type() === 'error' && !/Failed to load resource.*(404|net::ERR)/.test(m.text())) errors.push(m.text());
+    // Messages from the game inside the iframe (another site) are not ours to fix.
+    if (m.type() === 'error' && !/Failed to load resource.*(404|net::ERR)|Permissions policy violation/.test(m.text())) errors.push(m.text());
   });
   const badImages = [];
   page.on('response', (r) => {
@@ -107,7 +110,7 @@ async function checkPage(browser, path, width, links) {
   record(path, width, 'images load', badImages.length === 0 && facts.brokenImgs.length === 0, [...badImages, ...facts.brokenImgs].slice(0, 2).join(' | '));
   record(path, width, 'no long dashes', !facts.dash);
   if (!path.startsWith('/admin')) {
-    record(path, width, 'SEO tags', !!facts.title && facts.canonical && facts.robots && (expect404 || facts.jsonld > 0), `title ${!!facts.title}, canonical ${facts.canonical}, robots ${facts.robots}, json-ld ${facts.jsonld}`);
+    record(path, width, 'SEO tags', !!facts.title && facts.canonical && facts.robots && (expect404 || NO_JSONLD.has(path) || facts.jsonld > 0), `title ${!!facts.title}, canonical ${facts.canonical}, robots ${facts.robots}, json-ld ${facts.jsonld}`);
   }
   if (width <= 390) record(path, width, 'tap targets >= 44px', facts.smallCount === 0, `${facts.smallCount}: ${facts.small.map((s) => `${s.what} ${s.w}x${s.h}`).join(', ')}`);
   const failed = results.some((r) => r.page === path && r.width === width && !r.ok);
@@ -233,7 +236,7 @@ await interactions(browser, sample);
 // Internal links: each one once.
 const bad = [];
 for (const href of links) {
-  if (!href || href === '/') continue;
+  if (!href || href === '/' || href.startsWith('/cdn-cgi/')) continue; // Cloudflare Access sign-out only exists on Cloudflare
   const r = await req.get(BASE + href, { maxRedirects: 3 });
   if (r.status() >= 400) bad.push(`${r.status()} ${href}`);
 }
