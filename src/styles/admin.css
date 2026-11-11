@@ -522,6 +522,7 @@ body.adm {
 }
 .adm-chart-inner {
   min-width: 560px;
+  min-height: 289px; /* R51: the chart (260px plot + legend) is drawn after load; reserve its height so nothing below moves */
 }
 .adm-chart .u-legend {
   font: var(--t-small);
