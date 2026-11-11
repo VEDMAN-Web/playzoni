@@ -11,7 +11,7 @@ All times are India time (IST). If a task is not done by its deadline, push what
 - Every UI change: check at 360, 390, 768, 1280 and 1920 wide. Nothing overflows or is cut off, tap targets are 44px or more, there is no layout shift, and there are no console errors.
 - No new dependencies. No long dashes (— or –) in any text. Never invent numbers.
 - If something is unclear or blocked, or an error survives 2 attempts: write it in `docs/QUESTIONS.md`, set the task to `blocked`, and go to the next task. Do not wait for an answer.
-- Use **Sonnet** for this whole run (`/model sonnet`). R1, R5 and R6 need it.
+- **Model: Haiku for the whole night (owner decision, 12 Nov 02:26).** This overrides the CLAUDE.md model note: do the tasks marked `sonnet` too, including R50, R5 and R6. Work in smaller steps, run `npm run check` after each step, and test more. If a step fails twice, write it in QUESTIONS and move on.
 - Do not start: T5.9 (hover previews, on hold), Phase 6, 7, 8, 11 or 12 tasks, or anything that needs an account, key or payment.
 
 ## Tasks and deadlines
