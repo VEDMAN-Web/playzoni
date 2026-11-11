@@ -303,7 +303,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 
 
 ### T5.8 — Game page background in the game's colours (owner, 12 Nov 2026: "the background changed and looked like the game")
-- status: todo · deps: — · model: haiku · docs: DESIGN §Colours
+- status: done · deps: — · model: haiku · docs: DESIGN §Colours
 - Do: `scripts/theme-colors.ts` (`npm run theme:colors`): for every game, read `public/thumbs/<slug>/m.webp` with sharp (already approved), take 2 colours (the dominant colour and the average of the bottom half), soften them (mix 35% white, keep saturation under 70%) and write them to `data/game-colors.json` as `{ slug: [from, to] }`. The import (`publish`) runs it for new games. The game page sets `--page-from` / `--page-to` from that file on `<main>` so the page gradient behind the player and tiles uses the game's colours; cards stay white, text contrast unchanged (≥ 4.5:1). Missing entry: normal site gradient.
 - Done when: 5 game pages with very different thumbnails show matching backgrounds (screenshots in `docs/screens/T5.8/` at 390 and 1280); built HTML has the colours inline (works with JS off); no CLS.
 - Always: mobile-first (360px+); no layout shift; design tokens; pages readable with JS off; no long dashes; `npm run check` passes; check at 360/390/768/1280.
@@ -316,7 +316,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Always: mobile-first (360px+); no layout shift; design tokens; pages readable with JS off; no long dashes; `npm run check` passes; check at 360/390/768/1280.
 
 ### T5.10 — "Your games" at the top of the home feed (owner: Poki shows the games you played at the top)
-- status: todo · deps: — · model: haiku · docs: DESIGN §V2.8 (played badge), `src/components/RecentlyPlayed.astro`
+- status: done · deps: — · model: haiku · docs: DESIGN §V2.8 (played badge), `src/components/RecentlyPlayed.astro`
 - How Poki does it: a list of played games saved in the browser (localStorage, like a cookie but never sent to a server). We already save the same list for the "Recently played" row.
 - Do: on the home page, after load, fill the first small tiles of the mosaic (after the big tiles and any admin-pinned slots from T10.17) with the visitor's last played games, newest first, up to 6, by swapping tile contents (same method as `admin-config.ts`, so nothing moves). Each swapped-out game takes the place where the played game was, so no game disappears and none shows twice. Played badge on them. First visit: nothing changes. Add a "Clear" link in the profile panel (already clears history).
 - Done when: Playwright test: play 3 games, return home → those 3 are the first small tiles at 390 and 1280, no duplicates, CLS 0, JS off unchanged.
