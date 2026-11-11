@@ -3,10 +3,12 @@
 // is shown inside tiles that are already there; rows are reordered only while they are all below the screen; banners,
 // notice and maintenance appear in a fixed bar at the bottom. Without JavaScript pages keep their built defaults.
 import { pageType } from './track-rules';
+import { planPins } from './home-pins';
 
 interface Config {
   hidden: string[];
   hero: Record<string, string[]>;
+  slots?: Record<string, { i: number; slug: string }[]>;
   rows: Record<string, { id: string; active: boolean }[]>;
   banners: { id: number; lang: string; text: string; link: string | null; pages: string[] }[];
   notice: { text: string; link: string | null } | null;
@@ -109,7 +111,32 @@ export async function applyConfig(cfg: Config): Promise<void> {
   };
 
   // Hero order on the home page: the big tiles show the chosen games in order.
-  const order = pt === 'home' ? (pick(cfg.hero) ?? []).filter((s) => !hidden.has(s)) : [];
+  // Home feed pins (T10.17): a pinned game is shown in its slot of the home mosaic. A game already on the page swaps places
+  // with the game in that slot, so none disappears and none shows twice. Pins replace the old hero order for the language.
+  const pins = pt === 'home' ? (pick(cfg.slots ?? {}) ?? []).filter((p) => !hidden.has(p.slug)) : [];
+  if (pins.length) {
+    const grid = [...doc.querySelectorAll<HTMLAnchorElement>('.grid-mosaic a.tile[data-slug]')];
+    const moves = planPins(grid.map((a) => a.dataset.slug ?? ''), pins);
+    for (const m of moves) {
+      const target = grid[m.target];
+      if (m.source === null) {
+        const g = (await games()).find((x) => x.slug === m.slug);
+        if (g) showIn(target, g);
+      } else {
+        const other = grid[m.source];
+        const mine = { slug: target.dataset.slug ?? '', title: titleOf(target) };
+        showIn(target, { slug: m.slug, title: titleOf(other) });
+        showIn(other, mine);
+      }
+    }
+    for (const p of pins) {
+      const tile = grid[p.i];
+      if (tile && tile.dataset.slug === p.slug) tile.dataset.pinned = '1';
+    }
+  }
+
+  // Hero order on the home page (before pins existed): the big tiles show the chosen games in order.
+  const order = pt === 'home' && !pins.length ? (pick(cfg.hero) ?? []).filter((s) => !hidden.has(s)) : [];
   if (order.length) {
     const big = [...doc.querySelectorAll<HTMLAnchorElement>('main a.tile-xl[data-slug], main a.tile-l[data-slug]')];
     for (let i = 0; i < Math.min(order.length, big.length); i++) {

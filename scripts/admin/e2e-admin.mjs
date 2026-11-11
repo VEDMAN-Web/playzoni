@@ -2,7 +2,7 @@
 // Admin end-to-end checks in a real browser (T10.16), against `npm run admin:dev` (local D1, demo seed, dev sign-in):
 // 1. Sign-in gate: a second server WITHOUT the dev bypass must refuse every admin API call.
 // 2. One edit flow: change a game title in the form and save (queued for GitHub, audit row written).
-// 3. One instant control: move a game up in the hero list, save, and see the new order in /api/config.
+// 3. One instant control: pin a game to slot 14 of the home feed and save (T10.17).
 // Run: NODE_PATH=$(npm root -g) node scripts/admin/e2e-admin.mjs [base] [gate-base]
 import { createRequire } from 'node:module';
 
@@ -42,28 +42,23 @@ check(saved > 0, 'edit: no "Saved" message after saving the game');
 const audit = await (await fetch(`${base}/api/admin/audit?action=game.edit`)).json();
 check(audit.rows.some((r) => r.target === slug && r.after?.includes('(edited)')), 'edit: no audit row with the new title');
 
-// 3. Instant control: hero order.
+// 3. Instant control: pin a game to a slot of the home feed (T10.17).
 await page.goto(`${base}/admin/home-layout`, { waitUntil: 'networkidle' });
-const items = page.locator('ol.adm-sortable').first().locator('li');
-if ((await items.count()) < 2) {
-  await page.fill('#hl-find', games[1].title);
-  await page.getByRole('button', { name: 'Add to hero' }).click();
-  await page.fill('#hl-find', games[2].title);
-  await page.getByRole('button', { name: 'Add to hero' }).click();
-}
-const firstBefore = await items.nth(0).locator('.adm-sort-label').textContent();
-const second = await items.nth(1).locator('.adm-sort-label').textContent();
-await items.nth(1).locator('[data-up]').click();
-await page.getByRole('button', { name: 'Save layout' }).click();
+await page.waitForSelector('.adm-feed-tile');
+const slots = await (await fetch(`${base}/home-slots.json`)).json();
+const pinGame = games.find((g) => g.status === 'published' && !g.sample && !slots.some((s) => s.slug === g.slug));
+await page.locator('.adm-feed-tile').nth(13).click();
+await page.fill('.adm-feed-side input[type="search"]', pinGame.title);
+await page.locator('.adm-feed-hit', { hasText: pinGame.title }).first().getByRole('button', { name: 'Put in slot 14' }).click();
+await page.getByRole('button', { name: 'Save home feed' }).click();
 await page.waitForTimeout(1200);
 const layout = await (await fetch(`${base}/api/admin/home-layout?lang=*`)).json();
-const titleOf = (s) => games.find((g) => g.slug === s)?.title;
-check(titleOf(layout.hero[0]) === second && titleOf(layout.hero[1]) === firstBefore, `instant: hero order not saved (${layout.hero.slice(0, 2).join(', ')})`);
+check(layout.slots.some((p) => p.i === 13 && p.slug === pinGame.slug), `instant: the pin on slot 14 was not saved (${JSON.stringify(layout.slots)})`);
 await browser.close();
 
 if (failures.length) {
   for (const f of failures) console.log(`e2e-admin: FAIL: ${f}`);
   process.exitCode = 1;
 } else {
-  console.log('e2e-admin: ok (sign-in gate, game edit saved and audited, hero order saved)');
+  console.log('e2e-admin: ok (sign-in gate, game edit saved and audited, home feed pin saved)');
 }

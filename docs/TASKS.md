@@ -567,7 +567,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Done when: all admin tests pass in `npm run check` (admin suite).
 
 ### T10.17 — Home feed editor: choose which game sits in which slot (owner, 12 Nov 2026)
-- status: todo · deps: T10.9 · model: **sonnet** · docs: ADMIN §5.6, §6
+- status: done · deps: T10.9 · model: **sonnet** · docs: ADMIN §5.6, §6
 - Today the Home layout screen only orders the big (hero) tiles and the rows. Do:
   1. Build writes `/home-slots.json`: the home mosaic in page order, one entry per tile slot: `{ i, size: 'XL'|'L'|'S', slug }` (the built default game).
   2. Admin screen "Home feed" (replaces the hero list, keeps the rows list): desktop shows a picture of the home grid with the real tile sizes and thumbnails (same columns as the site at 1280); drag any game (search box on the right) onto any slot, or drag one slot onto another to swap; a pin icon marks chosen slots; "Unpin" and "Reset to popularity". Phones (390): the same slots as a numbered list with search and up/down buttons. Save is instant (D1 `home_layout`, per language), audited.

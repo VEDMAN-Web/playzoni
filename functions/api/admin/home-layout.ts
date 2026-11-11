@@ -1,5 +1,6 @@
-// GET /api/admin/home-layout?lang=* (Analyst and up): hero order and rows for one language.
-// POST (Editor and up): { "lang": "*", "hero": ["slug", ...], "rows": [{ "id": "popular-games", "active": true }, ...] }
+// GET /api/admin/home-layout?lang=* (Analyst and up): hero order, home feed pins (slots) and rows for one language.
+// POST (Editor and up): { "lang": "*", "hero": ["slug", ...], "slots": [{ "i": 14, "slug": "game" }, ...], "rows": [{ "id": "popular-games", "active": true }, ...] }
+// A pin puts a game in a slot of the home mosaic (T10.17, src/lib/home-pins.ts); "slots": [] clears all pins.
 // Instant (docs/ADMIN.md §5.6): the site reads it from /api/config. Audited with before/after.
 import { auditStatement } from '../_lib/audit';
 import { guard } from '../_lib/auth';
@@ -7,6 +8,7 @@ import { heroList, heroStatements } from '../_lib/flags';
 import { fail, json, readJson } from '../_lib/http';
 import type { D1Database, PagesContext } from '../_lib/types';
 import { isObj, slug } from '../_lib/validate';
+import { cleanPins, type Pin } from '../../../src/lib/home-pins';
 
 const langOf = (v: unknown): string | null => (v === '*' || (typeof v === 'string' && /^[a-z]{2}$/.test(v)) ? (v as string) : null);
 
@@ -15,12 +17,17 @@ async function rowsOf(db: D1Database, lang: string): Promise<{ id: string; activ
   return r.results.map((x) => ({ id: x.ref, active: x.active === 1 }));
 }
 
+async function slotsOf(db: D1Database, lang: string): Promise<Pin[]> {
+  const r = await db.prepare("SELECT ref, position FROM home_layout WHERE lang = ? AND item_type = 'slot' AND active = 1 ORDER BY position").bind(lang).all<{ ref: string; position: number }>();
+  return r.results.map((x) => ({ i: x.position, slug: x.ref }));
+}
+
 export const onRequestGet = async (context: PagesContext): Promise<Response> => {
   const user = await guard(context, 'analyst');
   if (user instanceof Response) return user;
   const lang = langOf(new URL(context.request.url).searchParams.get('lang') ?? '*') ?? '*';
   const db = context.env.DB;
-  return json({ lang, hero: await heroList(db, lang), rows: await rowsOf(db, lang) });
+  return json({ lang, hero: await heroList(db, lang), slots: await slotsOf(db, lang), rows: await rowsOf(db, lang) });
 };
 
 export const onRequestPost = async (context: PagesContext): Promise<Response> => {
@@ -34,15 +41,20 @@ export const onRequestPost = async (context: PagesContext): Promise<Response> =>
   const rows = Array.isArray(body.rows)
     ? body.rows.filter(isObj).map((r) => ({ id: slug(r.id), active: r.active !== false })).filter((r): r is { id: string; active: boolean } => r.id !== null).slice(0, 60)
     : null;
-  if (!hero && !rows) return fail(400, 'Nothing to save.');
+  const slots = Array.isArray(body.slots) ? cleanPins(body.slots.filter(isObj)) : null;
+  if (!hero && !rows && !slots) return fail(400, 'Nothing to save.');
   const db = context.env.DB;
-  const before = { hero: await heroList(db, lang), rows: await rowsOf(db, lang) };
+  const before = { hero: await heroList(db, lang), slots: await slotsOf(db, lang), rows: await rowsOf(db, lang) };
   const statements = hero ? heroStatements(db, lang, hero) : [];
   if (rows) {
     statements.push(db.prepare("DELETE FROM home_layout WHERE lang = ? AND item_type = 'row'").bind(lang));
     rows.forEach((r, i) => statements.push(db.prepare("INSERT INTO home_layout (lang, item_type, ref, position, active) VALUES (?, 'row', ?, ?, ?)").bind(lang, r.id, i + 1, r.active ? 1 : 0)));
   }
-  const after = { hero: hero ?? before.hero, rows: rows ?? before.rows };
+  if (slots) {
+    statements.push(db.prepare("DELETE FROM home_layout WHERE lang = ? AND item_type = 'slot'").bind(lang));
+    for (const p of slots) statements.push(db.prepare("INSERT INTO home_layout (lang, item_type, ref, position, active) VALUES (?, 'slot', ?, ?, 1)").bind(lang, p.slug, p.i));
+  }
+  const after = { hero: hero ?? before.hero, slots: slots ?? before.slots, rows: rows ?? before.rows };
   statements.push(auditStatement(db, user.email, 'home.layout', lang, before, after));
   await db.batch(statements);
   return json({ ok: true, message: 'Saved. The home page shows the new order within about a minute.' });

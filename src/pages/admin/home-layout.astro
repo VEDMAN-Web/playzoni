@@ -1,14 +1,14 @@
 ---
-// Admin screen: Home layout (docs/ADMIN.md §5).
+// Admin screen: Home feed (docs/ADMIN.md §5.6, T10.17).
 import AdminLayout from '../../layouts/AdminLayout.astro';
 ---
-<AdminLayout title="Home layout" screen="home-layout">
-  <p class="adm-intro">Hero order and home rows, per language. Saving is instant: the home page changes within about a minute, no rebuild.</p>
+<AdminLayout title="Home feed" screen="home-layout">
+  <p class="adm-intro">Choose which game sits in which slot of the home page, and which rows show, per language. Saving is instant: the home page changes within about a minute, no rebuild.</p>
   <div data-screen-root></div>
 </AdminLayout>
 
 <script>
-  import { startHomeLayout } from '../../admin/controls';
+  import { startHomeFeed } from '../../admin/home-feed';
   const root = document.querySelector<HTMLElement>('[data-screen-root]');
-  if (root) void startHomeLayout(root);
+  if (root) void startHomeFeed(root);
 </script>

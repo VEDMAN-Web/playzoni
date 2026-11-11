@@ -1028,3 +1028,151 @@ body.adm {
   border-radius: var(--r-player);
   background: var(--c-bg);
 }
+
+/* ---- Home feed screen (T10.17): the home grid as a picture, or a numbered list on phones ---- */
+.adm-feed {
+  display: grid;
+  gap: 16px;
+}
+.adm-feed-grid {
+  display: none;
+  grid-template-columns: repeat(var(--feed-cols, 11), minmax(0, 1fr));
+  grid-auto-flow: dense;
+  gap: 6px;
+  margin-top: 12px;
+}
+.adm-feed-nav {
+  grid-column: span 2;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--c-surface);
+  border: 1px dashed var(--c-line);
+  color: var(--c-ink-2);
+  font: var(--t-small);
+}
+.adm-feed-tile {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: var(--c-surface);
+  cursor: pointer;
+  aspect-ratio: 1 / 1;
+}
+.adm-feed-l {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.adm-feed-xl {
+  grid-column: span 3;
+  grid-row: span 3;
+}
+.adm-feed-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.adm-feed-tile.is-selected,
+.adm-feed-row.is-selected {
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 2px var(--c-primary);
+}
+.adm-feed-tile.is-over {
+  border-color: var(--c-accent);
+}
+.adm-feed-tile:focus-visible {
+  outline: 3px solid var(--c-focus);
+  outline-offset: 2px;
+}
+.adm-feed-num {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  min-width: 20px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: rgba(14, 36, 64, 0.8);
+  color: #fff;
+  font: 700 11px/18px var(--font-sans);
+}
+.adm-feed-pin {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  font-size: 14px;
+  line-height: 1;
+}
+.adm-feed-list {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.adm-feed-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--c-bg);
+}
+.adm-feed-row .adm-feed-img {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+.adm-feed-pos {
+  flex: 0 0 auto;
+  min-width: 28px;
+  font: 800 14px/20px var(--font-sans);
+}
+.adm-feed-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font: var(--t-small);
+}
+.adm-feed-found {
+  display: grid;
+  gap: 8px;
+  max-height: 480px;
+  margin: 12px 0 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+.adm-feed-hit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.adm-feed-hit .adm-feed-img {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+@media (min-width: 1024px) {
+  .adm-feed {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    align-items: start;
+  }
+  .adm-feed-grid {
+    display: grid;
+  }
+  .adm-feed-list {
+    display: none;
+  }
+  .adm-feed-list-view .adm-feed-grid {
+    display: none;
+  }
+  .adm-feed-list-view .adm-feed-list {
+    display: grid;
+  }
+}
