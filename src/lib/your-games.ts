@@ -33,7 +33,13 @@ export async function applyYourGames(): Promise<number> {
   const tiles = [...document.querySelectorAll<HTMLAnchorElement>('.grid-mosaic a.tile[data-slug]')];
   if (tiles.length === 0) return 0;
   const slots = tiles.map((a) => a.dataset.slug ?? '');
-  const smallIdx = tiles.flatMap((a, i) => (a.classList.contains('tile-s') ? [i] : []));
+  // Visible small tiles in the order you see them (top to bottom, then left to right). Page order differs from screen order
+  // on phones, and the fit script hides some tiles, so the targets are picked from the screen (R48).
+  const smallIdx = tiles
+    .map((a, i) => ({ i, a, r: a.getBoundingClientRect() }))
+    .filter(({ a, r }) => a.classList.contains('tile-s') && r.width > 0 && r.height > 0 && a.closest('[hidden]') === null)
+    .sort((x, y) => Math.round(x.r.top) - Math.round(y.r.top) || x.r.left - y.r.left)
+    .map(({ i }) => i);
   const moves = planSwaps(slots, smallIdx, getRecentlyPlayed());
   if (moves.length === 0) return 0;
 
