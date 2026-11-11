@@ -264,8 +264,14 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Do: write `src/content/categories/<slug>.md` for every category with ≥ 12 published real games, using only published games in "Top" sections. Repeatable task: run again whenever a category reaches 12.
 - Done when: validate passes; each text is original (no shared sentences between categories).
 
+### T5.2b — Import ~300 more popular games (owner, 11 Nov 2026)
+- status: todo · deps: — · model: haiku · docs: PRD §Sources, QUESTIONS Q17
+- Do: run `npm run import:gm -- --limit 0` and `npm run import:pg` (if a feed rate-limits, wait and run again; record counts in STATUS). From the games not yet on the site, add **about 300 new drafts**: most played first when the feed gives a play/popularity number, otherwise the feed's own order; skip duplicates of games we already have, games without a phone version, and anything not suitable for children. Include an **open-world / city set** (about 20): city driving, police chase, gangster or sandbox car games, found by title/tags (city, open world, police, gangster, sandbox, car simulator). Never import or link anything using GTA, Rockstar or other brand names we have no licence for. List the open-world set's slugs in STATUS.
+- Done when: about 300 new drafts with thumbnails exist, `npm run check` passes, counts and the open-world list are in STATUS. Do not publish them: the planner's play-test agents write their QA files first.
+
 ### T5.3 — Game pages (repeat in batches of 20)
 - status: todo · deps: T5.1 · model: haiku · docs: SEO-PLAN §Content
+- QA files now come from the planner's automated play-test agents (`tester: "Claude QA (automated play-test)"`), pushed to `data/qa/` on dev in batches. Publish only games whose verdict is `publish`; skip `pending` and `reject`. Work in order of `popularity` (highest first). Batches of 20 per commit, as many batches per session as you can.
 - Do: for 20 draft games that have a QA file and are not rejected: fill frontmatter text fields and body from the QA notes + feed facts (rewritten), set `status: published`, `addedDate`/`updatedDate` = today. Commit message `T5.3: batch <n> (<first-slug>…)`.
 - Done when: validate passes for the batch. Repeat until 300.
 
