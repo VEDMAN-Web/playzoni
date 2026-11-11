@@ -80,8 +80,14 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
     </div>
   ))}
 </div>
+{mode === 'mosaic' && <script is:inline src="/mosaic-fit.js"></script>}
 
 <style>
+  /* R47: a mosaic grid is shown only after the fit script has run (public/mosaic-fit.js), so tiles never move after the
+     first paint. Without JavaScript BaseLayout.astro makes it visible again (noscript style). */
+  .grid-mosaic:not([data-fitted]) {
+    visibility: hidden;
+  }
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, var(--cell));
@@ -146,61 +152,16 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
 </style>
 
 <script>
-  // R32: on mosaic grids the last row must be full. This measures the tiles and hides trailing ones that leave
-  // empty cells in the last row (src/lib/mosaic-fit.ts). Runs on load and when the window is resized.
-  import { fillersNeeded, tilesToHide, type Box } from '../lib/mosaic-fit';
-
-  function fitMosaic(grid: HTMLElement): void {
-    for (const el of grid.querySelectorAll<HTMLElement>('[data-fit-hidden]')) {
-      el.hidden = false;
-      el.removeAttribute('data-fit-hidden');
-    }
-    const fillers = Array.from(grid.querySelectorAll<HTMLElement>('[data-fill]'));
-    for (const el of fillers) el.hidden = true;
-    const styles = getComputedStyle(grid);
-    const cell = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell'));
-    const gap = parseFloat(styles.columnGap);
-    const cols = styles.gridTemplateColumns.split(' ').filter((t) => t.length > 0).length;
-    if (!(cell > 0) || !(gap >= 0) || cols < 1) return;
-
-    const origin = grid.getBoundingClientRect();
-    const tiles: HTMLElement[] = [];
-    const boxes: Box[] = [];
-    for (const el of Array.from(grid.children) as HTMLElement[]) {
-      if (el.hidden) continue;
-      const r = el.getBoundingClientRect();
-      if (r.width === 0 || r.height === 0) continue;
-      tiles.push(el);
-      boxes.push({
-        x: Math.round((r.left - origin.left) / (cell + gap)),
-        y: Math.round((r.top - origin.top) / (cell + gap)),
-        // At least one cell each way: shorter blocks (the related-category chip strip, 36px) still take a whole row.
-        w: Math.max(1, Math.round((r.width + gap) / (cell + gap))),
-        h: Math.max(1, Math.round((r.height + gap) / (cell + gap))),
-        hideable: el.classList.contains('cell') && !el.classList.contains('cell-nav') && !el.hasAttribute('data-fill'),
-      });
-    }
-    // R39: first try to complete the bottom row with filler games (category pages); otherwise hide trailing tiles.
-    const need = fillersNeeded(boxes, cols, fillers.length);
-    if (need >= 0) {
-      for (const el of fillers.slice(0, need)) el.hidden = false;
-      return;
-    }
-    for (const i of tilesToHide(boxes, cols)) {
-      tiles[i].hidden = true;
-      tiles[i].setAttribute('data-fit-hidden', '');
-    }
-  }
-
-  function fitAll(): void {
-    for (const grid of document.querySelectorAll<HTMLElement>('.grid-mosaic')) fitMosaic(grid);
-  }
+  // R32 / R47: on mosaic grids the last row must be full (src/lib/mosaic-fit-dom.ts). The first fit happens in the blocking
+  // script right after the grid (public/mosaic-fit.js), before the content below is painted. This one runs it again
+  // on load (harmless) and whenever the window is resized.
+  import { fitAllMosaics } from '../lib/mosaic-fit-dom';
 
   let frame = 0;
   window.addEventListener('resize', () => {
     cancelAnimationFrame(frame);
-    frame = requestAnimationFrame(fitAll);
+    frame = requestAnimationFrame(fitAllMosaics);
   });
-  fitAll();
+  fitAllMosaics();
 </script>
 
