@@ -172,7 +172,7 @@ export function startGames(root: HTMLElement): void {
         let node: Node;
         if (c.key === 'title') node = titleCell(r);
         else node = document.createTextNode(fmt(v, c.fmt ?? 'text', NA));
-        tr.append(el('td', { 'data-label': c.label, class: [isNum ? 'num' : '', c.key === 'title' ? 'is-title' : '', v === null ? 'is-null' : ''].filter(Boolean).join(' ') || undefined }, node));
+        tr.append(el('td', { 'data-label': c.label, class: [isNum ? 'num' : '', c.key === 'title' ? 'is-title' : '', c.key === 'cats' ? 'is-wide' : '', v === null ? 'is-null' : ''].filter(Boolean).join(' ') || undefined }, node));
       }
       body.append(tr);
     }
