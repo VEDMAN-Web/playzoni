@@ -13,7 +13,7 @@ interface Props {
 // 4 only for very long ones.
 const { crumbs, h1, span = h1.length <= 18 ? 2 : h1.length <= 40 ? 3 : 4 } = Astro.props;
 ---
-<div class={`title-tile span-${span}`}>
+<div class={`title-tile span-${span}`} style={`--chars: ${h1.length}`}>
   <nav class="crumbs" aria-label="Breadcrumb">
     <ol>
       {crumbs.map((c, i) => (
@@ -72,6 +72,7 @@ const { crumbs, h1, span = h1.length <= 18 ? 2 : h1.length <= 40 ? 3 : 4 } = Ast
       border-radius: var(--r-card);
       background: var(--c-surface);
       box-shadow: var(--sh-tile);
+      container-type: inline-size;
     }
     .title-tile.span-2 {
       grid-column: span 2;
@@ -86,6 +87,10 @@ const { crumbs, h1, span = h1.length <= 18 ? 2 : h1.length <= 40 ? 3 : 4 } = Ast
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
       font: 800 19px/23px var(--font-sans);
+      /* The title grows to fill the tile's width (owner, 11 Nov: no empty space after short names); long titles
+         stay at 19px and wrap to two lines. 0.7em is a safe letter width for Nunito 800 (no JS); the script below then sizes it exactly. */
+      font-size: clamp(19px, calc(100cqi / (var(--chars) * 0.7)), 32px);
+      line-height: 1.15;
       overflow-wrap: break-word;
     }
     .crumbs ol {
@@ -101,3 +106,26 @@ const { crumbs, h1, span = h1.length <= 18 ? 2 : h1.length <= 40 ? 3 : 4 } = Ast
     }
   }
 </style>
+
+<script>
+  // Exact fit (owner, 11 Nov): from 1024px, grow the title to fill one line of the tile, 19px to 32px. If even 19px
+  // does not fit on one line, keep the CSS size and let it wrap to two lines.
+  const fit = (): void => {
+    for (const h1 of document.querySelectorAll<HTMLElement>('.title-tile .page-title')) {
+      h1.style.removeProperty('font-size');
+      h1.style.removeProperty('white-space');
+      if (!window.matchMedia('(min-width: 1024px)').matches) continue;
+      h1.style.whiteSpace = 'nowrap';
+      const base = parseFloat(getComputedStyle(h1).fontSize);
+      const words = document.createRange();
+      words.selectNodeContents(h1);
+      const textWidth = words.getBoundingClientRect().width;
+      if (textWidth === 0) continue;
+      const size = Math.min(32, Math.floor(base * (h1.clientWidth / textWidth) * 0.98));
+      if (size >= 19) h1.style.fontSize = `${size}px`;
+      else h1.style.removeProperty('white-space');
+    }
+  };
+  void document.fonts.ready.then(fit);
+  window.addEventListener('resize', fit, { passive: true });
+</script>

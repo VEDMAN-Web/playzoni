@@ -231,6 +231,7 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
     const more = track.dataset.more;
     let loading = false;
     let done = !more;
+    let loop = 0; // position in the repeat pass, after every game has been shown once
     const isDedupe = track.hasAttribute('data-dedupe');
     const loadMore = async (force = false): Promise<void> => {
       if (done || loading || !more) return;
@@ -241,9 +242,13 @@ const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
       );
       const taken = isDedupe ? takenElsewhere(track) : new Set<string>();
       const want = force ? Math.max(0, BATCH - shown.size) : BATCH;
-      const next = listFor(more, await loadIndex())
-        .filter((g) => !shown.has(g.slug) && !taken.has(g.slug))
-        .slice(0, want);
+      const list = listFor(more, await loadIndex()).filter((g) => !taken.has(g.slug));
+      let next = list.filter((g) => !shown.has(g.slug)).slice(0, want);
+      // Endless: once every game in the list is on the row, start again from its first game (owner: rows never end).
+      if (next.length === 0 && !force && list.length > 0) {
+        next = Array.from({ length: BATCH }, (_, i) => list[(loop + i) % list.length]);
+        loop = (loop + BATCH) % list.length;
+      }
       if (next.length === 0) {
         if (!force) done = true;
       } else {
