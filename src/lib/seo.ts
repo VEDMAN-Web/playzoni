@@ -10,27 +10,27 @@ export const DESCRIPTION_MAX = 155;
 const BRAND_SUFFIX = ` | ${SITE_NAME}`;
 const PLAY_FREE = 'Play Free Online';
 
-// Game: "{Title} — Play Free Online | Playzoni"; if > 60: "{Title} | Playzoni"; if still > 60: "{Title}"
+// Game: "{Title}: Play Free Online | Playzoni"; if > 60: "{Title} | Playzoni"; if still > 60: "{Title}"
 export function buildGameTitle(title: string): string {
-  const full = `${title} — ${PLAY_FREE}${BRAND_SUFFIX}`;
+  const full = `${title}: ${PLAY_FREE}${BRAND_SUFFIX}`;
   if (full.length <= TITLE_MAX) return full;
   const short = `${title}${BRAND_SUFFIX}`;
   if (short.length <= TITLE_MAX) return short;
   return title;
 }
 
-// Category: "{Name} — Play Free Online {Name} | Playzoni"; if > 60: "{Name} — Play Free Online | Playzoni"; if still > 60 the same fallback chain as games.
+// Category: "{Name}: Play Free Online {Name} | Playzoni"; if > 60: "{Name}: Play Free Online | Playzoni"; if still > 60 the same fallback chain as games.
 export function buildCategoryTitle(name: string): string {
-  const full = `${name} — ${PLAY_FREE} ${name}${BRAND_SUFFIX}`;
+  const full = `${name}: ${PLAY_FREE} ${name}${BRAND_SUFFIX}`;
   if (full.length <= TITLE_MAX) return full;
-  const short = `${name} — ${PLAY_FREE}${BRAND_SUFFIX}`;
+  const short = `${name}: ${PLAY_FREE}${BRAND_SUFFIX}`;
   if (short.length <= TITLE_MAX) return short;
   return name;
 }
 
-// Category page N: "{Name} — Page {N} | Playzoni"
+// Category page N: "{Name}, Page {N} | Playzoni"
 export function buildCategoryPageTitle(name: string, page: number): string {
-  return `${name} — Page ${page}${BRAND_SUFFIX}`;
+  return `${name}, Page ${page}${BRAND_SUFFIX}`;
 }
 
 // Canonical URL: absolute, no trailing slash (the home page is the only exception: "/").
@@ -56,7 +56,7 @@ export function assertDescription(description: string): void {
   const len = description.length;
   if (len < DESCRIPTION_MIN || len > DESCRIPTION_MAX) {
     throw new Error(
-      `description is ${len} chars (must be ${DESCRIPTION_MIN}–${DESCRIPTION_MAX}): "${description}"`,
+      `description is ${len} chars (must be ${DESCRIPTION_MIN} to ${DESCRIPTION_MAX}): "${description}"`,
     );
   }
 }

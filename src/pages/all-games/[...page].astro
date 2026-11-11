@@ -55,11 +55,11 @@ for (const g of pageGames) {
 const isFirst = pageNumber === 1;
 const basePath = '/all-games';
 const canonicalPath = isFirst ? basePath : `${basePath}/${pageNumber}`;
-const title = isFirst ? 'All Games A–Z | Playzoni' : buildCategoryPageTitle('All Games', pageNumber);
+const title = isFirst ? 'All Games A to Z | Playzoni' : buildCategoryPageTitle('All Games', pageNumber);
 const description = isFirst
   ? 'Browse every free game on Playzoni from A to Z. Jump to a letter, pick a title and press Play to start in your browser with no download.'
   : buildPagedDescription('All Games', pageNumber);
-const h1 = isFirst ? 'All Games A–Z' : `All Games — Page ${pageNumber}`;
+const h1 = isFirst ? 'All Games A to Z' : `All Games, Page ${pageNumber}`;
 const crumbs = [
   { name: 'Home', path: '/' },
   { name: 'All Games', path: basePath },

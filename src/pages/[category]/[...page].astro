@@ -173,7 +173,7 @@ const jsonLd = [collectionLd, itemListLd, breadcrumbLd, ...(faqLd && isFirst ? [
     eagerCount={1}
     label={`${cat.name} games`}
   >
-    <TitleTile slot="lead" crumbs={crumbs} h1={`${cat.h1}${isFirst ? '' : ` — Page ${pageNumber}`}`} />
+    <TitleTile slot="lead" crumbs={crumbs} h1={`${cat.h1}${isFirst ? '' : `, Page ${pageNumber}`}`} />
 
     {(parent || children.length > 0) && (
       <nav slot="lead" class="related" aria-label="Related categories" style={`--chip-cells: ${chipCells}`}>

@@ -28,7 +28,7 @@ const isFirst = pageNumber === 1;
 const canonicalPath = isFirst ? basePath : `${basePath}/${pageNumber}`;
 const title = isFirst ? firstTitle : buildCategoryPageTitle(name, pageNumber);
 const description = isFirst ? firstDescription : buildPagedDescription(name, pageNumber);
-const h1 = isFirst ? name : `${name} — Page ${pageNumber}`;
+const h1 = isFirst ? name : `${name}, Page ${pageNumber}`;
 const crumbs = [
   { name: 'Home', path: '/' },
   { name, path: basePath },

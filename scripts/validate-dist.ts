@@ -47,11 +47,18 @@ const pages = htmlFiles(DIST);
 for (const file of pages) {
   const rel = relative(DIST, file).split(sep).join('/');
   const html = readFileSync(file, 'utf8');
-  // Draft preview pages (PUBLIC_INCLUDE_DRAFTS=true) are marked noindex,nofollow and may be unfinished: not checked.
-  if (/name="robots" content="noindex,nofollow"/.test(html)) continue;
   const add = (rule: string, detail: string): void => {
     errors.push(`dist/${rel}: ${rule}: ${detail}`);
   };
+
+  // No long dashes (em/en) in visible text, the tab title or meta text, on every page incl. drafts (owner rule, R41).
+  const metaText = [...html.matchAll(/<meta [^>]*content="([^"]*)"/g)].map((m) => m[1]).join(' ');
+  const shown = `${visibleText(html)} ${decode(html.match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? '')} ${decode(metaText)}`;
+  const dash = shown.match(/.{0,30}[\u2013\u2014].{0,30}/);
+  if (dash) add('long-dash', `"${dash[0].trim()}": use a comma, colon, "|" or "to" instead`);
+
+  // Draft preview pages (PUBLIC_INCLUDE_DRAFTS=true) are marked noindex,nofollow and may be unfinished: not checked further.
+  if (/name="robots" content="noindex,nofollow"/.test(html)) continue;
 
   // At most 12 badges on a page (docs/DESIGN.md §V2.2).
   const badgeCount = (html.match(/class="badge /g) ?? []).length;

@@ -41,13 +41,13 @@ function throws(fn: () => void): boolean {
 const t20 = buildGameTitle(titleOfLength(20));
 const t45 = buildGameTitle(titleOfLength(45));
 const t70 = buildGameTitle(titleOfLength(70));
-check('fallback 1 (20-char title keeps full form)', t20.endsWith(' — Play Free Online | Playzoni') && t20.length <= TITLE_MAX, t20);
+check('fallback 1 (20-char title keeps full form)', t20.endsWith(': Play Free Online | Playzoni') && t20.length <= TITLE_MAX, t20);
 check('fallback 2 (45-char title uses short form)', t45.endsWith(' | Playzoni') && !t45.includes('Play Free Online') && t45.length <= TITLE_MAX, t45);
 check('fallback 3 (70-char title falls back to bare title)', t70 === titleOfLength(70), t70);
 
 // 2. Category and category-page titles.
 const cat = buildCategoryPageTitle('Car Games', 2);
-check('category page title', cat === 'Car Games — Page 2 | Playzoni', cat);
+check('category page title', cat === 'Car Games, Page 2 | Playzoni', cat);
 
 // 3. Canonical URLs: absolute, no trailing slash.
 check('canonical has no trailing slash', canonicalUrl('/car-games') === 'https://playzoni.com/car-games');
@@ -67,7 +67,7 @@ check(
   throws(() => assertDescription('x'.repeat(DESCRIPTION_MAX + 1))),
 );
 check(
-  `description ${DESCRIPTION_MIN}–${DESCRIPTION_MAX} passes`,
+  `description ${DESCRIPTION_MIN} to ${DESCRIPTION_MAX} passes`,
   !throws(() => assertDescription('x'.repeat(130))),
 );
 
