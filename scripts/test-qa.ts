@@ -10,7 +10,7 @@ import { expect, finish, same } from './test-kit';
 
 const ROOT = join(import.meta.dirname, '..');
 const guide = readFileSync(join(ROOT, 'docs', 'QA-GUIDE.md'), 'utf8');
-const example = /```json\n([\s\S]*?)\n```/.exec(guide)?.[1];
+const example = /```json\r?\n([\s\S]*?)\r?\n```/.exec(guide)?.[1];
 expect(example !== undefined, 'the guide has a json example');
 
 function valid(): Record<string, unknown> {
