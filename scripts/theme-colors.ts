@@ -3,7 +3,9 @@
 //   from = the dominant colour of the picture,
 //   to   = the average colour of the bottom half,
 // softens both (35% white, saturation at most 70%), and checks that the page text (ink) still has 4.5:1 contrast.
-// Result: data/game-colors.json as { slug: [from, to] } (hex). A game without an entry keeps the site gradient.
+// A picture whose two colours are both very light (lightness over 88%) or both grey (saturation under 15%) would only give a
+// washed-out page behind the white cards, so it gets no entry (R46). Result: data/game-colors.json as { slug: [from, to] } (hex).
+// A game without an entry keeps the site gradient.
 import { existsSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -16,6 +18,22 @@ const MAX_SATURATION = 0.7;
 const MIN_CONTRAST = 4.5;
 
 export type Rgb = [number, number, number];
+
+export const MAX_LIGHTNESS = 0.88;
+export const MIN_SATURATION = 0.15;
+
+// False when the pair would look washed out: both very light, or both grey.
+export function usablePair(from: string, to: string): boolean {
+  const [a, b] = [from, to].map((hex) => rgbToHsl(fromHex(hex)));
+  // A colour is washed out when it is very light or grey; the page is washed out when both colours are.
+  const washed = (c: [number, number, number]): boolean => c[2] > MAX_LIGHTNESS || c[1] < MIN_SATURATION;
+  return !(washed(a) && washed(b));
+}
+
+export function fromHex(hex: string): Rgb {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
 
 export function toHex([r, g, b]: Rgb): string {
   return `#${[r, g, b].map((v) => Math.round(Math.min(255, Math.max(0, v))).toString(16).padStart(2, '0')).join('')}`;
@@ -122,16 +140,19 @@ async function main(): Promise<void> {
   const thumbs = join(ROOT, 'public', 'thumbs');
   const out: Record<string, [string, string]> = {};
   let skipped = 0;
+  let plain = 0;
   for (const slug of readdirSync(thumbs).sort()) {
     const file = join(thumbs, slug, 'm.webp');
     if (!existsSync(file)) {
       skipped++;
       continue;
     }
-    out[slug] = await colorsFor(file);
+    const pair = await colorsFor(file);
+    if (usablePair(pair[0], pair[1])) out[slug] = pair;
+    else plain++;
   }
   writeFileSync(join(ROOT, 'data', 'game-colors.json'), `${JSON.stringify(out, null, 2)}\n`);
-  console.log(`theme:colors: ${Object.keys(out).length} games, ${skipped} without a picture`);
+  console.log(`theme:colors: ${Object.keys(out).length} games with colours, ${plain} keep the site gradient (too light or grey), ${skipped} without a picture`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
