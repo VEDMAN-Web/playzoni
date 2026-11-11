@@ -483,7 +483,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Do: validate events against the dictionary, add country/region/device from the request (no IP stored), bot filter, rate limit, insert into `events`/`sessions`. Mark T9.3 as replaced by T10.2–T10.3.
 - Done when: test requests with bad events are rejected; good batches appear in D1.
 ### T10.4 — Rollups (Cron Trigger)
-- status: todo · deps: T10.3 · model: **sonnet** · docs: ADMIN §4
+- status: done · deps: T10.3 · model: **sonnet** · docs: ADMIN §4
 - Do: hourly + nightly jobs filling every `daily_*` table and `retention`; delete raw events older than 90 days.
 - Done when: a seeded test day produces the expected rollup numbers (unit test with fixed input).
 ### T10.5 — Admin app shell + Cloudflare Access
