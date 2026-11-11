@@ -16,23 +16,23 @@ All times are India time (IST). If a task is not done by its deadline, push what
 
 ## Tasks and deadlines
 
-### R1. Hidden from Google until launch (by 03:00)
+### R1. Hidden from Google until launch (by 03:00): DONE by the planner (12 Nov 03:40)
 - Add an env switch `PUBLIC_LAUNCH`. Unless it is exactly `true`, every page gets `<meta name="robots" content="noindex,nofollow">` and `robots.txt` says `Disallow: /`. The sitemap is still built.
 - The switch is off by default, so a merge to `main` can never publish an indexable site before the domain is bought. Document it in `docs/PRD.md` (Launch) and `.env.example`.
 - Update `scripts/validate-dist.ts` and `scripts/sitemap-check.ts` so they understand this mode (it is not an error when `PUBLIC_LAUNCH` is off).
 - Done when: a build without the flag has noindex on every page and a blocking robots.txt; a build with `PUBLIC_LAUNCH=true` is exactly as it is today; `npm run check` passes.
 
-### R2. Production build is clean (by 03:30) = T5.4
+### R2. Production build is clean (by 03:30) = T5.4: DONE (build chat)
 - Production builds (no `PUBLIC_INCLUDE_DRAFTS`) contain no sample games, no `/sample-game.html` and no draft pages.
 - Make sure `npm run build` without any flags passes `validate-dist`.
 - Done when: a plain build has 0 sample pages and 0 draft pages; mark T5.4 done (the "first 300" dependency is dropped by the planner).
 
-### R3. Category texts (by 04:15) = T5.2
+### R3. Category texts (by 04:15) = T5.2: DONE (build chat)
 - Write `src/content/categories/<slug>.md` for every category that has 12 or more published games. Quick pages count as published.
 - Use only published games in the "Top" sections. The text is original: no shared sentences between categories, no feed text.
 - Done when: `npm run validate` passes and each text follows SEO-PLAN §Content.
 
-### R4. robots.txt and llms.txt (by 04:30) = T8.8
+### R4. robots.txt and llms.txt (by 04:30) = T8.8: DONE by the planner
 - Use the recommended Q20 answer: allow all search and answer bots; block only `Bytespider` and `CCBot`.
 - Add `public/llms.txt`: site name, one-line description, and links to home, categories, new, popular and about.
 - This must work together with R1: while `PUBLIC_LAUNCH` is off, robots.txt still disallows everything.

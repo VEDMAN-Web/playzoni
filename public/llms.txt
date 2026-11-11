@@ -1,0 +1,11 @@
+# Playzoni
+
+> Playzoni is a free online games website. Play hundreds of browser games instantly on phone, tablet or computer, with no download and no sign-up.
+
+## Main pages
+- [Home](https://playzoni.com/): popular and featured games
+- [All categories](https://playzoni.com/categories): every game category
+- [New games](https://playzoni.com/new-games): the latest games added
+- [Popular games](https://playzoni.com/popular-games): the most played games
+- [All games A to Z](https://playzoni.com/all-games): every game in one list
+- [About Playzoni](https://playzoni.com/about): who we are

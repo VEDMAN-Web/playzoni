@@ -7,6 +7,8 @@ A free website where anyone can play browser games instantly on phone, tablet or
 
 Reference model: Poki.com (structure only — see `CLAUDE.md` "Never"). Poki works with about 1,500 curated games, 100M+ monthly players, an ad-only business model, and a category-driven SEO structure. We copy the **pattern**, not the content.
 
+**Launch switch (RELAY R1, 12 Nov 2026):** until `PUBLIC_LAUNCH=true` is set on the production build, every page has an extra `noindex, nofollow` robots tag and `robots.txt` blocks everything, so a merge to `main` never publishes an indexable site. Set it only when playzoni.com is connected.
+
 **Launch goal:** 300 curated, working, mobile-tested games with unique pages. Grow by 20–50 games per week. Quality over quantity — never bulk-publish thousands of thin pages.
 
 ## 2. Tech stack (approved — do not add anything else without asking)
