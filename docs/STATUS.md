@@ -4,7 +4,7 @@ Updated by the build agent after every task. The reviewer reads this first.
 
 - Last updated: 12 Nov 2026
 - Phase: P done (TP.1–TP.7, R18–R29). Phase 5 next: T5.1b (R20), then the Phase 5 tasks
-- Preview URL: — (after T5.5)
+- Preview URL: https://dev.playzoni.pages.dev (Cloudflare Pages project `playzoni`, branch `dev`, drafts on, every page noindex). Production branch `main` (not deployed yet).
 - Next task: TS.1 (owner types the /plugin installs), R38 (/graphify .), then T5.2 (test the 32 easy games from R29 first) when games are published. Planner: Q17 (player bar vs exact 7x4 / 9x5 block), Lighthouse on the new game page.
 
 ## Current task
