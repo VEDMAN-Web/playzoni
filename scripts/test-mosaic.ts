@@ -17,8 +17,13 @@ function testSlots(): void {
 }
 
 function testPlacement(): void {
-  const plain = sizes(placeItems(games(30), mosaic));
-  same(plain.map((s, i) => (s === 'L' ? i + 1 : 0)).filter(Boolean), [3, 16, 27], 'plain games: L at 3, 16, 27');
+  // 70 games: L at 3, 16, 27 (the last 32 tiles, 39–70, are always S — R39).
+  const plain = sizes(placeItems(games(70), mosaic));
+  same(plain.map((s, i) => (s === 'L' ? i + 1 : 0)).filter(Boolean), [3, 16, 27], 'plain games: L at 3, 16, 27, none in the last 32');
+  // 30 games: the tail rule starts after the first 8 tiles, so only position 3 stays L.
+  const short = sizes(placeItems(games(30), mosaic));
+  same(short.map((s, i) => (s === 'L' ? i + 1 : 0)).filter(Boolean), [3], 'short grid: L only in the first 8 tiles');
+  expect(sizes(placeItems(games(100), mosaic)).slice(-32).every((s) => s === 'S'), 'R39: the last 32 tiles are all S');
   same(new Set(plain), new Set(['S', 'L']), 'no M and no XL without xlFirst');
 
   const withFeatured = placeItems(games(30, [5, 9, 20]), mosaic);

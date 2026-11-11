@@ -8,6 +8,10 @@ export const MOSAIC_CYCLE = 24;
 export const LARGE_SLOTS: readonly number[] = [3, 16];
 export const MAX_BADGES_PER_PAGE = 12;
 export const MAX_HOT_BADGES_PER_PAGE = 6;
+// R39: the last tiles of a mosaic are always small (two rows at the widest grid, 16 columns), so a big tile can
+// never leave holes in the bottom rows. Grids with few tiles keep their first 8 tiles as placed.
+export const SMALL_TAIL = 32;
+export const KEEP_HEAD = 8;
 
 export type PlacedSize = 'S' | 'L' | 'XL' | 'CAT';
 
@@ -51,6 +55,12 @@ export function placeItems<T extends Placeable>(items: T[], options: PlaceOption
       placed.push({ item: next, size: 'XL' });
     } else {
       placed.push({ item: next, size: slot });
+    }
+  }
+  if (mosaic) {
+    const from = Math.max(KEEP_HEAD, placed.length - SMALL_TAIL);
+    for (let i = from; i < placed.length; i++) {
+      if (placed[i].size === 'L' || placed[i].size === 'XL') placed[i] = { ...placed[i], size: 'S' };
     }
   }
   return placed;

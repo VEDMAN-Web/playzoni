@@ -42,11 +42,14 @@ interface Props {
   xlFirst?: boolean;
   /** The first tile loads with high priority (the LCP picture on grid pages). False on the game page, where the player cover is the LCP. */
   priorityFirst?: boolean;
+  /** R39: extra 1x1 games (not part of this list) rendered hidden after the tiles; the fit script shows just enough of
+      them to complete the bottom row. Not part of the page's ItemList. */
+  fillers?: { title: string; slug: string }[];
   /** For pages made only of 2x1 tiles (the categories page): columns are 2 cells wide and stretch to fill the row, so an odd number of cell columns never leaves a hole. */
   wide?: boolean;
 }
 
-const { items, mode = 'mosaic', uniformSize = 'S', navBox = false, eagerCount = 6, label = 'Games', xlFirst = false, priorityFirst = true, wide = false } = Astro.props;
+const { items, mode = 'mosaic', uniformSize = 'S', navBox = false, eagerCount = 6, label = 'Games', xlFirst = false, priorityFirst = true, wide = false, fillers = [] } = Astro.props;
 
 const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
 ---
@@ -69,6 +72,11 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
           screenshots={p.item.screenshots}
         />
       )}
+    </div>
+  ))}
+  {mode === 'mosaic' && fillers.map((f) => (
+    <div class="cell cell-s cell-fill" hidden data-fill>
+      <GameTile title={f.title} slug={f.slug} size="S" />
     </div>
   ))}
 </div>
@@ -140,13 +148,15 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
 <script>
   // R32: on mosaic grids the last row must be full. This measures the tiles and hides trailing ones that leave
   // empty cells in the last row (src/lib/mosaic-fit.ts). Runs on load and when the window is resized.
-  import { tilesToHide, type Box } from '../lib/mosaic-fit';
+  import { fillersNeeded, tilesToHide, type Box } from '../lib/mosaic-fit';
 
   function fitMosaic(grid: HTMLElement): void {
     for (const el of grid.querySelectorAll<HTMLElement>('[data-fit-hidden]')) {
       el.hidden = false;
       el.removeAttribute('data-fit-hidden');
     }
+    const fillers = Array.from(grid.querySelectorAll<HTMLElement>('[data-fill]'));
+    for (const el of fillers) el.hidden = true;
     const styles = getComputedStyle(grid);
     const cell = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell'));
     const gap = parseFloat(styles.columnGap);
@@ -164,10 +174,17 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
       boxes.push({
         x: Math.round((r.left - origin.left) / (cell + gap)),
         y: Math.round((r.top - origin.top) / (cell + gap)),
-        w: Math.round((r.width + gap) / (cell + gap)),
-        h: Math.round((r.height + gap) / (cell + gap)),
-        hideable: el.classList.contains('cell') && !el.classList.contains('cell-nav'),
+        // At least one cell each way: shorter blocks (the related-category chip strip, 36px) still take a whole row.
+        w: Math.max(1, Math.round((r.width + gap) / (cell + gap))),
+        h: Math.max(1, Math.round((r.height + gap) / (cell + gap))),
+        hideable: el.classList.contains('cell') && !el.classList.contains('cell-nav') && !el.hasAttribute('data-fill'),
       });
+    }
+    // R39: first try to complete the bottom row with filler games (category pages); otherwise hide trailing tiles.
+    const need = fillersNeeded(boxes, cols, fillers.length);
+    if (need >= 0) {
+      for (const el of fillers.slice(0, need)) el.hidden = false;
+      return;
     }
     for (const i of tilesToHide(boxes, cols)) {
       tiles[i].hidden = true;

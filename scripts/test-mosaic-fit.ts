@@ -1,6 +1,6 @@
 // Self-test for the last-row fill rule (R32, src/lib/mosaic-fit.ts). Pure function only.
 
-import { tilesToHide, type Box } from '../src/lib/mosaic-fit';
+import { fillersNeeded, tilesToHide, type Box } from '../src/lib/mosaic-fit';
 import { finish, same } from './test-kit';
 
 // Builds tiles of the given sizes in page order, placed the way the browser places them (dense: first free spot).
@@ -76,7 +76,16 @@ function testCapped(): void {
   same(tilesToHide(boxes, 4, 0), [], 'when the cap is zero, nothing is hidden');
 }
 
+function testFillers(): void {
+  // 6 small tiles in 4 columns: the bottom row has 2 tiles, so 2 fillers complete it.
+  const six = dense([[1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1]], 4);
+  same(fillersNeeded(six, 4, 32), 2, 'R39: two fillers complete a half row');
+  same(fillersNeeded(dense([[1, 1], [1, 1], [1, 1], [1, 1]], 4), 4, 32), 0, 'R39: a full grid needs no fillers');
+  same(fillersNeeded(six, 4, 1), -1, 'R39: not enough fillers returns -1');
+}
+
 testFull();
+testFillers();
 testSmallTail();
 testLargeTile();
 testFixedBlock();

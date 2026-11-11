@@ -112,3 +112,17 @@ export function tilesToHide(boxes: readonly Box[], cols: number, maxHide: number
     hide.push((best as { index: number }).index);
   }
 }
+
+// R39: how many hidden filler tiles (1x1, appended after the grid's own tiles) must be shown so the bottom row is
+// full. Dense placement puts each filler into the first free cell, so fillers also close holes higher up.
+// Returns -1 when even all `available` fillers cannot fill the bottom row (the caller then hides tiles instead).
+export function fillersNeeded(boxes: readonly Box[], cols: number, available: number): number {
+  for (let k = 0; k <= available; k++) {
+    const all: Box[] = [...boxes, ...Array.from({ length: k }, () => ({ x: 0, y: 0, w: 1, h: 1, hideable: true }))];
+    const shown = all.map(() => true);
+    const { at } = layout(all, shown, cols);
+    const { row, covered } = bottom(all, shown, at, cols);
+    if (row < 0 || covered >= cols) return k;
+  }
+  return -1;
+}

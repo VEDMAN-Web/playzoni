@@ -91,6 +91,16 @@ const relatedCategoryItems: GridItem[] = [...(parent ? [parent] : []), ...childr
   emoji: c.emoji,
   imageSlug: pictures.get(c.slug),
 }));
+// R39: up to 32 popular games from other categories, shown only to complete the mosaic's bottom row.
+const inGrid = new Set(pageGames.map((g) => g.data.slug));
+const fillerGames = isFirst
+  ? [...games]
+      .filter((g) => !inGrid.has(g.data.slug) && !g.data.categories.includes(slug))
+      .sort((a, b) => b.data.popularity - a.data.popularity)
+      .slice(0, 32)
+      .map((g) => ({ title: g.data.title, slug: g.data.slug }))
+  : [];
+
 const gridItems: GridItem[] =
   isFirst && gameItems.length > 30 && relatedCategoryItems.length > 0
     ? [...gameItems.slice(0, 30), ...relatedCategoryItems, ...gameItems.slice(30)]
@@ -157,6 +167,7 @@ const jsonLd = [collectionLd, itemListLd, breadcrumbLd, ...(faqLd && isFirst ? [
   <GameGrid
     items={gridItems}
     mode={isFirst ? 'mosaic' : 'uniform'}
+    fillers={fillerGames}
     uniformSize="S"
     navBox={true}
     eagerCount={1}
