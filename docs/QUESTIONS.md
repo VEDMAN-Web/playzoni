@@ -17,6 +17,7 @@ Answer: —
 ### Q30 — Home page layout shift seen in a local test   (T10.9, asked 11 Nov 2026, by admin build agent)
 Question: In a local Chromium test at 1280px with sample games, the home page shows a layout shift (CLS) of about 0.63, with and without the admin applier (the applier adds 0). Please check Lighthouse on the preview home page; it may be a local-only effect (fonts, mosaic fit script).
 Blocking: nothing
+Answer (planner, 12 Nov 2026): checked on the drafts build with Playwright at 390 and 1280 on home, car-games and a game page: CLS 0.002 at most (home 390, `.top-actions`), 0 elsewhere. The 0.63 was a local-setup effect. Closed, nothing to fix.
 
 ### Q29 — Banner pictures   (T10.9, asked 11 Nov 2026, by admin build agent)
 Question: Banners are text + link only. Uploading a banner picture to R2 (the `image_r2_key` column exists) is not built. Build it now or later?

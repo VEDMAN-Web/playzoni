@@ -597,8 +597,8 @@ body.adm {
 }
 .adm-table td::before {
   content: attr(data-label);
-  flex: none;
-  min-width: 0;
+  flex: 0 1 auto;
+  min-width: min-content;
   overflow-wrap: normal;
   word-break: normal;
   color: var(--c-ink-2);
