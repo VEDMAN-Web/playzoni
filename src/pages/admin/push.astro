@@ -1,0 +1,14 @@
+---
+// Admin screen 12: Push alerts (docs/ADMIN.md §5.12).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Push alerts" screen="push">
+  <p class="adm-intro">New-game alerts to people who said yes. At most 2 in any 7 days, so nobody is annoyed.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { startPush } from '../../admin/push';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) void startPush(root);
+</script>

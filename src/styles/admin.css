@@ -1015,3 +1015,14 @@ body.adm {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+.adm-push-preview {
+  box-shadow: var(--sh-tile);
+}
+.adm-push-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--r-player);
+  background: var(--c-bg);
+}

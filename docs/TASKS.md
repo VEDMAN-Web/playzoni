@@ -510,7 +510,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 ### T10.12 — Ads screen (with Phase 11)
 - status: partial (structure only: numbers wait for Phase 11 and the AdSense API) · deps: T10.6, T11.6 · model: haiku · docs: ADMIN §5 (11), ADS-DATA §7
 ### T10.13 — Push screen (with T9.9)
-- status: todo · deps: T10.6, T9.9 · model: haiku · docs: ADMIN §5 (12)
+- status: partial (compose, schedule, 2-per-week limit done; sending and subscriber count wait for OneSignal keys, T9.9) · deps: T10.6, T9.9 · model: haiku · docs: ADMIN §5 (12)
 - Done when: an alert can be composed and scheduled; a third alert in one week is refused.
 ### T10.14 — Experiments screen (with T9.7)
 - status: todo · deps: T10.9, T9.7 · model: **sonnet** · docs: ADMIN §5 (13)
