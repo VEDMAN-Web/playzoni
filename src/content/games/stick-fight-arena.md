@@ -27,18 +27,18 @@ tags:
   - "addictive-games"
 addedDate: 2026-11-11
 updatedDate: 2026-11-11
-description: ""
-intro: ""
+description: "Play Stick Fight Arena free online at Playzoni. An action game you can play in your browser on phone, tablet or computer, with no download."
+intro: "This is a free action game you can play right here in your browser. It works on phones, tablets and computers, with no download and no sign-up."
 controls:
-  desktop: ""
-  mobile: ""
+  desktop: "Shown on the first screen of the game."
+  mobile: "Shown on the first screen of the game."
 featured: false
 popularity: 2171
-status: "draft"
+status: "published"
+quick: true
 faq: []
 ---
 
 ## How to play Stick Fight Arena
 
-
-
+Press Play to start. The game shows its own controls on the first screen, so follow them to learn how to move, score and win.
