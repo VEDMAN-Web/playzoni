@@ -114,14 +114,17 @@ function watchPlay(): void {
     if (on) add({ n: 'play_end', s: slug, v: secs, x: fs });
     on = false;
   };
-  new MutationObserver(() => {
+  // The desktop player may have started before this script loaded, so check once now and then on every change.
+  const check = (): void => {
     const has = !!root.querySelector('iframe');
     if (has && !on) {
       on = true;
       secs = 0;
       add({ n: 'play_start', s: slug });
     } else if (!has) end();
-  }).observe(root, { childList: true, subtree: true });
+  };
+  check();
+  new MutationObserver(check).observe(root, { childList: true, subtree: true });
   setInterval(() => {
     if (!on || doc.visibilityState !== 'visible') return;
     if (doc.fullscreenElement || root.querySelector('.is-overlay')) fs = 'fs';
@@ -182,6 +185,8 @@ export function start(): void {
     x: [ref, p.get('utm_source') ?? '', p.get('utm_medium') ?? '', p.get('utm_campaign') ?? '', w < 480 ? 'xs' : w < 1024 ? 'sm' : w < 1440 ? 'md' : 'lg'].join('|'),
   });
 
+  // Play watcher first, so its pagehide handler queues play_end before the final flush.
+  watchPlay();
   visibleAt = doc.visibilityState === 'visible' ? now : 0;
   doc.addEventListener('visibilitychange', () => (doc.visibilityState === 'hidden' ? flush() : tick()));
   addEventListener('pagehide', () => {
@@ -192,7 +197,6 @@ export function start(): void {
 
   if (Math.random() < 0.2) watchTiles();
   if (Math.random() < 0.1) vitals();
-  watchPlay();
 
   const marks = [25, 50, 75, 100];
   addEventListener(

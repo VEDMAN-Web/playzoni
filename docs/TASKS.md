@@ -378,7 +378,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Done when: in a fresh browser the bar appears only after playing 2 different games; "Not now" hides it for good (reload confirms); the profile entry still works; nothing shows on game pages; private window shows no errors; screenshots at 390 and 1280 in `docs/screens/T9.2/`.
 
 ### T9.3 — Own play counting (Cloudflare Function + D1)
-- status: todo · deps: T5.6 · model: **sonnet** · docs: PRD §2 (Phase 2: Cloudflare Worker + D1), GROWTH "What Poki does" (own analytics events)
+- status: done-by-T10 (replaced by T10.2 tracking + T10.3 /api/e, ADMIN §3) · deps: T5.6 · model: **sonnet** · docs: PRD §2 (Phase 2: Cloudflare Worker + D1), GROWTH "What Poki does" (own analytics events)
 - Do:
   1. Owner action first: add a QUESTIONS entry "Owner action needed" with plain steps: create a D1 database `playzoni` in the Cloudflare dashboard, bind it to the Pages project as `DB` (production and preview), and paste `migrations/0001_plays.sql` into the D1 console. Continue building and testing with the fake DB below while waiting.
   2. `migrations/0001_plays.sql`: one table of **daily totals only** — `plays(day TEXT, slug TEXT, event TEXT, variant TEXT, n INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (day, slug, event, variant))`. No visitor id, no IP, no user agent, no timestamp finer than the UTC day.
@@ -479,7 +479,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Do: anonymous ID + session ID, batching, sendBeacon every 10 s and on `pagehide`, the event list in ADMIN §3 (tile impressions sampled with IntersectionObserver), engaged time counts only while the tab is visible, opt-out switch in the profile panel, GPC/consent gate. < 3 KB gz.
 - Done when: unit tests for batching/session rules; Lighthouse shows no CLS/LCP change; bundle size checked in `npm run check`.
 ### T10.3 — Collection endpoint `/api/e`
-- status: todo · deps: T10.1 · model: **sonnet** · docs: ADMIN §3, §7
+- status: done · deps: T10.1 · model: **sonnet** · docs: ADMIN §3, §7
 - Do: validate events against the dictionary, add country/region/device from the request (no IP stored), bot filter, rate limit, insert into `events`/`sessions`. Mark T9.3 as replaced by T10.2–T10.3.
 - Done when: test requests with bad events are rejected; good batches appear in D1.
 ### T10.4 — Rollups (Cron Trigger)
