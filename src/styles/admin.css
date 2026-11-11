@@ -349,6 +349,10 @@ body.adm {
   font: var(--t-small);
   cursor: pointer;
 }
+.adm-check-box {
+  justify-content: center;
+  min-width: 44px;
+}
 .adm-check input {
   width: 20px;
   height: 20px;
@@ -432,6 +436,7 @@ body.adm {
 }
 
 .adm-card {
+  position: relative;
   min-width: 0;
   padding: var(--s-4);
   border-radius: var(--adm-radius);
@@ -556,6 +561,7 @@ body.adm {
 
 /* Tables: stacked cards on phones, real tables from 768px with sticky header and 44px rows. */
 .adm-table-wrap {
+  position: relative;
   overflow: visible;
 }
 .adm-table {
@@ -843,7 +849,7 @@ body.adm {
   }
 
   .adm-table-wrap {
-    max-height: 70vh;
+    max-height: 680px;
     overflow: auto;
     border-radius: var(--r-player);
   }
@@ -878,13 +884,23 @@ body.adm {
   }
   .adm-table td {
     display: table-cell;
+    max-width: 360px;
     height: var(--adm-row);
     padding: 0 var(--s-3);
+    overflow: hidden;
+    text-overflow: ellipsis;
     vertical-align: middle;
+    white-space: nowrap;
   }
   .adm-table td.num {
     text-align: right;
     white-space: nowrap;
+  }
+  .adm-table td.is-title {
+    min-width: 180px;
+  }
+  .adm-table td.is-thumb {
+    width: 52px;
   }
   .adm-table td::before {
     display: none;

@@ -6,7 +6,7 @@ import { apiParams, readState, type RangeState } from './range';
 import { errorBox, renderScreen, skeleton } from './render';
 import { RANGE_EVENT } from './shell';
 
-export function analyticsScreen(endpoint: string, root: HTMLElement, after?: (screen: Screen) => void, refreshMs = 0): void {
+export function analyticsScreen(endpoint: string, root: HTMLElement, after?: (screen: Screen) => void, refreshMs = 0, extra: Record<string, string> = {}): void {
   let range = readState();
   let busy = false;
   const load = async (quiet = false): Promise<void> => {
@@ -14,7 +14,9 @@ export function analyticsScreen(endpoint: string, root: HTMLElement, after?: (sc
     busy = true;
     if (!quiet) root.replaceChildren(skeleton());
     try {
-      const screen = await apiGet<Screen>(endpoint, apiParams(range));
+      const params = apiParams(range);
+      for (const [k, v] of Object.entries(extra)) params.set(k, v);
+      const screen = await apiGet<Screen>(endpoint, params);
       renderScreen(root, screen);
       after?.(screen);
     } catch (error) {

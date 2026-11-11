@@ -494,7 +494,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - status: done · deps: T10.4, T10.5 · model: **sonnet** · docs: ADMIN §5 (1, 2)
 - Done when: every KPI matches a SQL check on seeded data; empty states show "—".
 ### T10.7 — Games table + game detail stats
-- status: todo · deps: T10.6 · model: haiku · docs: ADMIN §5 (3)
+- status: done · deps: T10.6 · model: haiku · docs: ADMIN §5 (3)
 ### T10.8 — Game edit + category edit via GitHub commits
 - status: todo · deps: T10.7 · model: **sonnet** · docs: ADMIN §2 (rebuild), §5 (4, 5)
 - Do: GitHub App (owner creates, planner guides), commits to `dev` only, same zod validation as the build, audit log entry per save.

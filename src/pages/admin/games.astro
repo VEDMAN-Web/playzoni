@@ -1,0 +1,14 @@
+---
+// Admin screen 3: Games table (docs/ADMIN.md §5.3).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Games" screen="games" range filters>
+  <p class="adm-intro">Every game, drafts too. Numbers are for the chosen dates. Hide, feature and hero changes are instant (about a minute); text changes go through a rebuild.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { startGames } from '../../admin/games';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) startGames(root);
+</script>
