@@ -129,7 +129,8 @@ async function interactions(browser, sample) {
       await page.goto(`${BASE}/game/${sample.published}`, { waitUntil: 'load' });
       // Phones and tablets show a cover with Play; from 1024px the game loads by itself (Player.astro).
       const play = page.locator('[data-play]').first();
-      if (await play.isVisible().catch(() => false)) await play.click();
+      // The Play button pulses (CSS animation), so it never counts as "stable"; click it directly when it is on screen.
+      if (await play.boundingBox().catch(() => null)) await play.click({ force: true, timeout: 5000 }).catch(() => {});
       await page.waitForTimeout(2500);
       const frame = await page.locator('[data-player] iframe').count();
       const overlay = await page.locator('.player-frame.is-overlay').count();
@@ -172,7 +173,7 @@ async function interactions(browser, sample) {
       }
 
       // Search panel: fuzzy match and popular fallback.
-      await page.locator('[data-search-open]').first().click();
+      await page.locator('[data-search-open]:visible').first().click();
       await page.waitForTimeout(500);
       const input = page.locator('[data-search-input]').first();
       await input.fill('tik tak toe');
@@ -197,10 +198,10 @@ async function interactions(browser, sample) {
       }
 
       // Profile panel opens and closes.
-      const prof = page.locator('[data-profile-open]').first();
+      const prof = page.locator('[data-profile-open]:visible').first();
       if (await prof.count()) {
         await page.goto(`${BASE}/`, { waitUntil: 'load' });
-        await page.locator('[data-profile-open]').first().click();
+        await page.locator('[data-profile-open]:visible').first().click();
         await page.waitForTimeout(500);
         const open = await page.locator('#profile-panel').isVisible();
         await page.keyboard.press('Escape');

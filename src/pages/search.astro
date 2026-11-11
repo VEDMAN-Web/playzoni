@@ -91,6 +91,7 @@ const popular = [...games]
   }
   .search-ui {
     max-width: 720px;
+    min-height: 64px; /* the Pagefind box is drawn after load; reserve its height so the footer does not jump (e2e) */
     --pagefind-ui-scale: 1;
     --pagefind-ui-primary: var(--c-primary);
     --pagefind-ui-text: var(--c-ink);
