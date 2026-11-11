@@ -572,9 +572,14 @@ body.adm {
 }
 .adm-table tr {
   display: grid;
-  gap: 2px var(--s-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px var(--s-4);
   padding: var(--s-3) 0;
   border-bottom: 1px solid var(--c-line);
+}
+.adm-table td.is-title,
+.adm-table td.is-wide {
+  grid-column: 1 / -1;
 }
 .adm-table td {
   display: flex;
@@ -930,7 +935,7 @@ body.adm {
     width: auto;
   }
   .adm-controls input[type='text'] {
-    width: 72px;
+    width: 108px;
   }
   .adm-controls .adm-check span {
     white-space: nowrap;

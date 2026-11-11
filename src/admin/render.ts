@@ -169,7 +169,7 @@ async function drawChart(target: HTMLElement, c: Chart): Promise<void> {
     stroke: s.prev ? grey : colours[n++ % colours.length],
     width: 2,
     dash: s.prev ? [6, 4] : undefined,
-    value: (_u: unknown, v: number | null) => (v === null ? 'n/a' : fmt(v, 'int')),
+    value: (_u: unknown, v: number | null, _s: number, idx: number | null) => (idx === null ? '' : v === null ? 'n/a' : fmt(v, 'int')),
   }));
   const width = Math.max(560, target.clientWidth || 560);
   new uPlot(

@@ -491,7 +491,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Do: `admin/` Astro app (separate Pages project `admin.playzoni.com`), sidebar/top bar/date-range picker per ADMIN §6, Access JWT check middleware for `/api/admin/*`, `team` roles, sign-out. Owner sets up Access with the planner's steps.
 - Done when: only allowed emails get in; role limits enforced server-side; layout pixel-matches the approved design at 390/1280/1440.
 ### T10.6 — Dashboard + Realtime screens
-- status: todo · deps: T10.4, T10.5 · model: **sonnet** · docs: ADMIN §5 (1, 2)
+- status: done · deps: T10.4, T10.5 · model: **sonnet** · docs: ADMIN §5 (1, 2)
 - Done when: every KPI matches a SQL check on seeded data; empty states show "—".
 ### T10.7 — Games table + game detail stats
 - status: todo · deps: T10.6 · model: haiku · docs: ADMIN §5 (3)

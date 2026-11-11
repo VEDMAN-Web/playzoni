@@ -30,7 +30,8 @@
     "functions:check": "wrangler pages functions build --outdir .wrangler/functions-check",
     "rollup:bundle": "tsx scripts/admin/bundle-rollup.ts",
     "admin:db": "wrangler d1 migrations apply DB --local",
-    "admin:dev": "wrangler pages dev dist --d1 DB=00000000-0000-0000-0000-000000000000 --r2 UPLOADS --port 8788"
+    "admin:dev": "wrangler pages dev dist --d1 DB=00000000-0000-0000-0000-000000000000 --r2 UPLOADS --port 8788",
+    "admin:seed": "tsx scripts/admin/seed-demo.ts"
   },
   "repository": {
     "type": "git",

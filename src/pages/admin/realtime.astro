@@ -1,0 +1,14 @@
+---
+// Admin screen 2: Realtime, the last 30 minutes, refreshed every 15 seconds (docs/ADMIN.md §5).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Realtime" screen="realtime" filters>
+  <p class="adm-intro">The last 30 minutes. This page refreshes every 15 seconds while it is open.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { analyticsScreen } from '../../admin/analytics';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) analyticsScreen('realtime', root, undefined, 15000);
+</script>
