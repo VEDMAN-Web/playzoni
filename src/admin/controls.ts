@@ -300,7 +300,7 @@ export async function startBanners(root: HTMLElement): Promise<void> {
           'div',
           { class: 'adm-sort-item' },
           el('span', { class: `adm-pill${b.active ? ' is-on' : ''}` }, b.active ? 'On' : 'Off'),
-          el('span', { class: 'adm-sort-label' }, `${b.text} (${b.pages}, ${b.lang === '*' ? 'all languages' : b.lang}${b.starts_at ? `, from ${b.starts_at}` : ''}${b.ends_at ? ` to ${b.ends_at}` : ''})`),
+          el('span', { class: 'adm-sort-label' }, `${b.text} (${b.pages === '*' ? 'every page' : b.pages}, ${b.lang === '*' ? 'all languages' : b.lang}${b.starts_at ? `, from ${b.starts_at}` : ''}${b.ends_at ? ` to ${b.ends_at}` : ''})`),
           edit,
           del,
         ),

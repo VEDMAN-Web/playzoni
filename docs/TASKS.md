@@ -517,7 +517,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 ### T10.15 — Team, roles and audit log
 - status: done · deps: T10.5 · model: haiku · docs: ADMIN §5 (16, 17)
 ### T10.16 — CSV exports and admin end-to-end tests
-- status: todo · deps: T10.6–T10.15 · model: **sonnet** · docs: ADMIN §5
+- status: done (browser suites run with npm run admin:screens / admin:e2e against admin:dev) · deps: T10.6–T10.15 · model: **sonnet** · docs: ADMIN §5
 - Do: CSV export on every table; Playwright tests for login gate, each screen at 390 and 1440, one edit flow, one instant control.
 - Done when: all admin tests pass in `npm run check` (admin suite).
 ---

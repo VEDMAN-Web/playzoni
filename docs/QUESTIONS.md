@@ -14,6 +14,34 @@ Answer: —
 
 ## Open
 
+### Q30 — Home page layout shift seen in a local test   (T10.9, asked 11 Nov 2026, by admin build agent)
+Question: In a local Chromium test at 1280px with sample games, the home page shows a layout shift (CLS) of about 0.63, with and without the admin applier (the applier adds 0). Please check Lighthouse on the preview home page; it may be a local-only effect (fonts, mosaic fit script).
+Blocking: nothing
+
+### Q29 — Banner pictures   (T10.9, asked 11 Nov 2026, by admin build agent)
+Question: Banners are text + link only. Uploading a banner picture to R2 (the `image_r2_key` column exists) is not built. Build it now or later?
+Options: A) Later, only if text banners are not enough (recommended) B) Now
+Blocking: nothing
+
+### Q28 — Home layout: tile sizes and category tile position   (T10.9, ADMIN §5.6, asked 11 Nov 2026, by admin build agent)
+Question: The admin sets the hero order and the rows (order, on/off) instantly. Choosing which tiles are big and where category tiles sit needs a change in `src/pages/index.astro` (a planner file tonight), so it is not built. Should the planner add a build step that reads these choices (rebuild), or drop them?
+Options: A) Planner adds it to index.astro later (rebuild, 1 to 3 min) B) Drop it
+Blocking: the rest of T10.9 (marked partial)
+
+### Q27 — Admin pages on the dev preview before sign-in is on   (T10.5, asked 11 Nov 2026, by admin build agent)
+Question: `dev.playzoni.pages.dev/admin` now shows the admin shell to anyone, but every admin API answers "Sign-in is not set up yet" (no data, no changes) until Cloudflare Access (ADMIN-SETUP Part 4) and its two settings are added. Game list data at `/admin/data/*.json` is the same public game data as `/games-index.json`. OK until Access is on?
+Options: A) OK, set up Access before production (recommended) B) Turn on Access for the preview now
+Blocking: nothing
+
+### Q26 — When to turn on our own measurement   (T10.2, ADS-DATA §8, asked 11 Nov 2026, by admin build agent)
+Question: Measurement is built but off (`PUBLIC_TRACKING_ENABLED` empty). It stores a random id in the browser, which needs consent in the EEA, UK and Switzerland. GPC and "Do not measure me" are honoured. The consent banner (CMP) comes with T11.3.
+Options: A) Keep it off until the CMP is live, then turn it on (recommended) B) Turn it on now everywhere except EEA/UK/CH (needs a small country check, ask the admin agent)
+Blocking: real numbers in the admin
+
+### Q25 — Owner action needed: admin setup in Cloudflare and GitHub   (T10.1, T10.5, T10.8, asked 11 Nov 2026, by admin build agent)
+Question: Please follow `docs/ADMIN-SETUP.md` (one step per line): D1 database, R2 bucket, bindings, Google sign-in (Access), names of the settings, GitHub App, the daily-numbers Worker. Then the planner pastes the D1 "Database ID" into `wrangler.toml` and `workers/rollup/wrangler.toml` (an id is not a secret) and runs `npm run rollup:bundle` if the Worker code changes.
+Blocking: the live admin (local and tests work without it)
+
 ### Q1 — Target "unblocked games"?   (SEO-PLAN §Strategy, asked 10 Nov 2026, by planner)
 Question: "Unblocked games" has very high search volume (~5M/month in the US), but it means "games that get past school/office filters". Do we want pages aimed at it?
 Options: A) No, not at launch (recommended — protects ad approval and brand) B) Yes, a small section later
@@ -82,13 +110,13 @@ Options: A) No for now — use the skills with manual data and Google's own tool
 Blocking: nothing
 Answer: —
 
+## Answered
+
 ### Q24 — Admin panel approvals   (ADMIN §2, §6, asked 11 Nov 2026, by planner)
 Question: The admin panel needs three new parts: (1) uPlot chart library (free, MIT), (2) Cloudflare Access for Google sign-in (free up to 50 users), (3) a GitHub App so admin edits become commits on `dev`. The planner will also show you a clickable design of the dashboard before building.
 Options: A) Approve all three (recommended) B) Discuss first
 Blocking: T10.5
-Answer: —
-
-## Answered
+Answer: A (owner approved all three on 11 Nov 2026, relayed by the planner; also `wrangler` as a devDependency for local tests only). The clickable design step was skipped: the admin was built directly.
 
 ### Q17 — Player block sizes in V2.10 are not exactly 16:9   (R28, asked 11 Nov 2026, by build agent)
 Question: V2.10 says the player is 7×4 cells (754×424) and 9×5 cells (974×534) "exactly 16:9", with the bar inside. 754×424 is 16:9, but 974×534 is not (16:9 at 974 wide is 548 high), and the control bar (64px) needs room too. What I built: the game frame is exactly 16:9 (754×424 up to 1599px; 974×548 from 1600px) and the bar sits directly below it, so the player block takes one more grid row than the frame (5 rows, 6 from 1600px). The ad strip moves one row down (row 6 / 7).

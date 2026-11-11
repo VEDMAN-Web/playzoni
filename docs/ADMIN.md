@@ -53,7 +53,7 @@ Small script `src/lib/track.ts` (< 3 KB gzipped, loaded after `load`, never bloc
 - Control: `settings` (key, value json, updated_by, updated_at), `home_layout` (lang, item_type, ref, position, size, active), `banners` (id, lang, text, link, image_r2_key, start, end, pages, active), `game_flags` (slug, hidden, featured, hero_rank), `experiments` (id, name, variants json, traffic %, status, start, end), `team` (email, role, added_by), `audit_log` (ts, email, action, target, before json, after json).
 
 ## 5. Screens
-All screens: date-range picker with "compare to previous period", country/device/language filters where they make sense, CSV export on every table, loading skeletons, empty states that explain why ("No plays yet — data starts after launch"), error states with retry. **No invented numbers**: when there is no data, show "—".
+Empty values show "No data" (KPI cards) or "n/a" (table cells) instead of a long dash (owner rule R41, 11 Nov 2026). All screens: date-range picker with "compare to previous period", country/device/language filters where they make sense, CSV export on every table, loading skeletons, empty states that explain why ("No plays yet — data starts after launch"), error states with retry. **No invented numbers**: when there is no data, show "—".
 
 | # | Screen | Contents |
 |---|---|---|
@@ -90,6 +90,7 @@ All screens: date-range picker with "compare to previous period", country/device
 - Public site budget unchanged: tracking script < 3 KB gz, deferred; `/api/config` cached at the edge; no layout shift from instant settings (they only reorder or hide existing reserved boxes).
 
 ## 8. Owner actions (when Phase 10 starts)
+Step-by-step guide for the owner: `docs/ADMIN-SETUP.md` (built 11 Nov 2026).
 1. Cloudflare account and domain (Q3) — needed first.
 2. Turn on Cloudflare Access (planner guides step by step) and list team emails + roles.
 3. Approve uPlot and the GitHub App (Q24).

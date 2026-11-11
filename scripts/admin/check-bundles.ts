@@ -49,6 +49,7 @@ const isAdmin = (file: string): boolean => {
 };
 
 const publicChunks = new Set<string>();
+const adminChunks = new Set<string>();
 let adminPages = 0;
 for (const file of htmlFiles(DIST)) {
   if (isAdmin(file)) {
@@ -56,6 +57,7 @@ for (const file of htmlFiles(DIST)) {
     const page = readFileSync(file, 'utf8');
     if (!page.includes('<meta name="robots" content="noindex,nofollow"')) errors.push(`${relative(DIST, file)} is not noindex,nofollow`);
     if (page.includes('data-pagefind-body')) errors.push(`${relative(DIST, file)} would be in the Pagefind index`);
+    for (const m of page.matchAll(/<script[^>]*\ssrc="(\/[^"]+\.js)"/g)) closure(join(DIST, m[1]), adminChunks);
     continue;
   }
   const html = readFileSync(file, 'utf8');
@@ -67,6 +69,10 @@ for (const chunk of publicChunks) {
   if (code.includes('/api/admin') || /uPlot|uplot/.test(code)) errors.push(`public page loads admin code: ${relative(DIST, chunk)}`);
 }
 
+// Owner rule R41: no long dashes in anything the admin shows (its scripts write the visible text).
+for (const chunk of adminChunks) {
+  if (/[\u2013\u2014]/.test(readFileSync(chunk, 'utf8'))) errors.push(`admin script has a long dash: ${relative(DIST, chunk)}`);
+}
 for (const map of readdirSync(DIST).filter((f) => /^sitemap.*\.xml$/.test(f))) {
   if (/\/admin(\/|<)/.test(readFileSync(join(DIST, map), 'utf8'))) errors.push(`${map} lists an admin page`);
 }
