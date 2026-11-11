@@ -599,6 +599,8 @@ body.adm {
   content: attr(data-label);
   flex: 0 1 auto;
   min-width: 0;
+  overflow-wrap: normal;
+  word-break: normal;
   color: var(--c-ink-2);
   font: var(--t-label);
   letter-spacing: 0.04em;

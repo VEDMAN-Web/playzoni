@@ -1,5 +1,7 @@
 // T10.13 to T10.16: admin write endpoints through their real handlers (role checks, rules, audit log).
+import { onRequestGet as auditGet } from '../../functions/api/admin/audit';
 import { onRequestPost as expPost } from '../../functions/api/admin/experiments';
+import { onRequestGet as teamGet, onRequestPost as teamPost } from '../../functions/api/admin/team';
 import { onRequestPost as pushPost } from '../../functions/api/admin/push';
 import { pushAllowed, WEEK_MS } from '../../functions/api/_lib/push';
 import type { AdminUser } from '../../functions/api/_lib/auth';
@@ -52,5 +54,30 @@ same(await exp(OWNER, { action: 'start', id: 'hot-badges' }), 409, 'second runni
 same(await exp(OWNER, { action: 'stop', id: 'rows-order' }), 200, 'stop test 1');
 same(await exp(OWNER, { action: 'start', id: 'hot-badges' }), 200, 'now test 2 can start');
 same((await db.prepare("SELECT COUNT(*) AS n FROM audit_log WHERE action LIKE 'experiment.%'").first<{ n: number }>())?.n, 5, 'experiment changes audited');
+
+// Team: Owner only; the last Owner stays.
+const team = async (user: AdminUser, body: unknown): Promise<number> => (await teamPost(ctx(db, user, body))).status;
+same((await teamGet(ctx(db, EDITOR, null, 'GET'))).status, 403, 'editors cannot see the team');
+same(await team(EDITOR, { action: 'add', email: 'x@example.com', role: 'owner' }), 403, 'editors cannot add people');
+same(await team(OWNER, { action: 'add', email: 'Boss@Example.com', role: 'owner' }), 200, 'owner adds an owner');
+same(await team(OWNER, { action: 'add', email: 'boss@example.com', role: 'editor' }), 409, 'no duplicates');
+same(await team(OWNER, { action: 'add', email: 'not-an-email', role: 'editor' }), 422, 'bad email refused');
+same(await team(OWNER, { action: 'add', email: 'a@example.com', role: 'god' }), 422, 'bad role refused');
+same(await team(OWNER, { action: 'remove', email: 'boss@example.com' }), 409, 'the last owner cannot be removed');
+same(await team(OWNER, { action: 'role', email: 'boss@example.com', role: 'analyst' }), 409, 'the last owner cannot be demoted');
+same(await team(OWNER, { action: 'add', email: 'second@example.com', role: 'owner' }), 200, 'second owner');
+same(await team(OWNER, { action: 'role', email: 'boss@example.com', role: 'analyst' }), 200, 'now demoting works');
+
+// Audit log: every write above is there with before/after, filterable.
+const audit = async (q: string): Promise<{ rows: { action: string; before: string | null; after: string | null }[] }> => {
+  const c = ctx(db, ANALYST, null, 'GET');
+  const req = new Request(`https://playzoni.com/api/admin/audit?${q}`, { headers: c.request.headers });
+  return (await (await auditGet({ ...c, request: req })).json()) as { rows: { action: string; before: string | null; after: string | null }[] };
+};
+const all = await audit('');
+same(all.rows.length, 11, 'all writes logged (3 push, 5 experiments, 2 team adds, 1 role change)');
+const roleRow = (await audit('action=team.role')).rows[0];
+same([JSON.parse(roleRow.before ?? 'null').role, JSON.parse(roleRow.after ?? 'null').role], ['owner', 'analyst'], 'before and after recorded');
+same((await audit('email=nobody')).rows.length, 0, 'email filter');
 
 finish('test-endpoints');

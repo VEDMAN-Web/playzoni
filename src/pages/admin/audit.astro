@@ -1,0 +1,14 @@
+---
+// Admin screen: Audit log (docs/ADMIN.md §5).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Audit log" screen="audit">
+  <p class="adm-intro">Every change made in the admin: who, when, what, and the value before and after.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { startAudit } from '../../admin/team';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) void startAudit(root);
+</script>
