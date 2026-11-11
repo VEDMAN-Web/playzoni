@@ -1,0 +1,14 @@
+---
+// Admin screen 10: Content and SEO (docs/ADMIN.md §5.10).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Content and SEO" screen="content">
+  <p class="adm-intro">Every game and category page from the last build: indexable or not, lengths, word counts and checks.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { startContent } from '../../admin/content';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) void startContent(root);
+</script>
