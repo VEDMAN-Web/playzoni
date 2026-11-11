@@ -1,0 +1,14 @@
+---
+// Admin screen: Engagement (docs/ADMIN.md §5).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Engagement" screen="engagement" range filters>
+  <p class="adm-intro">How long people stay, how often they come back, and where they drop off.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { analyticsScreen } from '../../admin/analytics';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) analyticsScreen('engagement', root);
+</script>

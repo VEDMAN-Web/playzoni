@@ -504,7 +504,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Do: site reads `/api/config` (edge cache 60 s) and applies hero order, hidden games, featured, row order per language, banners/notices, feature flags; JS-off pages keep the built defaults; replaces hand-edited `popularity` for the hero list (keep `popularity` as fallback).
 - Done when: changing the hero order in admin changes the live preview within ~1 min without a rebuild; no CLS.
 ### T10.10 — Search insights, Acquisition, Engagement screens
-- status: todo · deps: T10.6 · model: haiku · docs: ADMIN §5 (7, 8, 9)
+- status: done · deps: T10.6 · model: haiku · docs: ADMIN §5 (7, 8, 9)
 ### T10.11 — Content & SEO screen
 - status: todo · deps: T10.6 · model: haiku · docs: ADMIN §5 (10)
 ### T10.12 — Ads screen (with Phase 11)

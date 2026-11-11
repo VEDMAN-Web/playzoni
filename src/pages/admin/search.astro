@@ -1,0 +1,17 @@
+---
+// Admin screen 7: Search insights (docs/ADMIN.md §5.7).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Search insights" screen="search" range filters>
+  <p class="adm-intro">What people type in the search panel, what finds nothing, and which game they pick.</p>
+  <div data-screen-root></div>
+  <div class="adm-section" data-synonym></div>
+</AdminLayout>
+
+<script>
+  import { analyticsScreen } from '../../admin/analytics';
+  import { synonymForm } from '../../admin/synonym';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  const syn = document.querySelector<HTMLElement>('[data-synonym]');
+  if (root) analyticsScreen('search', root, (screen) => syn && void synonymForm(syn, screen));
+</script>

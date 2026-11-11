@@ -1,0 +1,14 @@
+---
+// Admin screen: Acquisition (docs/ADMIN.md §5).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Acquisition" screen="acquisition" range filters>
+  <p class="adm-intro">Where visitors come from: search engines (Google, Bing, Yandex and others), AI assistants, social sites, campaigns and countries.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { analyticsScreen } from '../../admin/analytics';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) analyticsScreen('acquisition', root);
+</script>
