@@ -496,7 +496,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 ### T10.7 — Games table + game detail stats
 - status: done · deps: T10.6 · model: haiku · docs: ADMIN §5 (3)
 ### T10.8 — Game edit + category edit via GitHub commits
-- status: todo · deps: T10.7 · model: **sonnet** · docs: ADMIN §2 (rebuild), §5 (4, 5)
+- status: done (commits wait for the GitHub App secrets; outbox until then) · deps: T10.7 · model: **sonnet** · docs: ADMIN §2 (rebuild), §5 (4, 5)
 - Do: GitHub App (owner creates, planner guides), commits to `dev` only, same zod validation as the build, audit log entry per save.
 - Done when: an edit in admin produces one commit on `dev` that passes `npm run check`.
 ### T10.9 — Instant controls: `/api/config`, home layout, game flags, banners, settings

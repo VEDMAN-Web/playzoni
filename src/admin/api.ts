@@ -4,6 +4,7 @@ export class ApiError extends Error {
   constructor(
     readonly status: number,
     message: string,
+    readonly problems: string[] = [],
   ) {
     super(message);
   }
@@ -23,7 +24,11 @@ async function handle<T>(response: Response): Promise<T> {
         : response.status === 404
           ? 'This part of the admin is not available on the server yet (404).'
           : `The server answered ${response.status}.`;
-    throw new ApiError(response.status, message);
+    const problems =
+      body && typeof body === 'object' && Array.isArray((body as { problems?: unknown }).problems)
+        ? ((body as { problems: unknown[] }).problems.map(String))
+        : [];
+    throw new ApiError(response.status, message, problems);
   }
   return body as T;
 }
