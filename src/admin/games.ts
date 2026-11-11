@@ -45,7 +45,9 @@ export function startGames(root: HTMLElement): void {
   let range: RangeState = readState();
   let games: AdminGame[] = [];
   let rows: Row[] = [];
-  let shown = 100;
+  // Phones show 25 cards at a time (a card is ~250px tall), wider screens 100 table rows.
+  const PAGE = window.matchMedia('(max-width: 767px)').matches ? 25 : 100;
+  let shown = PAGE;
   const selected = new Set<string>();
   let editor = false;
 
@@ -220,8 +222,8 @@ export function startGames(root: HTMLElement): void {
   }
 
   csv.addEventListener('click', () => downloadCsv('games', COLUMNS.concat({ key: 'slug', label: 'Slug' }), filtered()));
-  for (const input of [search, status, sort]) input.addEventListener('input', () => ((shown = 100), draw()));
-  more.addEventListener('click', () => ((shown += 100), draw()));
+  for (const input of [search, status, sort]) input.addEventListener('input', () => ((shown = PAGE), draw()));
+  more.addEventListener('click', () => ((shown += PAGE), draw()));
   document.addEventListener(RANGE_EVENT, (e) => {
     range = (e as CustomEvent<RangeState>).detail;
     void loadStats();
