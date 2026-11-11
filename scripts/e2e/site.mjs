@@ -44,7 +44,8 @@ async function pickPages(request) {
     ...[published, quick, portrait, twoPlayer, draft].filter(Boolean).map((s) => `/game/${s}`),
     '/search', '/favourites', '/about', '/contact', '/developers', '/privacy', '/terms', '/cookies', '/this-page-does-not-exist', '/admin',
   ];
-  return { pages: [...new Set(pages)], index, sample: { published, quick, twoPlayer } };
+  // Without sample games there may be no fully written page yet: use a quick page for the interaction checks then.
+  return { pages: [...new Set(pages)], index, sample: { published: published ?? quick, quick, twoPlayer } };
 }
 
 const contextFor = (width) =>

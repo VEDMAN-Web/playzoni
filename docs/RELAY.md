@@ -70,7 +70,7 @@ All times are India time (IST). If a task is not done by its deadline, push what
 - Output: `docs/seo-reports/2026-11-12-e2e.md` with a table of page × width × result, and screenshots of failures in `docs/screens/e2e/`.
 - Then fix every failure that is in scope and re-run until it reports 0 failures. Anything out of scope goes into QUESTIONS.
 
-### R6. Look-and-feel pass (by 07:45)
+### R6. Look-and-feel pass (by 07:45): DONE by the planner (04:40): list pages show 3 small tiles per row on 3-column phones instead of one 2x2 tile with an empty column; footer stays at the bottom of short pages; About, home text, FAQ and footer no longer claim every game is played and checked before it goes live (quick pages were not); screenshots in docs/screens/final/
 - Take screenshots of every page type at 390 and 1280 into `docs/screens/final/`.
 - Compare them with DESIGN.md (V2 sections), and fix anything that looks broken, crowded, misaligned or cut off:
   - long names must end in "…";

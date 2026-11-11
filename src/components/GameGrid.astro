@@ -124,6 +124,14 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
     grid-column: span 2;
     grid-row: span 2;
   }
+  /* Lists (uniform L, e.g. New Games) on phones that fit only 3 columns: a 2x2 tile leaves an empty column beside every
+     tile, so the tiles are drawn 1x1 there (look-and-feel pass, 12 Nov 2026). */
+  @media (max-width: 443px) {
+    .grid-uniform .cell-l {
+      grid-column: span 1;
+      grid-row: span 1;
+    }
+  }
   /* XL is 3x3 from 1024px; on smaller screens it is drawn as L so it does not fill the width. */
   .cell-xl {
     grid-column: span 2;
