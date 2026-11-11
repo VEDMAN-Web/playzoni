@@ -19,6 +19,7 @@
     "import:pg": "tsx --env-file-if-exists=.env scripts/import/pg.ts",
     "publish": "tsx scripts/publish.ts",
     "shortlist": "tsx scripts/shortlist.ts",
+    "theme:colors": "tsx scripts/theme-colors.ts",
     "unmapped:report": "tsx scripts/unmapped-report.ts",
     "qa:new": "tsx scripts/qa/new.ts",
     "images:og": "tsx scripts/import/regen-og.ts",

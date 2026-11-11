@@ -46,8 +46,9 @@
   /* §V2.1: fixed gradient on the page, our own triangle pattern on top (body::before), content above both. */
   html {
     min-height: 100%;
-    background-color: var(--c-bg-mid);
-    background-image: linear-gradient(160deg, var(--c-bg-from) 0%, var(--c-bg-mid) 55%, var(--c-bg-to) 100%);
+    /* T5.8: on a game page --page-from / --page-to hold the colours of that game's picture (data/game-colors.json). */
+    background-color: color-mix(in srgb, var(--page-from, var(--c-bg-mid)) 50%, var(--page-to, var(--c-bg-mid)));
+    background-image: linear-gradient(160deg, var(--page-from, var(--c-bg-from)) 0%, color-mix(in srgb, var(--page-from, var(--c-bg-mid)) 50%, var(--page-to, var(--c-bg-mid))) 55%, var(--page-to, var(--c-bg-to)) 100%);
     background-attachment: fixed;
   }
 

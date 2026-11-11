@@ -16,9 +16,11 @@ interface Props {
   mainClass?: string;
   /** Origin of the game frame (game pages only): opens the connection early so Play starts faster. */
   preconnect?: string;
+  /** Inline custom properties for <html>, e.g. the game page colours (T5.8). */
+  htmlStyle?: string;
 }
 
-const { title, description, canonicalPath, ogImage, noindex, mainClass, preconnect } = Astro.props;
+const { title, description, canonicalPath, ogImage, noindex, mainClass, preconnect, htmlStyle } = Astro.props;
 
 // Cloudflare Web Analytics beacon only when a token is set (docs/PRD.md §2).
 const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
@@ -28,7 +30,7 @@ const trackingEnabled = import.meta.env.PUBLIC_TRACKING_ENABLED === 'true';
 const adminConfigEnabled = import.meta.env.PUBLIC_ADMIN_CONFIG_ENABLED === 'true';
 ---
 <!doctype html>
-<html lang="en">
+<html lang="en" style={htmlStyle}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

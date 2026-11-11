@@ -1,7 +1,7 @@
 ---
 import { previewFields } from '../../lib/preview';
 import { render } from 'astro:content';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Header from '../../components/Header.astro';
@@ -29,6 +29,16 @@ const { slug } = Astro.params;
 const games = await getPublishedGames();
 const entry = games.find((g) => g.data.slug === slug)!;
 const d = entry.data;
+
+// Page colours from the game's picture (T5.8). No entry: the site gradient.
+const gameColors = (() => {
+  try {
+    return (JSON.parse(readFileSync(join(process.cwd(), 'data', 'game-colors.json'), 'utf8')) as Record<string, [string, string]>)[slug!];
+  } catch {
+    return undefined;
+  }
+})();
+const htmlStyle = gameColors ? `--page-from:${gameColors[0]};--page-to:${gameColors[1]}` : undefined;
 
 // The import's 1200x630 og image when it has been published with the game (docs/TASKS.md T4.5, Q13).
 const ogPath = `/thumbs/${slug}/og.jpg`;
@@ -128,7 +138,7 @@ try {
 }
 const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
 ---
-<BaseLayout title={title} description={d.description} canonicalPath={`/game/${slug}`} ogImage={ogImage} noindex={d.quick} mainClass="has-grid" preconnect={embedOrigin}>
+<BaseLayout title={title} description={d.description} canonicalPath={`/game/${slug}`} ogImage={ogImage} noindex={d.quick} mainClass="has-grid" preconnect={embedOrigin} htmlStyle={htmlStyle}>
   <Header slot="header" box={false} />
 
   <GameGrid items={tiles} mode="mosaic" navBox={true} eagerCount={0} priorityFirst={false} label="More games like this">
