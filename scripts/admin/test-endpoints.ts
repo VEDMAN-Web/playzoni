@@ -1,4 +1,5 @@
 // T10.13 to T10.16: admin write endpoints through their real handlers (role checks, rules, audit log).
+import { onRequestPost as expPost } from '../../functions/api/admin/experiments';
 import { onRequestPost as pushPost } from '../../functions/api/admin/push';
 import { pushAllowed, WEEK_MS } from '../../functions/api/_lib/push';
 import type { AdminUser } from '../../functions/api/_lib/auth';
@@ -39,5 +40,17 @@ same(await send(OWNER, 3), 409, 'a third alert in one week is refused');
 same(await send(OWNER, 20), 200, 'an alert two weeks later is fine');
 same((await pushPost(ctx(db, OWNER, { action: 'schedule', title: '', body: '', scheduled_at: 'soon' }))).status, 422, 'empty alert refused');
 same((await db.prepare("SELECT COUNT(*) AS n FROM audit_log WHERE action = 'push.schedule'").first<{ n: number }>())?.n, 3, 'every scheduled alert is in the audit log');
+
+// Experiments: one at a time, Owner only.
+const exp = async (user: AdminUser, body: unknown): Promise<number> => (await expPost(ctx(db, user, body))).status;
+same(await exp(EDITOR, { action: 'create', name: 'Rows', variants: ['A', 'B'], traffic: 50 }), 403, 'editors cannot create tests');
+same(await exp(OWNER, { action: 'create', name: 'Rows order', variants: ['A', 'B'], traffic: 50 }), 200, 'create test 1');
+same(await exp(OWNER, { action: 'create', name: 'Hot badges', variants: ['A', 'B', 'C'], traffic: 20 }), 200, 'create test 2');
+same(await exp(OWNER, { action: 'create', name: 'Bad', variants: ['A'], traffic: 0 }), 422, 'one variant and 0% refused');
+same(await exp(OWNER, { action: 'start', id: 'rows-order' }), 200, 'start test 1');
+same(await exp(OWNER, { action: 'start', id: 'hot-badges' }), 409, 'second running test refused');
+same(await exp(OWNER, { action: 'stop', id: 'rows-order' }), 200, 'stop test 1');
+same(await exp(OWNER, { action: 'start', id: 'hot-badges' }), 200, 'now test 2 can start');
+same((await db.prepare("SELECT COUNT(*) AS n FROM audit_log WHERE action LIKE 'experiment.%'").first<{ n: number }>())?.n, 5, 'experiment changes audited');
 
 finish('test-endpoints');

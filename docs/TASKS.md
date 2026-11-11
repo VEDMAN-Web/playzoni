@@ -513,7 +513,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - status: partial (compose, schedule, 2-per-week limit done; sending and subscriber count wait for OneSignal keys, T9.9) · deps: T10.6, T9.9 · model: haiku · docs: ADMIN §5 (12)
 - Done when: an alert can be composed and scheduled; a third alert in one week is refused.
 ### T10.14 — Experiments screen (with T9.7)
-- status: todo · deps: T10.9, T9.7 · model: **sonnet** · docs: ADMIN §5 (13)
+- status: partial (create/start/stop done; results wait for T9.7 variant tagging) · deps: T10.9, T9.7 · model: **sonnet** · docs: ADMIN §5 (13)
 ### T10.15 — Team, roles and audit log
 - status: todo · deps: T10.5 · model: haiku · docs: ADMIN §5 (16, 17)
 ### T10.16 — CSV exports and admin end-to-end tests
