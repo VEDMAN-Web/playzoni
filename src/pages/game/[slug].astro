@@ -62,6 +62,19 @@ const crumbs = [
   { name: d.title, path: `/game/${slug}` },
 ];
 
+// T5.1b: play-mode labels (only for modes the play test confirmed) and schema.org playMode.
+const modes = d.playModes;
+const modeLabels: { key: string; label: string; short: string }[] = [
+  ...(modes?.localTwoPlayer ? [{ key: 'local', label: '2 players on one keyboard', short: '2 players' }] : []),
+  ...(modes?.onlineMultiplayer ? [{ key: 'online', label: 'Play online', short: 'Online' }] : []),
+  ...(modes?.inviteLink ? [{ key: 'invite', label: 'Invite a friend', short: 'Invite a friend' }] : []),
+];
+const playMode = [
+  'SinglePlayer',
+  ...(modes?.localTwoPlayer || modes?.onlineMultiplayer ? ['MultiPlayer'] : []),
+  ...(modes?.coOp ? ['CoOp'] : []),
+];
+
 const videoGameLd = {
   '@context': 'https://schema.org',
   '@type': 'VideoGame',
@@ -71,6 +84,7 @@ const videoGameLd = {
   description: d.description,
   genre: primaryName,
   gamePlatform: ['Web browser'],
+  playMode: playMode.map((m) => `https://schema.org/${m}`),
   applicationCategory: 'Game',
   operatingSystem: 'Any',
   author: d.developer ? { '@type': 'Organization', name: d.developer } : undefined,
@@ -119,7 +133,7 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
 
   <GameGrid items={tiles} mode="mosaic" navBox={true} eagerCount={0} priorityFirst={false} label="More games like this">
     <div slot="lead" class="player-cell" data-pagefind-ignore>
-      <Player title={d.title} slug={slug!} developer={d.developer} embedUrl={d.embedUrl} aspect={d.aspect} />
+      <Player title={d.title} slug={slug!} developer={d.developer} embedUrl={d.embedUrl} aspect={d.aspect} modes={modeLabels.map((m) => m.short)} />
     </div>
     {adsEnabled && (
       <div slot="lead" class="ad-cell ad-cell-side"><AdSlot variant="side" /></div>
@@ -150,6 +164,13 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
 
       <h1 class="game-title" data-pagefind-meta={`image:/thumbs/${slug}/s.webp`}>{d.title}</h1>
       {d.status === 'draft' && <span class="draft-badge">Draft</span>}
+      {modeLabels.length > 0 && (
+        <ul class="modes" aria-label="Play modes">
+          {modeLabels.map((m) => (
+            <li class={`mode mode-${m.key}`}>{m.label}</li>
+          ))}
+        </ul>
+      )}
       <p class="intro">{d.intro}</p>
 
       <section class="about" aria-label="About this game">
@@ -176,6 +197,9 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
               <tr><th scope="row">Developer</th><td>{d.developer}</td></tr>
             )}
             <tr><th scope="row">Category</th><td>{primaryLinked ? <a href={`/${d.categories[0]}`}>{primaryName}</a> : primaryName}</td></tr>
+            {modeLabels.length > 0 && (
+              <tr><th scope="row">Play modes</th><td>{['Single player', ...modeLabels.map((m) => m.label)].join(', ')}</td></tr>
+            )}
             <tr><th scope="row">Platforms</th><td>{d.mobile ? 'Desktop, mobile' : 'Desktop'}</td></tr>
             {d.releaseDate && (
               <tr><th scope="row">Release date</th><td>{isoDate(d.releaseDate)}</td></tr>
@@ -390,5 +414,32 @@ const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
   }
   .count {
     color: var(--c-ink-2);
+  }
+  /* T5.1b play-mode labels under the H1: small soft-blue pills, wrap on phones. */
+  .modes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    list-style: none;
+    margin: 0 0 var(--s-3);
+    padding: 0;
+  }
+  .mode {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: var(--r-pill);
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font: var(--t-small);
+  }
+  .mode::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: var(--c-primary);
   }
 </style>

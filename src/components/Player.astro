@@ -7,11 +7,14 @@ interface Props {
   title: string;
   slug: string;
   developer?: string;
+  /** T5.1b: short play-mode words for the bar ("2 players", "Online"), only confirmed modes. */
+  modes?: string[];
   embedUrl: string;
   aspect: 'landscape' | 'portrait' | 'square';
 }
 
-const { title, slug, developer, embedUrl, aspect } = Astro.props;
+const { title, slug, developer, embedUrl, aspect, modes = [] } = Astro.props;
+const barLine = [developer ? `by ${developer}` : '', ...modes].filter(Boolean).join(' · ');
 const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Problem with ${title} (${slug})`)}`;
 ---
 <section class="player" aria-label={`Play ${title}`} data-player data-slug={slug} data-title={title} data-embed={embedUrl} data-aspect={aspect}>
@@ -35,7 +38,7 @@ const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Prob
     <img class="bar-icon" src={`/thumbs/${slug}/s.webp`} alt="" width="150" height="150" decoding="async" />
     <div class="bar-text">
       <p class="bar-title">{title}</p>
-      {developer && <p class="bar-dev">by {developer}</p>}
+      {barLine && <p class="bar-dev">{barLine}</p>}
     </div>
     <div class="bar-actions">
       <button type="button" class="icon-btn" aria-label="Favourite" title="Favourite" aria-pressed="false" data-fav>

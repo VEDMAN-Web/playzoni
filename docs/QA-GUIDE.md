@@ -17,6 +17,13 @@ Play on a **phone** and on a **computer**. On each one:
 - Do the controls work? Write them down in your own words.
 - Does anything break, freeze or look wrong? Write it in "issues".
 
+Then answer three questions about **how** the game can be played (write `true` or `false` in `playModes`):
+
+- **localTwoPlayer**: Open the game's menu. Is there a "2 Players", "Local" or "VS" button that lets two people play on the same screen or keyboard? 
+- **onlineMultiplayer**: Do you play against or with other real people over the internet (for example names of other players, "searching for players", a room list)?
+- **inviteLink**: Can you invite a friend yourself, with a link, a room code or a "Play with friends" button?
+- Optional **coOp**: add `"coOp": true` only if two or more players are on the **same team** (they help each other).
+
 ## 3. Fill the file
 
 1. In the project folder, run `npm run qa:new -- <slug>`. This makes `data/qa/<slug>.json`.
@@ -40,6 +47,7 @@ Only a game with "publish" can go live.
   "worksMobile": true,
   "worksDesktop": true,
   "orientation": "landscape",
+  "playModes": { "localTwoPlayer": true, "onlineMultiplayer": false, "inviteLink": false },
   "loadSeconds": 4,
   "controlsDesktop": "Click and hold to aim, release to shoot.",
   "controlsMobile": "Touch and drag to aim, lift your finger to shoot.",

@@ -8,12 +8,22 @@ export const QA_ORIENTATIONS = ['landscape', 'portrait', 'either'] as const;
 
 const text = (label: string): z.ZodString => z.string().trim().min(1, `${label} is empty`);
 
+// T5.1b: how the game can be played. Each answer is true or false; coOp (players on the same team) is optional.
+export const PlayModesSchema = z.object({
+  localTwoPlayer: z.boolean(),
+  onlineMultiplayer: z.boolean(),
+  inviteLink: z.boolean(),
+  coOp: z.boolean().optional(),
+});
+export type PlayModes = z.infer<typeof PlayModesSchema>;
+
 export const QaNotesSchema = z.object({
   tester: text('tester'),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'date must be YYYY-MM-DD'),
   worksMobile: z.boolean(),
   worksDesktop: z.boolean(),
   orientation: z.enum(QA_ORIENTATIONS),
+  playModes: PlayModesSchema,
   loadSeconds: z.number().min(0).max(120),
   controlsDesktop: text('controlsDesktop'),
   controlsMobile: text('controlsMobile'),

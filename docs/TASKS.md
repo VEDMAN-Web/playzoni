@@ -249,7 +249,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: guide ≤ 1 page, example valid against a zod schema used by validate.
 
 ### T5.1b — Play modes (local 2-player, online, invite link)
-- status: todo · deps: T5.1 · model: haiku · docs: SEO-PLAN §Schema, DESIGN §Content blocks
+- status: done (planner, 11 Nov 2026 — labels shown under the H1 and as a short line in the player bar, not as pills inside the bar: the bar is full at 1024px and its height is fixed in the grid) · deps: T5.1 · model: haiku · docs: SEO-PLAN §Schema, DESIGN §Content blocks
 - Do:
   1. QA notes schema (`scripts/qa/schema.ts`) gets a required `playModes` object: `localTwoPlayer` (two people on one screen/keyboard), `onlineMultiplayer` (plays with other people over the internet), `inviteLink` (the game itself lets you invite a friend with a link or room code) — each `true`/`false`. Update `npm run qa:new` template, the example, and `docs/QA-GUIDE.md` with one plain sentence per question ("Open the game's menu. Is there a 2 Players or Local button? …").
   2. Game frontmatter gets the same optional `playModes` (copied from the QA file when the game page is written).

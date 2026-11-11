@@ -51,6 +51,19 @@ try {
   for (const rule of ['qa-missing', 'word-count']) {
     expect(real.some((e) => e.includes(`: ${rule}:`)), `non-sample game should report ${rule}, got: ${real.join(' | ')}`);
   }
+
+  // 4. T5.1b: a real game in two-player-games without a local 2-player or invite-link play mode must fail.
+  const nonSample = sample.replace(/^sample: .*\n/m, '').replace(/^slug: .*$/m, 'slug: "sample-game-99"');
+  const twoPlayer = nonSample.replace(/^categories:\n(  - .*\n)+/m, 'categories:\n  - "two-player-games"\n');
+  writeFileSync(join(gamesDir, 'sample-game-99.md'), twoPlayer);
+  const modes = validateContent(paths).filter((e) => e.startsWith('games/sample-game-99.md:'));
+  expect(modes.some((e) => e.includes(': play-mode-category:')), `two-player game without playModes should report play-mode-category, got: ${modes.join(' | ')}`);
+  writeFileSync(
+    join(gamesDir, 'sample-game-99.md'),
+    twoPlayer.replace(/^status: /m, 'playModes:\n  localTwoPlayer: true\n  onlineMultiplayer: false\n  inviteLink: false\nstatus: '),
+  );
+  const fixed = validateContent(paths).filter((e) => e.startsWith('games/sample-game-99.md:') && e.includes(': play-mode-category:'));
+  expect(fixed.length === 0, `a two-player game with localTwoPlayer true passes the play-mode rule, got: ${fixed.join(' | ')}`);
 } finally {
   rmSync(tmp, { recursive: true, force: true });
 }

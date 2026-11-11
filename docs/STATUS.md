@@ -5,7 +5,7 @@ Updated by the build agent after every task. The reviewer reads this first.
 - Last updated: 12 Nov 2026
 - Phase: P done (TP.1–TP.7, R18–R29). Phase 5 next: T5.1b (R20), then the Phase 5 tasks
 - Preview URL: — (after T5.5)
-- Next task: T5.1b (play modes, Haiku), then T5.2 (test the 32 easy games from R29 first) when games are published. Planner: Q17 (player bar vs exact 7x4 / 9x5 block), Lighthouse on the new game page.
+- Next task: TS.1 (owner types the /plugin installs), R38 (/graphify .), then T5.2 (test the 32 easy games from R29 first) when games are published. Planner: Q17 (player bar vs exact 7x4 / 9x5 block), Lighthouse on the new game page.
 
 ## Current task
 (none — Phase P finished)
@@ -13,6 +13,7 @@ Updated by the build agent after every task. The reviewer reads this first.
 ## Log (newest first)
 | Date | Task | What changed (files) | How verified | Left open |
 |---|---|---|---|---|
+| 11 Nov 2026 | T5.1b (planner, overnight) | scripts/qa/schema.ts (`playModes` required: localTwoPlayer, onlineMultiplayer, inviteLink, optional coOp), data/qa/_template.json, docs/QA-GUIDE.md (one plain question per mode + example), src/content.config.ts (optional `playModes`), src/pages/game/[slug].astro (labels under the H1, "Play modes" info row, VideoGame `playMode`), src/components/Player.astro (bar line "by Dev · 2 players · Online"), scripts/validate/content.ts (two-player-games needs local 2-player or invite link; multiplayer/io needs online — published non-sample games), scripts/test-validate.ts | Temporary all-true test on one draft (reverted): 3 labels + bar line + JSON-LD SinglePlayer/MultiPlayer at 390 and 1280, no horizontal scroll; validate catches a two-player game without modes; `npm run check` passes | Labels sit under the H1, not inside the bar (bar full at 1024px) |
 | 11 Nov 2026 | R32 + R39 (planner, overnight) | src/lib/mosaic.ts (last 32 mosaic tiles always S, first 8 kept), src/lib/mosaic-fit.ts (`fillersNeeded`), src/components/GameGrid.astro (`fillers` prop, hidden filler tiles, fit script shows just enough, blocks measured as at least 1×1), src/pages/[category]/[...page].astro (32 popular games from other categories as fillers on page 1), tests | Playwright hole count = 0 on home, car, puzzle, action, sports, a game page at 1024/1280/1536/1920; car at 360/390/768; no horizontal scroll; `npm run check` passes | — |
 | 12 Nov 2026 | R32 (partly) | src/lib/mosaic-fit.ts (new: re-runs the browser's dense placement; hides up to one row of trailing tiles while the bottom row has holes), src/components/GameGrid.astro (script measures mosaic grids on load and on resize), scripts/test-mosaic-fit.ts in `npm run validate` | Browser, drafts on, count of empty cells in the bottom row: home 1280: 0; home 1536: 11; home 1920: 9; /action-games 1280/1536/1920: 0/0/0; /car-games: 8/12/11; /puzzle-games 1280/1536/1920: 0/11/0 | Not full everywhere (see R32). Nothing else changed |
 | 12 Nov 2026 | R33 | src/lib/category-image.ts (categoryPictures: nav order, no game used twice), home, /categories and category pages, scripts/test-tp6.ts | 19 of 19 pictures on /categories are different; `npm run check` passes | R32 (ragged last row of the mosaic) is still open |

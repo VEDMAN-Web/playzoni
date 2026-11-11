@@ -123,7 +123,21 @@ export function validateContent(paths: ContentPaths): string[] {
       .join('\n');
     checkBanned(file, text);
 
-    if (sample) continue; // samples skip the QA, word-count and feed-overlap checks
+    if (sample) continue; // samples skip the QA, word-count, play-mode and feed-overlap checks
+
+    // T5.1b: 2-player and multiplayer categories must match the tested play modes.
+    const modes = asObject(data.playModes);
+    const hasModes = data.playModes !== undefined;
+    const twoPlayerOk = modes.localTwoPlayer === true || modes.inviteLink === true;
+    const onlineOk = modes.onlineMultiplayer === true;
+    if (categories.includes('two-player-games') && !twoPlayerOk) {
+      add(file, 'play-mode-category', hasModes ? 'in two-player-games but playModes has no local 2-player or invite link' : 'in two-player-games but has no playModes');
+    }
+    for (const c of ['multiplayer-games', 'io-games']) {
+      if (categories.includes(c) && !onlineOk) {
+        add(file, 'play-mode-category', hasModes ? `in ${c} but playModes.onlineMultiplayer is not true` : `in ${c} but has no playModes`);
+      }
+    }
 
     checkRange(file, 'word-count', 'body word count', countWords(body), GAME_BODY_WORDS);
     const qaFile = join(paths.qaDir, `${slug}.json`);
