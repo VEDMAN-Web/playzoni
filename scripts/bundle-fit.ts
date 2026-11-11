@@ -18,7 +18,7 @@ const result = await build({
 });
 const code = result.outputFiles[0].text;
 if (process.argv.includes('--check')) {
-  if (!existsSync(OUT) || readFileSync(OUT, 'utf8') !== code) {
+  if (!existsSync(OUT) || readFileSync(OUT, 'utf8').split('\r\n').join('\n') !== code) {
     console.error('fit-bundle: public/mosaic-fit.js is out of date. Run `npm run fit:bundle`.');
     process.exit(1);
   }
