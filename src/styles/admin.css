@@ -1176,3 +1176,32 @@ body.adm {
     display: grid;
   }
 }
+
+/* R50: the screen's Save buttons move to the sticky top bar (src/admin/top-save.ts). */
+.adm-save-moved {
+  display: none !important;
+}
+.adm-top-save {
+  min-height: 44px;
+  gap: var(--s-1);
+  white-space: nowrap;
+}
+.adm-dirty-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c-accent);
+}
+.adm-top-save-note {
+  font: var(--t-small);
+  color: var(--c-ink-2);
+  white-space: nowrap;
+}
+.adm-top-save-note.is-error {
+  color: var(--c-accent-2);
+}
+@media (max-width: 599px) {
+  .adm-top-save-note {
+    display: none;
+  }
+}

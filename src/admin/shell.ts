@@ -2,6 +2,7 @@
 // browser), links that keep the chosen range, the signed-in user menu, the demo banner, and the game finder.
 import { ApiError, getMe, staticJson } from './api';
 import { label, presetDays, readState, saveState, type RangeState } from './range';
+import { startTopSave } from './top-save';
 
 export const RANGE_EVENT = 'adm:range';
 
@@ -180,4 +181,5 @@ export function startShell(): void {
   syncLinks();
   void wireUser();
   void wireFind();
+  startTopSave();
 }

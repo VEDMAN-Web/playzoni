@@ -8,6 +8,7 @@ import { ApiError, apiGet, apiPost, can, getMe, staticJson, type Me } from './ap
 import { LANGS, rowId, sortable } from './controls';
 import { field, showSaveResult } from './forms';
 import { el, empty, errorBox, skeleton } from './render';
+import { DIRTY_EVENT } from './top-save';
 
 interface Game {
   slug: string;
@@ -65,12 +66,15 @@ export async function startHomeFeed(root: HTMLElement): Promise<void> {
   const viewToggle = el('button', { class: 'adm-btn', type: 'button', 'aria-pressed': 'false' }, 'List view');
   let rows: ReturnType<typeof sortable> | null = null;
 
+  // R50: tell the top Save button that something changed (this screen has no form fields).
+  const changed = (): void => void save.dispatchEvent(new CustomEvent(DIRTY_EVENT, { bubbles: true }));
   const isPinned = (i: number): boolean => pins.some((p) => p.i === i);
   const shown = (): string[] => shownSlots(built, pins);
 
   // Pin `slug` to slot `i` (one slot per game, one game per slot). The game that was in the slot goes where `slug` was.
   function assign(i: number, slug: string): void {
     pins = cleanPins([...pins.filter((p) => p.slug !== slug && p.i !== i), { i, slug }]);
+    changed();
   }
   // Swap what two slots show; both become pins.
   function swap(a: number, b: number): void {
@@ -217,14 +221,22 @@ export async function startHomeFeed(root: HTMLElement): Promise<void> {
   }
 
   search.addEventListener('input', drawFound);
+  lang.setAttribute('data-no-dirty', '');
   lang.addEventListener('change', () => void load());
+  // Row order changes (up/down buttons, drag and drop) do not fire input events.
+  rowsBox.addEventListener('click', (e) => {
+    if (e.target instanceof Element && e.target.closest('button')) changed();
+  });
+  rowsBox.addEventListener('drop', () => changed());
   unpin.addEventListener('click', () => {
     if (selected === null) return;
     pins = pins.filter((p) => p.i !== selected);
+    changed();
     draw();
   });
   reset.addEventListener('click', () => {
     pins = [];
+    changed();
     note = '';
     draw();
   });
