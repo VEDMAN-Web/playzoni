@@ -1,0 +1,14 @@
+---
+// Admin screen: Banners and notices (docs/ADMIN.md §5).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Banners and notices" screen="banners">
+  <p class="adm-intro">A notice bar, a maintenance message and dated banners. They appear at the bottom of the page, so nothing on the page moves.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { startBanners } from '../../admin/controls';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) void startBanners(root);
+</script>

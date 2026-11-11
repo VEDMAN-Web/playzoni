@@ -1,0 +1,14 @@
+---
+// Admin screen: Settings (docs/ADMIN.md §5).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Settings" screen="settings">
+  <p class="adm-intro">Feature flags, measurement, data retention and language rules.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { startSettings } from '../../admin/controls';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) void startSettings(root);
+</script>

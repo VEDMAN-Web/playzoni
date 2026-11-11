@@ -29,6 +29,24 @@ export function rateLimited(key: string, now: number): boolean {
   return b.n > LIMIT;
 }
 
+// "Measurement" switch in admin Settings (cached per isolate for 60 seconds).
+let trackingCache: { at: number; on: boolean } | null = null;
+async function trackingOn(db: D1Database, now: number): Promise<boolean> {
+  if (trackingCache && now - trackingCache.at < 60000) return trackingCache.on;
+  let on: boolean;
+  try {
+    const row = await db.prepare("SELECT value FROM settings WHERE key = 'tracking'").first<{ value: string }>();
+    on = row ? (JSON.parse(row.value) as { enabled?: boolean }).enabled !== false : true;
+  } catch {
+    on = true;
+  }
+  trackingCache = { at: now, on };
+  return on;
+}
+export const resetTrackingCache = (): void => {
+  trackingCache = null;
+};
+
 const empty = (status = 204): Response => new Response(null, { status, headers: { 'cache-control': 'no-store' } });
 
 export async function collect(request: Request, db: D1Database, now = Date.now()): Promise<Response> {
@@ -48,6 +66,7 @@ export async function collect(request: Request, db: D1Database, now = Date.now()
     return json({ error: 'not JSON' }, 400);
   }
 
+  if (!(await trackingOn(db, now))) return empty();
   const { device, os, browser } = parseUa(ua);
   const region = typeof cf.region === 'string' && cf.region.length <= 60 ? cf.region : null;
   const checked = checkBatch(body, { country, region, device, os, browser }, now);

@@ -161,7 +161,16 @@ export async function runRollup(db: D1Database, mode: RollupMode, now = Date.now
 
   const from = addDays(today, -(RETENTION_DAYS + 1));
   await db.batch(retentionStatements(db, from));
-  const cutoff = addDays(today, -RAW_DAYS);
+  // Raw data is kept 90 days unless the Owner chose 30 or 60 in Settings.
+  let rawDays = RAW_DAYS;
+  try {
+    const row = await db.prepare("SELECT value FROM settings WHERE key = 'retention'").first<{ value: string }>();
+    const n = row ? Number((JSON.parse(row.value) as { rawDays?: number }).rawDays) : RAW_DAYS;
+    if ([30, 60, 90].includes(n)) rawDays = n;
+  } catch {
+    rawDays = RAW_DAYS;
+  }
+  const cutoff = addDays(today, -rawDays);
   await db.batch([
     db.prepare('DELETE FROM events WHERE day < ?').bind(cutoff),
     db.prepare('DELETE FROM sessions WHERE day < ?').bind(cutoff),

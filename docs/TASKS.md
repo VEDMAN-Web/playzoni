@@ -500,7 +500,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Do: GitHub App (owner creates, planner guides), commits to `dev` only, same zod validation as the build, audit log entry per save.
 - Done when: an edit in admin produces one commit on `dev` that passes `npm run check`.
 ### T10.9 — Instant controls: `/api/config`, home layout, game flags, banners, settings
-- status: todo · deps: T10.5 · model: **sonnet** · docs: ADMIN §2 (instant), §5 (6, 14, 15)
+- status: partial (tile sizes and category tile position not built: index.astro belongs to the planner) · deps: T10.5 · model: **sonnet** · docs: ADMIN §2 (instant), §5 (6, 14, 15)
 - Do: site reads `/api/config` (edge cache 60 s) and applies hero order, hidden games, featured, row order per language, banners/notices, feature flags; JS-off pages keep the built defaults; replaces hand-edited `popularity` for the hero list (keep `popularity` as fallback).
 - Done when: changing the hero order in admin changes the live preview within ~1 min without a rebuild; no CLS.
 ### T10.10 — Search insights, Acquisition, Engagement screens

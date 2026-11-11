@@ -123,7 +123,15 @@ async function runRollup(db, mode, now = Date.now(), days) {
   if (mode !== "nightly") return { days: list, retentionFrom: null, purgedBefore: null };
   const from = addDays(today, -(RETENTION_DAYS + 1));
   await db.batch(retentionStatements(db, from));
-  const cutoff = addDays(today, -RAW_DAYS);
+  let rawDays = RAW_DAYS;
+  try {
+    const row = await db.prepare("SELECT value FROM settings WHERE key = 'retention'").first();
+    const n = row ? Number(JSON.parse(row.value).rawDays) : RAW_DAYS;
+    if ([30, 60, 90].includes(n)) rawDays = n;
+  } catch {
+    rawDays = RAW_DAYS;
+  }
+  const cutoff = addDays(today, -rawDays);
   await db.batch([
     db.prepare("DELETE FROM events WHERE day < ?").bind(cutoff),
     db.prepare("DELETE FROM sessions WHERE day < ?").bind(cutoff)

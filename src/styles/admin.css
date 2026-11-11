@@ -466,6 +466,7 @@ body.adm {
 
 .adm-grid {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--s-4);
 }
 .adm-grid > .adm-card + .adm-card {
@@ -705,6 +706,7 @@ body.adm {
 
 .adm-form {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--s-4);
 }
 .adm-form-row {
@@ -735,6 +737,7 @@ body.adm {
 /* Sortable list (home layout): drag handle + up/down buttons for keyboards. */
 .adm-sortable {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--s-2);
   margin: 0;
   padding: 0;

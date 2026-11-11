@@ -4,6 +4,7 @@ import brand from '../../data/brand.json';
 import nunitoUrl from '@fontsource-variable/nunito/files/nunito-latin-wght-normal.woff2?url';
 import Seo from '../components/Seo.astro';
 import Tracking from '../components/Tracking.astro';
+import AdminConfig from '../components/AdminConfig.astro';
 
 interface Props {
   title: string;
@@ -23,6 +24,8 @@ const { title, description, canonicalPath, ogImage, noindex, mainClass, preconne
 const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
 // Phase 10 (docs/ADMIN.md): our own anonymous measurement. Off by default.
 const trackingEnabled = import.meta.env.PUBLIC_TRACKING_ENABLED === 'true';
+// The admin's instant settings (hero order, hidden games, banners). Off by default.
+const adminConfigEnabled = import.meta.env.PUBLIC_ADMIN_CONFIG_ENABLED === 'true';
 ---
 <!doctype html>
 <html lang="en">
@@ -68,5 +71,6 @@ const trackingEnabled = import.meta.env.PUBLIC_TRACKING_ENABLED === 'true';
       applyPlayedBadges();
     </script>
     {trackingEnabled && <Tracking />}
+    {adminConfigEnabled && <AdminConfig />}
   </body>
 </html>

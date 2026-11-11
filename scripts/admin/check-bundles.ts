@@ -12,16 +12,15 @@ const DIST = join(ROOT, 'dist');
 const TRACK_LIMIT = 3 * 1024;
 const errors: string[] = [];
 
-const out = await build({
-  entryPoints: [join(ROOT, 'src', 'lib', 'track.ts')],
-  bundle: true,
-  minify: true,
-  format: 'esm',
-  target: 'es2022',
-  write: false,
-});
-const gz = gzipSync(out.outputFiles[0].contents).length;
+async function gzSize(file: string): Promise<number> {
+  const out = await build({ entryPoints: [join(ROOT, 'src', 'lib', file)], bundle: true, minify: true, format: 'esm', target: 'es2022', write: false });
+  return gzipSync(out.outputFiles[0].contents).length;
+}
+const gz = await gzSize('track.ts');
 if (gz > TRACK_LIMIT) errors.push(`track.ts is ${gz} bytes gzipped, the limit is ${TRACK_LIMIT}`);
+// The instant-settings applier (T10.9) has the same small budget.
+const gzConfig = await gzSize('admin-config.ts');
+if (gzConfig > TRACK_LIMIT) errors.push(`admin-config.ts is ${gzConfig} bytes gzipped, the limit is ${TRACK_LIMIT}`);
 
 function htmlFiles(dir: string): string[] {
   const list: string[] = [];
@@ -77,4 +76,4 @@ if (errors.length) {
   for (const e of errors) console.error(`check-bundles: ${e}`);
   process.exit(1);
 }
-console.log(`check-bundles: ok (track.ts ${gz} B gzipped; ${publicChunks.size} public chunks clean; ${adminPages} admin pages)`);
+console.log(`check-bundles: ok (track.ts ${gz} B, admin-config.ts ${gzConfig} B gzipped; ${publicChunks.size} public chunks clean; ${adminPages} admin pages)`);

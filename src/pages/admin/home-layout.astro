@@ -1,0 +1,14 @@
+---
+// Admin screen: Home layout (docs/ADMIN.md §5).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Home layout" screen="home-layout">
+  <p class="adm-intro">Hero order and home rows, per language. Saving is instant: the home page changes within about a minute, no rebuild.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { startHomeLayout } from '../../admin/controls';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) void startHomeLayout(root);
+</script>
