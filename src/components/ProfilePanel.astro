@@ -6,6 +6,8 @@ import '../styles/client-tiles.css';
 // numbers, a row of recently played games with "Played today"-style labels, favourites, and a "Clear my history" link
 // with a confirmation inside the panel. The panel is filled by the script below when it opens; without JavaScript the
 // profile buttons are plain links to /favourites.
+// "Do not measure me" (docs/ADMIN.md §3): shown only when our own measurement is turned on. Wired by Tracking.astro.
+const trackingEnabled = import.meta.env.PUBLIC_TRACKING_ENABLED === 'true';
 ---
 <div class="backdrop" data-profile-backdrop></div>
 <aside id="profile-panel" class="panel" role="dialog" aria-modal="true" aria-label="Your games" aria-hidden="true" data-profile-panel>
@@ -64,6 +66,17 @@ import '../styles/client-tiles.css';
         </div>
       </div>
     </div>
+
+    {trackingEnabled && (
+      <div class="privacy">
+        <label class="switch">
+          <input type="checkbox" role="switch" data-no-track />
+          <span class="switch-text">Do not measure me</span>
+        </label>
+        <p class="privacy-note">We count visits without knowing who you are. Turn this on and this device sends nothing.</p>
+        <p class="privacy-note" hidden data-no-track-gpc>Your browser already asks sites not to track you, so nothing is sent.</p>
+      </div>
+    )}
   </div>
 </aside>
 
@@ -290,6 +303,32 @@ import '../styles/client-tiles.css';
     color: var(--c-ink);
     font: 800 14px/20px var(--font-sans);
     cursor: pointer;
+  }
+  .privacy {
+    margin-top: 28px;
+  }
+  .switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    color: var(--c-ink);
+    font: var(--t-small);
+    cursor: pointer;
+  }
+  .switch input {
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    accent-color: var(--c-primary);
+  }
+  .privacy-note {
+    margin: 4px 0 0;
+    color: var(--c-ink-2);
+    font: var(--t-small);
+  }
+  .privacy-note[hidden] {
+    display: none;
   }
   .btn-danger {
     border-color: var(--c-ink);

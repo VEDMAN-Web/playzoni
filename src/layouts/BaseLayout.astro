@@ -3,6 +3,7 @@ import '../styles/global.css';
 import brand from '../../data/brand.json';
 import nunitoUrl from '@fontsource-variable/nunito/files/nunito-latin-wght-normal.woff2?url';
 import Seo from '../components/Seo.astro';
+import Tracking from '../components/Tracking.astro';
 
 interface Props {
   title: string;
@@ -20,6 +21,8 @@ const { title, description, canonicalPath, ogImage, noindex, mainClass, preconne
 
 // Cloudflare Web Analytics beacon only when a token is set (docs/PRD.md §2).
 const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
+// Phase 10 (docs/ADMIN.md): our own anonymous measurement. Off by default.
+const trackingEnabled = import.meta.env.PUBLIC_TRACKING_ENABLED === 'true';
 ---
 <!doctype html>
 <html lang="en">
@@ -64,5 +67,6 @@ const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
       startTilePreview();
       applyPlayedBadges();
     </script>
+    {trackingEnabled && <Tracking />}
   </body>
 </html>

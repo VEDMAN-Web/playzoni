@@ -475,7 +475,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Do: `wrangler.toml` binding for D1 (`DB`) and R2 (`UPLOADS`) — created by the owner in the Cloudflare dashboard with the planner's steps (no wrangler runs on the Windows PC, R12); `migrations/0001_init.sql` with every table in ADMIN §4; `functions/api/_lib/` (db helpers, JSON responses, validation); a migration check script in `npm run check` (SQL parses, tables match ADMIN §4).
 - Done when: migrations apply on the preview D1; check passes.
 ### T10.2 — Tracking script (`src/lib/track.ts`)
-- status: todo · deps: T10.1 · model: **sonnet** · docs: ADMIN §3
+- status: done · deps: T10.1 · model: **sonnet** · docs: ADMIN §3
 - Do: anonymous ID + session ID, batching, sendBeacon every 10 s and on `pagehide`, the event list in ADMIN §3 (tile impressions sampled with IntersectionObserver), engaged time counts only while the tab is visible, opt-out switch in the profile panel, GPC/consent gate. < 3 KB gz.
 - Done when: unit tests for batching/session rules; Lighthouse shows no CLS/LCP change; bundle size checked in `npm run check`.
 ### T10.3 — Collection endpoint `/api/e`
