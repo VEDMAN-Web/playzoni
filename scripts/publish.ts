@@ -1,8 +1,10 @@
-// npm run publish -- --slugs a,b | --file data/launch-list.csv [--date 2026-11-11] [--staging data/staging] [--games-dir src/content/games] [--public-thumbs public/thumbs]
+// npm run publish -- --slugs a,b | --file data/launch-list.csv [--quick true] [--date 2026-11-11] [--staging data/staging] [--games-dir src/content/games] [--public-thumbs public/thumbs]
 // --file reads the `slug` column of a CSV. A slug that is not in staging is logged and skipped (T4.6).
 // Copies staged games into src/content/games as status: draft, with empty text fields for a human to fill,
 // and copies each game's images from <staging>/thumbs/<slug>/ into public/thumbs/<slug>/ (docs/TASKS.md T4.5, Q13).
 // Never overwrites a game page or an image folder, and never publishes: a draft builds no page (docs/PRD.md §10).
+// --quick true (owner, 11 Nov 2026): writes the page as published with `quick: true` and a short generated text instead of
+// empty fields. Quick pages are live for players and noindex until real text replaces them (src/content.config.ts).
 
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -23,6 +25,8 @@ export interface PublishOptions {
   /** YYYY-MM-DD used for addedDate and updatedDate. */
   date: string;
   includeTestFolders?: boolean;
+  /** Category slug -> display name; when set, pages are written as quick published pages. */
+  quickNames?: Record<string, string>;
 }
 
 export interface PublishResult {
@@ -35,7 +39,31 @@ export interface PublishResult {
 // YAML double-quoted strings are JSON strings, so JSON.stringify gives a safe value.
 const quote = (value: string): string => JSON.stringify(value);
 
-export function draftMarkdown(game: StagingGame, date: string): string {
+// "Car Games" -> "car game", "IO Games" -> "IO game": the kind of game, used in the generated quick text.
+export function gameKind(categoryName: string): string {
+  const words = categoryName.replace(/\s*Games?$/i, '').split(' ');
+  return `${words.map((w) => (w === w.toUpperCase() ? w : w.toLowerCase())).join(' ')} game`.trim();
+}
+
+// Short honest text for a quick page: no claims beyond what every game on the site has. The description takes the
+// first option that fits 120 to 155 characters.
+export function quickText(title: string, kind: string): { description: string; intro: string; body: string } {
+  const a = /^[aeiou]/i.test(kind) ? 'an' : 'a';
+  const options = [
+    `Play ${title} free online at Playzoni. ${a[0].toUpperCase()}${a.slice(1)} ${kind} you can play in your browser on phone, tablet or computer, with no download.`,
+    `Play ${title} free online at Playzoni. ${a[0].toUpperCase()}${a.slice(1)} ${kind} that runs in your browser on any device, no download needed.`,
+    `Play ${title} free at Playzoni, ${a} ${kind} in your browser, no download.`,
+  ];
+  const description = options.find((d) => d.length >= 120 && d.length <= 155) ?? options[options.length - 1];
+  return {
+    description,
+    intro: `This is a free ${kind} you can play right here in your browser. It works on phones, tablets and computers, with no download and no sign-up.`,
+    body: `Press Play to start. The game shows its own controls on the first screen, so follow them to learn how to move, score and win.`,
+  };
+}
+
+export function draftMarkdown(game: StagingGame, date: string, quickNames?: Record<string, string>): string {
+  const quick = quickNames ? quickText(game.title, gameKind(quickNames[game.categories[0]] ?? 'Games')) : null;
   const lines: string[] = [
     '---',
     `title: ${quote(game.title)}`,
@@ -57,20 +85,21 @@ export function draftMarkdown(game: StagingGame, date: string): string {
   lines.push(
     `addedDate: ${date}`,
     `updatedDate: ${date}`,
-    `description: ${quote('')}`,
-    `intro: ${quote('')}`,
+    `description: ${quote(quick?.description ?? '')}`,
+    `intro: ${quote(quick?.intro ?? '')}`,
     'controls:',
-    `  desktop: ${quote('')}`,
-    `  mobile: ${quote('')}`,
+    `  desktop: ${quote(quick ? 'Shown on the first screen of the game.' : '')}`,
+    `  mobile: ${quote(quick ? 'Shown on the first screen of the game.' : '')}`,
     'featured: false',
     `popularity: ${game.popularity}`,
-    'status: "draft"',
+    quick ? 'status: "published"' : 'status: "draft"',
+    ...(quick ? ['quick: true'] : []),
     'faq: []',
     '---',
     '',
     `## How to play ${game.title}`,
     '',
-    '',
+    quick?.body ?? '',
     '',
   );
   return `${lines.join('\n')}\n`;
@@ -115,7 +144,7 @@ export function publishDrafts(options: PublishOptions): PublishResult {
     const imageTarget = join(options.publicThumbsRoot, slug);
     mkdirSync(imageTarget, { recursive: true });
     for (const file of IMAGE_FILES) copyFileSync(join(imageSource, file), join(imageTarget, file));
-    writeFileSync(join(options.gamesDir, `${slug}.md`), draftMarkdown(matches[0].game, options.date), { flag: 'wx' });
+    writeFileSync(join(options.gamesDir, `${slug}.md`), draftMarkdown(matches[0].game, options.date, options.quickNames), { flag: 'wx' });
     written.push(slug);
   }
   return { written, skipped, problems };
@@ -124,6 +153,11 @@ export function publishDrafts(options: PublishOptions): PublishResult {
 export { parseArgs };
 
 const todayIso = (): string => new Date().toISOString().slice(0, 10);
+
+function categoryNames(): Record<string, string> {
+  const list = JSON.parse(readFileSync(join(ROOT, 'data', 'categories.json'), 'utf8')) as { slug: string; name: string }[];
+  return Object.fromEntries(list.map((c) => [c.slug, c.name]));
+}
 
 function main(): void {
   const args = parseArgs(process.argv.slice(2));
@@ -136,8 +170,9 @@ function main(): void {
     gamesDir: resolve(ROOT, args['games-dir'] ?? join('src', 'content', 'games')),
     publicThumbsRoot: resolve(ROOT, args['public-thumbs'] ?? join('public', 'thumbs')),
     date: args.date ?? todayIso(),
+    quickNames: args.quick === 'true' ? categoryNames() : undefined,
   });
-  for (const slug of result.written) console.log(`draft written: src/content/games/${slug}.md, images in public/thumbs/${slug}/`);
+  for (const slug of result.written) console.log(`${args.quick === 'true' ? 'quick page' : 'draft'} written: src/content/games/${slug}.md, images in public/thumbs/${slug}/`);
   for (const line of result.skipped) console.log(`skipped: ${line}`);
   for (const problem of result.problems) console.error(`not written: ${problem}`);
   console.log(`publish: ${result.written.length} written, ${result.skipped.length} skipped (not in staging), ${result.problems.length} not written`);

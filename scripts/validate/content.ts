@@ -100,8 +100,13 @@ export function validateContent(paths: ContentPaths): string[] {
 
     const description = asString(data.description);
     const intro = asString(data.intro);
-    noteUnique(file, 'description', description);
-    noteUnique(file, 'intro', intro);
+    // Quick pages (owner, 11 Nov 2026) share a generated text pattern and are noindex, so they skip the duplicate,
+    // FAQ, section, controls, play-mode, word-count, QA and feed checks. Title, description, intro and banned words still apply.
+    const quick = data.quick === true;
+    if (!quick) {
+      noteUnique(file, 'description', description);
+      noteUnique(file, 'intro', intro);
+    }
     if (!published) continue; // drafts only get the structural checks above and the duplicate check
 
     const title = asString(data.title);
@@ -109,21 +114,21 @@ export function validateContent(paths: ContentPaths): string[] {
     checkRange(file, 'description-length', 'description', description.length, DESCRIPTION_RANGE);
     checkRange(file, 'intro-sentences', 'intro sentence count', countSentences(intro), INTRO_SENTENCES);
     const faq = asList(data.faq);
-    checkRange(file, 'faq-count', 'FAQ item count', faq.length, GAME_FAQ);
-
-    for (const section of GAME_SECTIONS) {
-      if (!section.pattern.test(body)) add(file, 'missing-section', `body has no "${section.label}" heading`);
-    }
-
     const controls = asObject(data.controls);
-    if (asString(controls.desktop).trim() === '') add(file, 'missing-field', 'controls.desktop is empty');
-    if (asString(controls.mobile).trim() === '') add(file, 'missing-field', 'controls.mobile is empty');
+    if (!quick) {
+      checkRange(file, 'faq-count', 'FAQ item count', faq.length, GAME_FAQ);
+      for (const section of GAME_SECTIONS) {
+        if (!section.pattern.test(body)) add(file, 'missing-section', `body has no "${section.label}" heading`);
+      }
+      if (asString(controls.desktop).trim() === '') add(file, 'missing-field', 'controls.desktop is empty');
+      if (asString(controls.mobile).trim() === '') add(file, 'missing-field', 'controls.mobile is empty');
+    }
     const text = [title, description, intro, asString(controls.desktop), asString(controls.mobile), body]
       .concat(faq.map((f) => `${asString(asObject(f).q)} ${asString(asObject(f).a)}`))
       .join('\n');
     checkBanned(file, text);
 
-    if (sample) continue; // samples skip the QA, word-count, play-mode and feed-overlap checks
+    if (sample || quick) continue; // samples and quick pages skip the QA, word-count, play-mode and feed-overlap checks
 
     // T5.1b: 2-player and multiplayer categories must match the tested play modes.
     const modes = asObject(data.playModes);

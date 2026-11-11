@@ -5,6 +5,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import GameGrid, { type GridItem } from '../components/GameGrid.astro';
+import ShowMore from '../components/ShowMore.astro';
 import MoreRows from '../components/MoreRows.astro';
 import RecentlyPlayed from '../components/RecentlyPlayed.astro';
 import SeoCard from '../components/SeoCard.astro';
@@ -129,6 +130,7 @@ const faqPage = {
   <Header slot="header" box={false} />
 
   <GameGrid items={mosaicItems} mode="mosaic" navBox={true} xlFirst={true} eagerCount={1} label="Popular and featured games" />
+  <ShowMore />
 
   <RecentlyPlayed />
 

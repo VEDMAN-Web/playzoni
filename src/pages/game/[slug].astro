@@ -128,7 +128,7 @@ try {
 }
 const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
 ---
-<BaseLayout title={title} description={d.description} canonicalPath={`/game/${slug}`} ogImage={ogImage} mainClass="has-grid" preconnect={embedOrigin}>
+<BaseLayout title={title} description={d.description} canonicalPath={`/game/${slug}`} ogImage={ogImage} noindex={d.quick} mainClass="has-grid" preconnect={embedOrigin}>
   <Header slot="header" box={false} />
 
   <GameGrid items={tiles} mode="mosaic" navBox={true} eagerCount={0} priorityFirst={false} label="More games like this">

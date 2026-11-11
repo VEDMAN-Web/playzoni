@@ -37,6 +37,9 @@ const games = defineCollection({
     status: z.enum(['draft', 'published']),
     faq: z.array(z.object({ q: z.string().min(1), a: z.string().min(1) })).max(5).default([]),
     sample: z.boolean().default(false),
+    // Owner, 11 Nov 2026: published without a play test. The page is live for players but noindex (hidden from search
+    // engines) until real text replaces the short generated text; then remove the flag.
+    quick: z.boolean().default(false),
   }),
 });
 

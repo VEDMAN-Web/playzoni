@@ -264,6 +264,12 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Do: write `src/content/categories/<slug>.md` for every category with ≥ 12 published real games, using only published games in "Top" sections. Repeatable task: run again whenever a category reaches 12.
 - Done when: validate passes; each text is original (no shared sentences between categories).
 
+### T5.2c — Quick-publish the planner's top 100 (owner, 11 Nov 2026: "without checking, directly to the live site")
+- status: todo · deps: — · model: haiku · docs: this task
+- The planner chose 100 games from the Playgama catalog that are not on the site yet: `data/launch-list-quick.csv` (catalog rank order, mixed categories, brand copies and horror/romance left out). The code is ready: `publish --quick true` writes them as published with `quick: true` and a short generated text; quick pages are live for players and `noindex` (search engines skip them) until real text replaces it.
+- Do: `npm run publish -- --file data/launch-list-quick.csv --quick true`. A slug "not in staging" is fine (log it in STATUS); for "images missing", run `npm run import:pg` again and repeat the command (it never overwrites). Then `npm run check`.
+- Done when: about 100 quick pages exist, `npm run check` passes, commit `T5.2c: quick-publish top 100` pushed to dev, counts in STATUS.
+
 ### T5.2b — Import ~300 more popular games (owner, 11 Nov 2026)
 - status: todo · deps: — · model: haiku · docs: PRD §Sources, QUESTIONS Q17
 - Do: run `npm run import:gm -- --limit 0` and `npm run import:pg` (if a feed rate-limits, wait and run again; record counts in STATUS). From the games not yet on the site, add **about 300 new drafts**: most played first when the feed gives a play/popularity number, otherwise the feed's own order; skip duplicates of games we already have, games without a phone version, and anything not suitable for children. Include an **open-world / city set** (about 20): city driving, police chase, gangster or sandbox car games, found by title/tags (city, open world, police, gangster, sandbox, car simulator). Never import or link anything using GTA, Rockstar or other brand names we have no licence for. List the open-world set's slugs in STATUS.

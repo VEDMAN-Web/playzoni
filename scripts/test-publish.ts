@@ -93,6 +93,20 @@ function testPublish(tmp: string): void {
   writeFileSync(join(games, 'zorp-blaster.md'), markdown.replace('status: "draft"', 'status: "published"'));
   const publishedErrors = validateContent(paths).filter((e) => e.startsWith('games/zorp-blaster.md')).join(' | ');
   expect(publishedErrors.includes('description-length') && publishedErrors.includes('intro-sentences') && publishedErrors.includes('controls.desktop'), `a published empty game is caught: ${publishedErrors}`);
+
+  // --quick true (owner, 11 Nov 2026): published, quick, generated text that passes the validator without a QA file.
+  const zorp = readStagingGames(staging).find((s) => s.game.slug === 'zorp-blaster');
+  if (zorp) {
+    const quickMd = draftMarkdown(zorp.game, '2026-11-11', { 'action-games': 'Action Games' });
+    const q = parseFrontmatter(quickMd).data;
+    same([q.status, q.quick], ['published', true], 'quick page is published and flagged');
+    expect(String(q.description).length >= 120 && String(q.description).length <= 155, `quick description fits 120 to 155: ${String(q.description)}`);
+    writeFileSync(join(games, 'zorp-blaster.md'), quickMd);
+    const quickErrors = validateContent(paths).filter((e) => e.startsWith('games/zorp-blaster.md'));
+    same(quickErrors, [], 'a quick page passes the content validator without a QA file');
+  } else {
+    expect(false, 'staging fixture zorp-blaster not found for the quick test');
+  }
 }
 
 function testStagingReader(tmp: string): void {
