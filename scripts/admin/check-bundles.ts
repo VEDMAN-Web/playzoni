@@ -54,6 +54,9 @@ let adminPages = 0;
 for (const file of htmlFiles(DIST)) {
   if (isAdmin(file)) {
     adminPages++;
+    const page = readFileSync(file, 'utf8');
+    if (!page.includes('<meta name="robots" content="noindex,nofollow"')) errors.push(`${relative(DIST, file)} is not noindex,nofollow`);
+    if (page.includes('data-pagefind-body')) errors.push(`${relative(DIST, file)} would be in the Pagefind index`);
     continue;
   }
   const html = readFileSync(file, 'utf8');
@@ -64,6 +67,11 @@ for (const chunk of publicChunks) {
   const code = readFileSync(chunk, 'utf8');
   if (code.includes('/api/admin') || /uPlot|uplot/.test(code)) errors.push(`public page loads admin code: ${relative(DIST, chunk)}`);
 }
+
+for (const map of readdirSync(DIST).filter((f) => /^sitemap.*\.xml$/.test(f))) {
+  if (/\/admin(\/|<)/.test(readFileSync(join(DIST, map), 'utf8'))) errors.push(`${map} lists an admin page`);
+}
+if (!/^Disallow: \/admin$/m.test(readFileSync(join(ROOT, 'public', 'robots.txt'), 'utf8'))) errors.push('robots.txt must have "Disallow: /admin"');
 
 if (errors.length) {
   for (const e of errors) console.error(`check-bundles: ${e}`);

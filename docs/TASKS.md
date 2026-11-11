@@ -487,7 +487,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Do: hourly + nightly jobs filling every `daily_*` table and `retention`; delete raw events older than 90 days.
 - Done when: a seeded test day produces the expected rollup numbers (unit test with fixed input).
 ### T10.5 — Admin app shell + Cloudflare Access
-- status: todo · deps: T10.1, Q24 · model: **sonnet** · docs: ADMIN §1, §2, §6
+- status: done · deps: T10.1, Q24 · model: **sonnet** · docs: ADMIN §1, §2, §6
 - Do: `admin/` Astro app (separate Pages project `admin.playzoni.com`), sidebar/top bar/date-range picker per ADMIN §6, Access JWT check middleware for `/api/admin/*`, `team` roles, sign-out. Owner sets up Access with the planner's steps.
 - Done when: only allowed emails get in; role limits enforced server-side; layout pixel-matches the approved design at 390/1280/1440.
 ### T10.6 — Dashboard + Realtime screens

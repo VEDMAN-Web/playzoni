@@ -28,6 +28,8 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
+      // The admin panel (docs/ADMIN.md §2) is never in the sitemap.
+      filter: (page) => !/^https?:\/\/[^/]+\/admin(\/|$)/.test(page),
       // noindex pages are removed after the build by scripts/sitemap-check.ts, which reads the
       // robots meta of each built page (the source of truth for what is indexable).
       serialize(item) {
