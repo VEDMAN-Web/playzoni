@@ -5,7 +5,7 @@ You are building **playzoni.com**: a free browser-games website in the style of 
 Owner: Vedant Paliwal (SparkBeta Tech). He is non-technical. Any message you write for him must be short, plain English, one step at a time.
 
 ## Read order (every session)
-1. This file.
+1. This file. Then `docs/RELAY.md` if it exists: it is the planner's current instruction set and comes first.
 2. `docs/REVIEW.md` — notes from the reviewer (senior model / Vedant). Fix every item marked `open` **before** starting a new task.
 3. `docs/STATUS.md` — where the work stands.
 4. `docs/TASKS.md` — pick the first task whose status is `todo` and whose dependencies are `done`.

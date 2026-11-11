@@ -282,7 +282,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: validate passes for the batch. Repeat until 300.
 
 ### T5.4 — Production switch
-- status: todo · deps: T5.3 (first 300) · model: haiku
+- status: todo · deps: — (planner, 12 Nov 2026: the first-300 dependency is dropped, see RELAY R2) · model: haiku
 - Do: set `PUBLIC_INCLUDE_SAMPLES` off for production builds, delete `/sample-game.html` from production output, confirm no `sample: true` page builds in production, final `npm run check`.
 - Done when: production build has 0 sample pages.
 
