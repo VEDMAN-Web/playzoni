@@ -7,12 +7,15 @@
 interface Props {
   label?: string;
   wide?: boolean;
+  /** Slug of a game: its picture sits at the left of the card text (owner, 12 Nov 2026: "thumbnail missing"). */
+  picture?: string;
 }
 
-const { label = 'About this page', wide = false } = Astro.props;
+const { label = 'About this page', wide = false, picture } = Astro.props;
 ---
 <section class="seo-card" aria-label={label}>
   <div class:list={['seo-inner', { wide }]}>
+    {picture && <img class="seo-pic" src={`/thumbs/${picture}/m.webp`} width="140" height="140" alt="" loading="lazy" decoding="async" />}
     <slot />
   </div>
 </section>
@@ -36,6 +39,22 @@ const { label = 'About this page', wide = false } = Astro.props;
   .seo-inner {
     max-width: 860px;
     margin: 0 auto;
+  }
+  /* A game picture at the left of the text; the text wraps beside it. */
+  .seo-pic {
+    float: left;
+    width: 96px;
+    height: 96px;
+    margin: 0 var(--s-4) var(--s-3) 0;
+    border-radius: var(--r-tile-l);
+    box-shadow: var(--sh-tile);
+    object-fit: cover;
+  }
+  @media (min-width: 768px) {
+    .seo-pic {
+      width: 140px;
+      height: 140px;
+    }
   }
   .seo-inner.wide {
     max-width: 1200px;

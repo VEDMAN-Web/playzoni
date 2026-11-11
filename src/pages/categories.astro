@@ -24,6 +24,8 @@ const crumbs = [
 const games = await getPublishedGames();
 const published = publishedCategoriesFrom(games);
 const pictures = categoryPictures(games, published);
+// A good-looking picture for the About card: the most popular game on the site.
+const cardPicture = [...games].sort((a, b) => b.data.popularity - a.data.popularity)[0]?.data.slug;
 const items: GridItem[] = published.map((c) => ({
   kind: 'category',
   slug: c.slug,
@@ -53,7 +55,7 @@ const jsonLd = [
 
   {items.length === 0 && <p class="empty">Categories appear here once they have 12 games.</p>}
 
-  <SeoCard label="About the categories">
+  <SeoCard label="About the categories" picture={cardPicture}>
     <h2>About the categories</h2>
     <p>
       Pick a category to see its games. Each category shows how many games it has. Every game is free and plays in your browser.
