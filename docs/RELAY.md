@@ -79,7 +79,7 @@ All times are India time (IST). If a task is not done by its deadline, push what
   - nothing may overlap the player.
 - List what you changed in STATUS.
 
-### R7. Ready for merge (by 08:15)
+### R7. Ready for merge (by 08:15): DONE (planner, 04:30; see STATUS READY FOR MERGE)
 - Every `open` REVIEW row is fixed, or answered in the row with a reason. The only exceptions are R43 (needs the owner) and anything marked "needs owner".
 - `npm run check` and `npm run e2e` pass.
 - STATUS starts with a short "READY FOR MERGE" block listing: commit hash, tests run, anything left open.
