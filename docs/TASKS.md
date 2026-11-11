@@ -301,6 +301,27 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Do (planner, with Playwright in the cloud on the preview URL): every page type (home, each category incl. paged, every game page, new/popular/all-games/categories, search panel + search page, favourites, profile panel, about/contact/developers/privacy/terms/cookies, 404) at 360, 390, 768, 1280, 1536, 1920: no horizontal scroll, no console errors, no broken links/images, Play loads the game iframe (desktop) and the overlay (phone), endless rows load, fuzzy search returns results + popular fallback, played badges after a play, favourites and profile work, JS-off pages readable, noindex/canonical/hreflang/JSON-LD present. Report `docs/seo-reports/<date>-e2e.md`; fixes go to REVIEW.
 - Done when: report saved and every failure is a REVIEW row.
 
+
+### T5.8 — Game page background in the game's colours (owner, 12 Nov 2026: "the background changed and looked like the game")
+- status: todo · deps: — · model: haiku · docs: DESIGN §Colours
+- Do: `scripts/theme-colors.ts` (`npm run theme:colors`): for every game, read `public/thumbs/<slug>/m.webp` with sharp (already approved), take 2 colours (the dominant colour and the average of the bottom half), soften them (mix 35% white, keep saturation under 70%) and write them to `data/game-colors.json` as `{ slug: [from, to] }`. The import (`publish`) runs it for new games. The game page sets `--page-from` / `--page-to` from that file on `<main>` so the page gradient behind the player and tiles uses the game's colours; cards stay white, text contrast unchanged (≥ 4.5:1). Missing entry: normal site gradient.
+- Done when: 5 game pages with very different thumbnails show matching backgrounds (screenshots in `docs/screens/T5.8/` at 390 and 1280); built HTML has the colours inline (works with JS off); no CLS.
+- Always: mobile-first (360px+); no layout shift; design tokens; pages readable with JS off; no long dashes; `npm run check` passes; check at 360/390/768/1280.
+
+### T5.9 — Hover previews: our own gameplay screenshots (owner: "on hover it plays how the game is played")
+- status: todo · deps: — · model: **sonnet** · docs: DESIGN §V2.8 (hover preview: video, else screenshots cross-fade, else zoom)
+- The feeds give no preview videos, so we make our own. Do: `scripts/record-previews.ts` (`npm run previews -- --slugs a,b | --top 120`): Playwright (approved dev tool) opens each live game's `embedUrl` at 1280x720, waits for the game (up to 25 s), clicks the centre and presses Space/arrow keys a few times, then takes 6 screenshots 1.5 s apart; keeps the 4 best (skip frames that are mostly one colour, a loading bar or an ad: low colour variance or "Ad"/"Skip"/"Loading" text in the page); crops the centre square, resizes with sharp to 300x300 WebP (quality 70, < 25 KB each) into `public/thumbs/<slug>/p1.webp…p4.webp`; writes `screenshots:` into the game's frontmatter. Never hotlink. Then make sure GameTile plays the cross-fade on hover (desktop only, 900 ms, loaded only on hover, off with prefers-reduced-motion).
+- Later (needs a yes for ffmpeg, Q31): short muted `preview.mp4` clips (4 s, 300 px, < 300 KB) recorded the same way; the tile prefers the video when present.
+- Done when: the top 120 live games have 2 to 4 good screenshots each (spot-check 20 in `docs/screens/T5.9/`), hovering a tile cross-fades them, page weight before hover unchanged (Lighthouse), mobile shows no hover effect.
+- Always: mobile-first (360px+); no layout shift; design tokens; pages readable with JS off; no long dashes; `npm run check` passes; check at 360/390/768/1280.
+
+### T5.10 — "Your games" at the top of the home feed (owner: Poki shows the games you played at the top)
+- status: todo · deps: — · model: haiku · docs: DESIGN §V2.8 (played badge), `src/components/RecentlyPlayed.astro`
+- How Poki does it: a list of played games saved in the browser (localStorage, like a cookie but never sent to a server). We already save the same list for the "Recently played" row.
+- Do: on the home page, after load, fill the first small tiles of the mosaic (after the big tiles and any admin-pinned slots from T10.17) with the visitor's last played games, newest first, up to 6, by swapping tile contents (same method as `admin-config.ts`, so nothing moves). Each swapped-out game takes the place where the played game was, so no game disappears and none shows twice. Played badge on them. First visit: nothing changes. Add a "Clear" link in the profile panel (already clears history).
+- Done when: Playwright test: play 3 games, return home → those 3 are the first small tiles at 390 and 1280, no duplicates, CLS 0, JS off unchanged.
+- Always: mobile-first (360px+); no layout shift; design tokens; pages readable with JS off; no long dashes; `npm run check` passes; check at 360/390/768/1280.
+
 ---
 ## Phase 6 — Ads (after AdSense approval)
 
@@ -356,6 +377,18 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - status: todo · deps: Q20 · model: haiku · docs: SEO-INTL §4, §5
 - Do: update `public/robots.txt` per the Q20 answer (search/answer bots allowed; training bots per answer); add `public/llms.txt` (site name, one-line description, links to home, categories, new, popular, about, per language once live).
 - Done when: robots.txt validates (no blocked Googlebot/Bingbot/YandexBot/OAI-SearchBot/Claude-SearchBot/PerplexityBot); llms.txt reachable.
+
+### T8.9 — Game names in each language + language picker in the header (owner, 12 Nov 2026: a Russian searching "крестики-нолики онлайн" must find our tic-tac-toe)
+- status: todo · deps: T8.1, T12.1 · model: **sonnet** · docs: SEO-INTL §3, §6; I18N v2
+- Why: people search the **local name of the game type** ("крестики-нолики", "jogo da velha", "tres en raya", "Drei gewinnt" is wrong: German uses "Tic-Tac-Toe"; always check), not our English title. Classic game types (tic-tac-toe, chess, checkers, ludo, dominoes, sudoku, solitaire, mahjong, snake, darts, 2048, bubble shooter, parking, pool, penalty) have big local searches.
+- Do:
+  1. `data/i18n/game-names.json`: for each published game whose type has a common local name, per wave language: `{ slug: { ru: { name, queries: [3 to 5 real search phrases] } } }`, filled from `keyword-research` (T12.1) with sources; branded game names stay English.
+  2. Localized game page (`/<lang>/game/<slug>`): title `<local name> онлайн: играть бесплатно | Playzoni` pattern per language (from the T12.2 templates), H1 with the local name plus our title in brackets when different, first sentence answers the search ("Play tic-tac-toe online free against the computer or a friend"), local FAQ question from the queries. Only for games with real (non-quick) English text; quick pages are not translated.
+  3. Category and search: the local names are added to that language's search words (T8.6) and to the category page intro.
+  4. Language picker visible on every page: a globe button in the nav box/bar (44px) opening the language list, plus the footer picker; it keeps the same page in the other language when it exists, else that language's home. No automatic redirect.
+- Done when: `/ru/game/<tic-tac-toe slug>` has the Russian title/H1/answer and correct hreflang pair; search "крестики" in the Russian site finds it; picker works at 360 and 1280; validate checks every `game-names.json` entry points to a published game.
+- Note: Russia is wave 2 (SEO-INTL §2, Q19: Google ads do not pay in Russia). The first languages are pt, es, de, fr; the same file serves them.
+
 ---
 ## Phase 9 — Growth and retention (docs/GROWTH.md) — after launch
 Starts only after the site is live (**after T5.6**) and only when the planner moves it up (R30). Anything that needs cookie consent waits for **T6.1** (ads + consent) — never load a cookie-based or ad-related script before that consent exists.
@@ -532,6 +565,16 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - status: done (browser suites run with npm run admin:screens / admin:e2e against admin:dev) · deps: T10.6–T10.15 · model: **sonnet** · docs: ADMIN §5
 - Do: CSV export on every table; Playwright tests for login gate, each screen at 390 and 1440, one edit flow, one instant control.
 - Done when: all admin tests pass in `npm run check` (admin suite).
+
+### T10.17 — Home feed editor: choose which game sits in which slot (owner, 12 Nov 2026)
+- status: todo · deps: T10.9 · model: **sonnet** · docs: ADMIN §5.6, §6
+- Today the Home layout screen only orders the big (hero) tiles and the rows. Do:
+  1. Build writes `/home-slots.json`: the home mosaic in page order, one entry per tile slot: `{ i, size: 'XL'|'L'|'S', slug }` (the built default game).
+  2. Admin screen "Home feed" (replaces the hero list, keeps the rows list): desktop shows a picture of the home grid with the real tile sizes and thumbnails (same columns as the site at 1280); drag any game (search box on the right) onto any slot, or drag one slot onto another to swap; a pin icon marks chosen slots; "Unpin" and "Reset to popularity". Phones (390): the same slots as a numbered list with search and up/down buttons. Save is instant (D1 `home_layout`, per language), audited.
+  3. Public applier: for every pinned slot, show the pinned game in that tile by swapping contents (existing `showIn` method); if the pinned game is elsewhere on the page, the two swap; unpinned slots keep the built order. Old `hero` entries migrate to pins on the big slots. Tile sizes stay as built (changing sizes needs a rebuild: later, via the GitHub App).
+- Done when: e2e: pin game X to slot 14 and game Y to the first big tile → the home page shows them there at 390 and 1280 after reload, no duplicate tiles, CLS unchanged; screens pass `admin:screens` at 390 and 1440.
+- Always: mobile-first (360px+); no layout shift; design tokens; pages readable with JS off; no long dashes; `npm run check` passes; check at 360/390/768/1280.
+
 ---
 ## Phase 11 — Ads and audience data (docs/ADS-DATA.md) — after AdSense approval (T6.1) and Phase 10 tracking
 - Shared rules for every task: never fingerprint, never store raw IPs, never sell or share visitor data, never infer age/gender/income; every slot reserved (no CLS), labelled "Advertisement", never in/over the player or in panels; mobile-first; `npm run check`; check at 360/390/768/1280; no invented numbers.

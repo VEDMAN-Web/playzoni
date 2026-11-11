@@ -202,4 +202,7 @@ Options: for each item, the doc you want followed.
 Blocking: T1.1 (none directly), T1.5, T2.1, T2.6, T3.1 — see items above
 Answer (planner, 10 Nov 2026): (1) Follow DESIGN: S 1×1, M 2×2, L 3×3 — PRD fixed. (2) Heart links to /favourites, no drawer — PRD fixed. (3) Yes, heart in the player bar — DESIGN fixed. (4) @tailwindcss/vite approved — PRD fixed. (5) Good catch: `Disallow: /search` removed from SEO-PLAN; keep `Disallow: /*?` and noindex on /search. PRD §6 reference fixed.
 
-
+## Q31 — ffmpeg for short hover videos (T5.9, later)
+Asked by: planner, 12 Nov 2026
+Question: Hover previews start with 4 screenshots per game (no new tool). Real 4-second video clips, like Poki, need ffmpeg installed on the build computer to cut and shrink the recordings. OK to install it later?
+Blocking: nothing now (screenshots first)
