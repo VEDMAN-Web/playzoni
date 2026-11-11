@@ -37,7 +37,7 @@ All times are India time (IST). If a task is not done by its deadline, push what
 - Add `public/llms.txt`: site name, one-line description, and links to home, categories, new, popular and about.
 - This must work together with R1: while `PUBLIC_LAUNCH` is off, robots.txt still disallows everything.
 
-### R5. Full end-to-end test suite (by 06:30)
+### R5. Full end-to-end test suite (by 06:30): DONE by the planner (04:20; `npm run e2e`, final run 1,249 checks, 0 failures, report docs/seo-reports/2026-11-12-e2e.md)
 - Add `npm run e2e` (`scripts/e2e/site.mjs`), using the same Playwright the admin scripts already use. It runs against `npm run preview` of a build with `PUBLIC_INCLUDE_DRAFTS=true`.
 - Widths: 360, 390, 768, 1280, 1536, 1920.
 - Pages:
