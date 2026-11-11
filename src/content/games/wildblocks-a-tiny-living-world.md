@@ -1,5 +1,5 @@
 ---
-title: "WildBlocks — A Tiny Living World"
+title: "WildBlocks: A Tiny Living World"
 slug: "wildblocks-a-tiny-living-world"
 source: "pg"
 sourceId: "126062"
@@ -34,7 +34,7 @@ status: "draft"
 faq: []
 ---
 
-## How to play WildBlocks — A Tiny Living World
+## How to play WildBlocks: A Tiny Living World
 
 
 
