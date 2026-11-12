@@ -1,0 +1,13 @@
+# Copy to .dev.vars for LOCAL development only (wrangler pages dev). Never commit .dev.vars.
+# ENVIRONMENT=development turns on the local sign-in bypass below. Never set it in the Cloudflare dashboard.
+ENVIRONMENT=
+ADMIN_DEV_EMAIL=
+ADMIN_OWNER_EMAILS=
+ACCESS_TEAM_DOMAIN=
+ACCESS_AUD=
+GITHUB_APP_ID=
+GITHUB_APP_INSTALLATION_ID=
+GITHUB_APP_PRIVATE_KEY=
+GITHUB_REPO=
+ONESIGNAL_APP_ID=
+ONESIGNAL_REST_API_KEY=

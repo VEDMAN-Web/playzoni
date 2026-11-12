@@ -1,0 +1,17 @@
+node_modules
+dist
+.astro
+.env
+data/staging/*
+!data/staging/.gitkeep
+graphify-out/*
+!graphify-out/GRAPH_REPORT.md
+.DS_Store
+.wrangler
+
+# Provider catalogs downloaded by the owner (keep out of git)
+data/playgama.json
+data/feeds/
+
+# Local Cloudflare dev settings (wrangler pages dev). Never commit.
+.dev.vars

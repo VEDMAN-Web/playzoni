@@ -1,0 +1,34 @@
+---
+import TextPage from '../components/TextPage.astro';
+
+const title = 'For Developers | Playzoni';
+const description =
+  'Want your game on Playzoni? See how to send us your browser game by email. We review every game before it goes live on phone and desktop.';
+---
+<TextPage title={title} description={description} canonicalPath="/developers" h1="For game developers">
+  <p>
+    Do you make browser games? We would like to hear from you. This page explains how to send us a game for Playzoni.
+  </p>
+
+  <h2>How to submit a game</h2>
+  <p>Send an email to <a href="mailto:hello@playzoni.com">hello@playzoni.com</a> with:</p>
+  <ul>
+    <li>a link where we can play the game in a browser,</li>
+    <li>the name of the game and your name or studio name,</li>
+    <li>two or three sentences about what the game is and how to play it.</li>
+  </ul>
+
+  <h2>What happens next</h2>
+  <p>
+    We review every game we receive. We play it on a phone and on a desktop computer, and we check that it loads quickly,
+    that the controls work, and that it is a good fit for a free browser games site. If it is a fit, we publish it with
+    your name shown as the developer.
+  </p>
+  <p>
+    We cannot promise that every game will be published. If we have questions, we will reply to your email.
+  </p>
+
+  <p>
+    <a class="button" href="mailto:hello@playzoni.com?subject=Game%20submission">Email your game</a>
+  </p>
+</TextPage>

@@ -1,0 +1,16 @@
+{
+  "tester": "",
+  "date": "",
+  "worksMobile": false,
+  "worksDesktop": false,
+  "orientation": "landscape",
+  "playModes": { "localTwoPlayer": false, "onlineMultiplayer": false, "inviteLink": false },
+  "loadSeconds": 0,
+  "controlsDesktop": "",
+  "controlsMobile": "",
+  "goal": "",
+  "threeFacts": ["", ""],
+  "tips": ["", "", ""],
+  "issues": "",
+  "verdict": "pending"
+}

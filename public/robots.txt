@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /*?
+Disallow: /admin
+Disallow: /api/
+
+# RELAY R4 / Q20 recommendation: block only these two training crawlers.
+User-agent: Bytespider
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+Sitemap: https://playzoni.com/sitemap-index.xml

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Sample game</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #0B1A2E; color: #FFFFFF; font-family: system-ui, sans-serif; overflow: hidden; }
+      #label { position: absolute; top: 8px; left: 0; right: 0; text-align: center; font-size: 14px; opacity: 0.8; pointer-events: none; }
+      canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+    </style>
+  </head>
+  <body>
+    <div id="label">Sample game: tap to bounce</div>
+    <canvas id="c"></canvas>
+    <script src="/sample-game.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,179 @@
+// Daily rollups (docs/ADMIN.md §4). Rebuilds the daily_* tables for whole UTC days from the raw `events` and `sessions`
+// tables, so running it again gives the same result (delete + insert per day, in one batch). Run hourly (today) and
+// nightly (yesterday + today, retention cohorts, and deleting raw rows older than 90 days) by the Cron Worker in
+// workers/rollup/, or by hand from the admin (POST /api/admin/rollup, Owner only).
+// In breakdown columns '*' means "all values together"; empty string means "unknown / none".
+import type { D1Database, D1PreparedStatement } from './types';
+import { addDays, dayOf } from './validate';
+
+export const RAW_DAYS = 90;
+export const RETENTION_DAYS = 30;
+
+export type RollupMode = 'hourly' | 'nightly';
+
+export interface RollupResult {
+  days: string[];
+  retentionFrom: string | null;
+  purgedBefore: string | null;
+}
+
+// Session groupings for daily_site: full breakdown plus one-dimension and grand totals.
+const SITE_SETS: [string, string, string][] = [
+  ["COALESCE(country, 'XX')", "COALESCE(device, '')", "COALESCE(lang, '')"],
+  ["COALESCE(country, 'XX')", "'*'", "'*'"],
+  ["'*'", "COALESCE(device, '')", "'*'"],
+  ["'*'", "'*'", "COALESCE(lang, '')"],
+  ["'*'", "'*'", "'*'"],
+];
+
+function dayStatements(db: D1Database, day: string): D1PreparedStatement[] {
+  const out: D1PreparedStatement[] = [];
+  const del = (table: string): void => {
+    out.push(db.prepare(`DELETE FROM ${table} WHERE day = ?`).bind(day));
+  };
+
+  del('daily_site');
+  for (const [c, d, l] of SITE_SETS) {
+    out.push(
+      db
+        .prepare(
+          `INSERT INTO daily_site (day, country, device, lang, visitors, new_visitors, sessions, page_views, engaged_s, plays)
+           SELECT ?, ${c}, ${d}, ${l}, COUNT(DISTINCT vid), COUNT(DISTINCT CASE WHEN is_new = 1 THEN vid END), COUNT(*),
+                  SUM(pages), SUM(engaged_s), SUM(plays)
+           FROM sessions WHERE day = ? GROUP BY 2, 3, 4`,
+        )
+        .bind(day, day),
+    );
+  }
+
+  del('daily_game');
+  for (const lang of ["COALESCE(lang, '')", "'*'"]) {
+    out.push(
+      db
+        .prepare(
+          `INSERT INTO daily_game (day, slug, lang, impressions, clicks, plays, plays_30s, play_s, errors, favourites)
+           SELECT ?, slug, ${lang},
+             CAST(ROUND(SUM(CASE WHEN name = 'tile_impression' THEN COALESCE(value_num, 1) ELSE 0 END)) AS INTEGER),
+             SUM(name IN ('tile_click', 'search_click')),
+             SUM(name = 'play_start'),
+             SUM(name = 'play_30s'),
+             CAST(ROUND(SUM(CASE WHEN name = 'play_end' THEN MAX(0, MIN(COALESCE(value_num, 0), 14400)) ELSE 0 END)) AS INTEGER),
+             SUM(name = 'game_error'),
+             SUM(name = 'favourite_add')
+           FROM events
+           WHERE day = ? AND slug IS NOT NULL
+             AND name IN ('tile_impression', 'tile_click', 'search_click', 'play_start', 'play_30s', 'play_end', 'game_error', 'favourite_add')
+           GROUP BY 2, 3`,
+        )
+        .bind(day, day),
+    );
+  }
+
+  del('daily_list');
+  out.push(
+    db
+      .prepare(
+        `INSERT INTO daily_list (day, list_id, impressions, clicks)
+         SELECT ?, list_id,
+           CAST(ROUND(SUM(CASE WHEN name = 'tile_impression' THEN COALESCE(value_num, 1) ELSE 0 END)) AS INTEGER),
+           SUM(name IN ('tile_click', 'search_click'))
+         FROM events
+         WHERE day = ? AND list_id IS NOT NULL AND name IN ('tile_impression', 'tile_click', 'search_click')
+         GROUP BY 2`,
+      )
+      .bind(day, day),
+  );
+
+  del('daily_search');
+  out.push(
+    db
+      .prepare(
+        `INSERT INTO daily_search (day, query, count, zero_results, clicks)
+         SELECT ?, value_text, SUM(name = 'search'), SUM(name = 'search' AND COALESCE(value_num, 0) = 0), SUM(name = 'search_click')
+         FROM events
+         WHERE day = ? AND value_text IS NOT NULL AND name IN ('search', 'search_click')
+         GROUP BY 2`,
+      )
+      .bind(day, day),
+  );
+
+  // Where each session came from = its first page view.
+  del('daily_referrer');
+  out.push(
+    db
+      .prepare(
+        `INSERT INTO daily_referrer (day, ref_domain, utm_source, utm_medium, utm_campaign, sessions, plays)
+         SELECT ?, COALESCE(f.ref_domain, ''), COALESCE(f.utm_source, ''), COALESCE(f.utm_medium, ''), COALESCE(f.utm_campaign, ''),
+                COUNT(*), SUM(s.plays)
+         FROM sessions s
+         LEFT JOIN (
+           SELECT e.sid, e.ref_domain, e.utm_source, e.utm_medium, e.utm_campaign
+           FROM events e
+           JOIN (SELECT sid, MIN(id) AS id FROM events WHERE name = 'page_view' AND day = ? GROUP BY sid) first ON first.id = e.id
+         ) f ON f.sid = s.sid
+         WHERE s.day = ?
+         GROUP BY 2, 3, 4, 5`,
+      )
+      .bind(day, day, day),
+  );
+
+  // Ads (Phase 11): counts from our own ad events; earnings stay as the AdSense import left them.
+  out.push(
+    db
+      .prepare(
+        `INSERT INTO daily_ads (day, slot, country, device, requests, impressions, viewable, clicks)
+         SELECT ?, list_id, COALESCE(country, 'XX'), COALESCE(device, ''),
+           SUM(name = 'ad_request'), SUM(name = 'ad_impression'), SUM(name = 'ad_viewable'), SUM(name = 'ad_click')
+         FROM events
+         WHERE day = ? AND list_id IS NOT NULL AND name IN ('ad_request', 'ad_impression', 'ad_viewable', 'ad_click')
+         GROUP BY 2, 3, 4
+         ON CONFLICT (day, slot, country, device) DO UPDATE SET
+           requests = excluded.requests, impressions = excluded.impressions, viewable = excluded.viewable, clicks = excluded.clicks`,
+      )
+      .bind(day, day),
+  );
+  return out;
+}
+
+/** Retention cohorts: visitors first seen on cohort_day who came back day_n days later (0 to 30). */
+function retentionStatements(db: D1Database, from: string): D1PreparedStatement[] {
+  return [
+    db.prepare('DELETE FROM retention WHERE cohort_day >= ?').bind(from),
+    db
+      .prepare(
+        `INSERT INTO retention (cohort_day, day_n, visitors)
+         SELECT c.cohort_day, CAST(julianday(s.day) - julianday(c.cohort_day) AS INTEGER) AS n, COUNT(DISTINCT s.vid)
+         FROM (SELECT vid, MIN(day) AS cohort_day FROM sessions GROUP BY vid) c
+         JOIN sessions s ON s.vid = c.vid
+         WHERE c.cohort_day >= ? AND CAST(julianday(s.day) - julianday(c.cohort_day) AS INTEGER) BETWEEN 0 AND ?
+         GROUP BY 1, 2`,
+      )
+      .bind(from, RETENTION_DAYS),
+  ];
+}
+
+/** Rebuilds the given days (and retention / purge for the nightly run). */
+export async function runRollup(db: D1Database, mode: RollupMode, now = Date.now(), days?: string[]): Promise<RollupResult> {
+  const today = dayOf(now);
+  const list = days ?? (mode === 'nightly' ? [addDays(today, -1), today] : [today]);
+  for (const day of list) await db.batch(dayStatements(db, day));
+  if (mode !== 'nightly') return { days: list, retentionFrom: null, purgedBefore: null };
+
+  const from = addDays(today, -(RETENTION_DAYS + 1));
+  await db.batch(retentionStatements(db, from));
+  // Raw data is kept 90 days unless the Owner chose 30 or 60 in Settings.
+  let rawDays = RAW_DAYS;
+  try {
+    const row = await db.prepare("SELECT value FROM settings WHERE key = 'retention'").first<{ value: string }>();
+    const n = row ? Number((JSON.parse(row.value) as { rawDays?: number }).rawDays) : RAW_DAYS;
+    if ([30, 60, 90].includes(n)) rawDays = n;
+  } catch {
+    rawDays = RAW_DAYS;
+  }
+  const cutoff = addDays(today, -rawDays);
+  await db.batch([
+    db.prepare('DELETE FROM events WHERE day < ?').bind(cutoff),
+    db.prepare('DELETE FROM sessions WHERE day < ?').bind(cutoff),
+  ]);
+  return { days: list, retentionFrom: from, purgedBefore: cutoff };
+}

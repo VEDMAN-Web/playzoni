@@ -1,0 +1,13 @@
+---
+// Admin screen 1: Dashboard (docs/ADMIN.md §5).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Dashboard" screen="dashboard" range filters>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { analyticsScreen } from '../../admin/analytics';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) analyticsScreen('dashboard', root);
+</script>

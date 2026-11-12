@@ -1,0 +1,463 @@
+---
+import { previewFields } from '../../lib/preview';
+import { render } from 'astro:content';
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import GameGrid, { type GridItem } from '../../components/GameGrid.astro';
+import JsonLd from '../../components/JsonLd.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import Player from '../../components/Player.astro';
+import { getPublishedGames } from '../../lib/games';
+import { categories } from '../../lib/categories';
+import { publishedCategoriesFrom } from '../../lib/published';
+import { relatedGames } from '../../lib/related';
+import { buildGameTitle, SITE_URL } from '../../lib/seo';
+
+// One page per published game (docs/DESIGN.md §V2.4). On desktop everything is one tile grid: the nav box, the
+// player block (6 cells wide, 4 tall, always wide) with related tiles packed around it, and the text in one white
+// card below the tiles. The player is static HTML here: the cover and the Play button. The iframe is added by the
+// player script: by itself on desktop, after a tap on Play on phones and tablets.
+export async function getStaticPaths() {
+  const games = await getPublishedGames();
+  return games.map((g) => ({ params: { slug: g.data.slug } }));
+}
+
+const { slug } = Astro.params;
+const games = await getPublishedGames();
+const entry = games.find((g) => g.data.slug === slug)!;
+const d = entry.data;
+
+// Page colours from the game's picture (T5.8). No entry: the site gradient.
+const gameColors = (() => {
+  try {
+    return (JSON.parse(readFileSync(join(process.cwd(), 'data', 'game-colors.json'), 'utf8')) as Record<string, [string, string]>)[slug!];
+  } catch {
+    return undefined;
+  }
+})();
+const htmlStyle = gameColors ? `--page-from:${gameColors[0]};--page-to:${gameColors[1]}` : undefined;
+
+// The import's 1200x630 og image when it has been published with the game (docs/TASKS.md T4.5, Q13).
+const ogPath = `/thumbs/${slug}/og.jpg`;
+const ogImage = existsSync(join(process.cwd(), 'public', ogPath)) ? ogPath : undefined;
+
+const primary = categories.find((c) => c.slug === d.categories[0]);
+const primaryName = primary?.name ?? d.categories[0];
+const countOf = (s: string): number => games.filter((g) => g.data.categories.includes(s)).length;
+// Only published categories are linked; a count of 0 is never shown.
+const publishedSlugs = new Set(publishedCategoriesFrom(games).map((c) => c.slug));
+const primaryLinked = publishedSlugs.has(d.categories[0]);
+const chips = d.categories
+  .map((s) => categories.find((c) => c.slug === s))
+  .filter((c): c is NonNullable<typeof c> => c !== undefined && publishedSlugs.has(c.slug))
+  .map((c) => ({ slug: c.slug, name: c.name, count: countOf(c.slug) }));
+
+// Related tiles pack the cells around the player, so there are enough of them to fill the rows beside it.
+const related = relatedGames(entry, games, 48);
+const toItem = (g: (typeof games)[number]): GridItem => ({ kind: 'game', title: g.data.title, slug: g.data.slug, ...previewFields(g.data) });
+const tiles = related.map(toItem);
+const adsEnabled = import.meta.env.PUBLIC_ADS_ENABLED === 'true';
+
+const { Content } = await render(entry);
+const isoDate = (date: Date): string => date.toISOString().slice(0, 10);
+const title = buildGameTitle(d.title);
+const pageUrl = `${SITE_URL}/game/${slug}`;
+
+const crumbs = [
+  { name: 'Home', path: '/' },
+  ...(primaryLinked ? [{ name: primaryName, path: `/${d.categories[0]}` }] : []),
+  { name: d.title, path: `/game/${slug}` },
+];
+
+// T5.1b: play-mode labels (only for modes the play test confirmed) and schema.org playMode.
+const modes = d.playModes;
+const modeLabels: { key: string; label: string; short: string }[] = [
+  ...(modes?.localTwoPlayer ? [{ key: 'local', label: '2 players on one keyboard', short: '2 players' }] : []),
+  ...(modes?.onlineMultiplayer ? [{ key: 'online', label: 'Play online', short: 'Online' }] : []),
+  ...(modes?.inviteLink ? [{ key: 'invite', label: 'Invite a friend', short: 'Invite a friend' }] : []),
+];
+const playMode = [
+  'SinglePlayer',
+  ...(modes?.localTwoPlayer || modes?.onlineMultiplayer ? ['MultiPlayer'] : []),
+  ...(modes?.coOp ? ['CoOp'] : []),
+];
+
+const videoGameLd = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoGame',
+  name: d.title,
+  url: pageUrl,
+  image: `${SITE_URL}/thumbs/${slug}/l.webp`,
+  description: d.description,
+  genre: primaryName,
+  gamePlatform: ['Web browser'],
+  playMode: playMode.map((m) => `https://schema.org/${m}`),
+  applicationCategory: 'Game',
+  operatingSystem: 'Any',
+  author: d.developer ? { '@type': 'Organization', name: d.developer } : undefined,
+  datePublished: isoDate(d.addedDate),
+  dateModified: isoDate(d.updatedDate),
+  offers: {
+    '@type': 'Offer',
+    price: 0,
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/InStock',
+  },
+};
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.name,
+    item: `${SITE_URL}${c.path}`,
+  })),
+};
+const faqLd =
+  d.faq.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: d.faq.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      }
+    : null;
+// Opens the connection to the game provider early (R24). Skipped if the embed address is not a valid URL.
+let embedOrigin: string | undefined;
+try {
+  embedOrigin = new URL(d.embedUrl).origin;
+} catch {
+  embedOrigin = undefined;
+}
+const jsonLd = [videoGameLd, breadcrumbLd, ...(faqLd ? [faqLd] : [])];
+---
+<BaseLayout title={title} description={d.description} canonicalPath={`/game/${slug}`} ogImage={ogImage} noindex={d.quick} mainClass="has-grid" preconnect={embedOrigin} htmlStyle={htmlStyle}>
+  <Header slot="header" box={false} />
+
+  <GameGrid items={tiles} mode="mosaic" navBox={true} eagerCount={0} priorityFirst={false} label="More games like this">
+    <div slot="lead" class="player-cell" data-pagefind-ignore>
+      <Player title={d.title} slug={slug!} developer={d.developer} embedUrl={d.embedUrl} aspect={d.aspect} modes={modeLabels.map((m) => m.short)} />
+    </div>
+    {adsEnabled && (
+      <div slot="lead" class="ad-cell ad-cell-side"><AdSlot variant="side" /></div>
+    )}
+    {adsEnabled && (
+      <div slot="lead" class="ad-cell ad-cell-strip"><AdSlot variant="strip" /></div>
+    )}
+  </GameGrid>
+
+  <article class="text-card" data-pagefind-body>
+    <div class="card-inner">
+      <nav class="crumbs" aria-label="Breadcrumb" data-pagefind-ignore>
+        <ol>
+          {crumbs.map((c, i) => (
+            <li>
+              {i === crumbs.length - 1 ? (
+                <span aria-current="page">{c.name}</span>
+              ) : (
+                <>
+                  <a href={c.path}>{c.name}</a>
+                  <span aria-hidden="true">›</span>
+                </>
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <h1 class="game-title" data-pagefind-meta={`image:/thumbs/${slug}/s.webp`}>{d.title}</h1>
+      {d.status === 'draft' && <span class="draft-badge">Draft</span>}
+      {modeLabels.length > 0 && (
+        <ul class="modes" aria-label="Play modes">
+          {modeLabels.map((m) => (
+            <li class={`mode mode-${m.key}`}>{m.label}</li>
+          ))}
+        </ul>
+      )}
+      <p class="intro">{d.intro}</p>
+
+      <section class="about" aria-label="About this game">
+        <Content />
+      </section>
+
+      {d.faq.length > 0 && (
+        <section class="faq" aria-labelledby="game-faq">
+          <h2 id="game-faq">FAQ</h2>
+          {d.faq.map((f) => (
+            <details>
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </section>
+      )}
+
+      <section class="info" aria-labelledby="about-game">
+        <h2 id="about-game">About this game</h2>
+        <table>
+          <tbody>
+            {d.developer && (
+              <tr><th scope="row">Developer</th><td>{d.developer}</td></tr>
+            )}
+            <tr><th scope="row">Category</th><td>{primaryLinked ? <a href={`/${d.categories[0]}`}>{primaryName}</a> : primaryName}</td></tr>
+            {modeLabels.length > 0 && (
+              <tr><th scope="row">Play modes</th><td>{['Single player', ...modeLabels.map((m) => m.label)].join(', ')}</td></tr>
+            )}
+            <tr><th scope="row">Platforms</th><td>{d.mobile ? 'Desktop, mobile' : 'Desktop'}</td></tr>
+            {d.releaseDate && (
+              <tr><th scope="row">Release date</th><td>{isoDate(d.releaseDate)}</td></tr>
+            )}
+            <tr><th scope="row">Added</th><td>{isoDate(d.addedDate)}</td></tr>
+            <tr><th scope="row">Last updated</th><td>{isoDate(d.updatedDate)}</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <nav class="related-categories" aria-label="Related categories">
+        <ul class="chips">
+          {chips.map((c) => (
+            <li><a class="chip" href={`/${c.slug}`}>{c.name} <span class="count">{c.count}</span></a></li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  </article>
+
+  <JsonLd data={jsonLd} />
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  /* ---- Where the player and the ad blocks sit in the tile grid (§V2.4, sizes from §V2.10) ---- */
+  /* Phones, tablets and narrow windows: the player is the full width, the tiles follow below it. */
+  .player-cell {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    min-width: 0;
+  }
+  /* The grid's rows are one tile tall (94px), so below 1060px the first row is sized by the player instead; otherwise
+     the player overflows its row and the tiles below cover its lower part and the bar (e2e, 12 Nov 2026). */
+  @media (max-width: 1059px) {
+    :global(.grid:has(> .player-cell)) {
+      grid-template-rows: auto;
+    }
+  }
+  .ad-cell {
+    display: none;
+    min-width: 0;
+  }
+  /* From 1060px (at least 9 columns, even with a scrollbar): the nav box takes columns 1-2 of row 1; the player is 7x4
+     cells (754x424, exactly 16:9) starting at column 3; the bar hangs below the frame in a fifth row, then the 7x1 ad strip. Tiles fill the rest. */
+  @media (min-width: 1060px) {
+    .player-cell {
+      grid-column: 3 / span 7;
+      grid-row: 1 / span 5;
+    }
+    .ad-cell-strip {
+      display: block;
+      grid-column: 3 / span 7;
+      grid-row: 6;
+    }
+  }
+  /* From 1352px (12 columns) there is room for the 3x3 ad block to the right of the player. */
+  @media (min-width: 1352px) {
+    .ad-cell-side {
+      display: block;
+      grid-column: 10 / span 3;
+      grid-row: 1 / span 3;
+    }
+  }
+  /* From 1600px the player grows to 9x5 cells (974x534); the ad block moves to columns 12-14, the strip is 9x1. */
+  @media (min-width: 1600px) {
+    .player-cell {
+      grid-column: 3 / span 9;
+      grid-row: 1 / span 6;
+    }
+    .ad-cell-strip {
+      grid-column: 3 / span 9;
+      grid-row: 7;
+    }
+    .ad-cell-side {
+      grid-column: 12 / span 3;
+    }
+  }
+
+  /* ---- The text card below the tiles (§V2.4, §V2.5) ---- */
+  .text-card {
+    box-sizing: border-box;
+    margin: var(--s-5) 0 var(--s-6);
+    padding: var(--s-4);
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    color: var(--c-ink);
+  }
+  @media (min-width: 768px) {
+    .text-card {
+      padding: var(--s-6);
+    }
+  }
+  .card-inner {
+    max-width: 78ch;
+  }
+  .draft-badge {
+    display: inline-block;
+    margin-left: var(--s-2);
+    padding: 2px var(--s-2);
+    border-radius: var(--r-pill);
+    background: var(--c-accent);
+    color: var(--c-ink);
+    font: var(--t-small);
+    vertical-align: middle;
+  }
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    list-style: none;
+    margin: 0 0 var(--s-2);
+    padding: 0;
+    color: var(--c-ink-2);
+    font: var(--t-small);
+  }
+  .crumbs li {
+    display: inline-flex;
+    gap: var(--s-1);
+    align-items: center;
+  }
+  .crumbs a {
+    color: var(--c-ink-2);
+  }
+  .game-title {
+    margin: 0 0 var(--s-2);
+    color: var(--c-ink);
+    font: var(--t-h1);
+  }
+  .intro {
+    margin: 0 0 var(--s-4);
+    color: var(--c-ink-2);
+  }
+  .about :global(h2),
+  .faq h2,
+  .info h2 {
+    margin: var(--s-5) 0 var(--s-2);
+    font: var(--t-h2);
+    color: var(--c-ink);
+  }
+  .about :global(h3) {
+    margin: var(--s-3) 0 var(--s-1);
+    font: var(--t-h3);
+  }
+  .about :global(p),
+  .about :global(li) {
+    color: var(--c-ink-2);
+  }
+  .about :global(a),
+  .info a {
+    color: var(--c-primary-dark);
+    font-weight: 700;
+  }
+  .faq details {
+    border-top: 1px solid var(--c-line);
+    padding: var(--s-2) 0;
+  }
+  .faq summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    font: var(--t-h3);
+    cursor: pointer;
+  }
+  .faq p {
+    margin: 0 0 var(--s-2);
+    color: var(--c-ink-2);
+  }
+  .info table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .info th,
+  .info td {
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--c-line);
+    text-align: left;
+    vertical-align: top;
+  }
+  .info th {
+    width: 40%;
+    color: var(--c-ink-2);
+    font-weight: 600;
+  }
+  .related-categories {
+    margin-top: var(--s-5);
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+    height: 36px;
+    padding: 0 var(--s-3);
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    font: var(--t-small);
+    text-decoration: none;
+  }
+  .chip::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+  }
+  .chip:hover {
+    border-color: var(--c-primary);
+    color: var(--c-primary);
+    text-decoration: none;
+  }
+  .count {
+    color: var(--c-ink-2);
+  }
+  /* T5.1b play-mode labels under the H1: small soft-blue pills, wrap on phones. */
+  .modes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    list-style: none;
+    margin: 0 0 var(--s-3);
+    padding: 0;
+  }
+  .mode {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: var(--r-pill);
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font: var(--t-small);
+  }
+  .mode::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: var(--c-primary);
+  }
+</style>

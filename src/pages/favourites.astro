@@ -1,0 +1,62 @@
+---
+import '../styles/client-tiles.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+// Favourites page. The list lives in the visitor's browser (localStorage), so the games are
+// drawn by a small script from /games-index.json. Not for search engines: noindex.
+const title = 'Favourites | Playzoni';
+const description =
+  'Your favourite games on Playzoni, saved in this browser. Tap the heart on any game page to add it here and play it again later.';
+---
+<BaseLayout title={title} description={description} canonicalPath="/favourites" noindex={true}>
+  <Header slot="header" />
+
+  <h1 class="page-title">Favourites</h1>
+
+  <p class="empty" data-fav-empty hidden>No favourites yet. Tap the heart on any game to save it here.</p>
+  <noscript><p class="empty">Favourites need JavaScript, because they are saved in your browser.</p></noscript>
+  <div class="pz-grid" data-fav-grid></div>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .page-title {
+    margin: var(--s-4) 0 var(--s-4);
+    color: var(--c-ink);
+    font: var(--t-h1);
+  }
+  .empty {
+    margin: 0 0 var(--s-4);
+    color: var(--c-ink-2);
+  }
+  .empty[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  import { getFavourites } from '../lib/storage';
+  import { gameTile, loadIndex, pickGames } from '../lib/render-tiles';
+
+  const grid = document.querySelector<HTMLElement>('[data-fav-grid]');
+  const empty = document.querySelector<HTMLElement>('[data-fav-empty]');
+
+  if (grid && empty) {
+    const slugs = getFavourites();
+    if (slugs.length === 0) {
+      empty.hidden = false;
+    } else {
+      void loadIndex().then((index) => {
+        const games = pickGames(index, slugs);
+        if (games.length === 0) {
+          empty.hidden = false;
+          return;
+        }
+        for (const game of games) grid.appendChild(gameTile(game, true));
+      });
+    }
+  }
+</script>

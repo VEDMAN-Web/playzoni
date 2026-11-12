@@ -1,0 +1,22 @@
+---
+// Admin screen 4: one game, stats over time and every editable field (docs/ADMIN.md §5.4). /admin/game?slug=<game>
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Game" screen="games" range filters>
+  <div class="adm-card adm-section" data-game-head>
+    <p class="adm-status">Loading the game</p>
+  </div>
+  <section class="adm-section" aria-label="Stats">
+    <div data-screen-root></div>
+  </section>
+  <section class="adm-section" aria-label="Edit" data-edit-root></section>
+</AdminLayout>
+
+<script>
+  import { analyticsScreen } from '../../admin/analytics';
+  import { startGameHead } from '../../admin/game-edit';
+  const slug = new URLSearchParams(location.search).get('slug') ?? '';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root && slug) analyticsScreen('game', root, undefined, 0, { slug });
+  void startGameHead(slug);
+</script>

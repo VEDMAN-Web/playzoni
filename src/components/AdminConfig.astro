@@ -1,0 +1,56 @@
+---
+// Loads the admin's instant settings applier (src/lib/admin-config.ts) after the page has loaded.
+// BaseLayout renders this only when PUBLIC_ADMIN_CONFIG_ENABLED=true (docs/ADMIN.md §2 "instant").
+---
+<script>
+  const go = (): void => {
+    void import('../lib/admin-config').then((m) => m.start());
+  };
+  if (document.readyState === 'complete') go();
+  else addEventListener('load', go, { once: true });
+</script>
+
+<style is:global>
+  /* Messages from the admin (banners, notice, maintenance): fixed at the bottom, so nothing on the page moves. */
+  .pz-cfg {
+    position: fixed;
+    right: var(--gutter);
+    bottom: var(--gutter);
+    left: var(--gutter);
+    z-index: 45;
+    display: grid;
+    gap: var(--s-2);
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .pz-cfg-item {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    margin: 0;
+    padding: var(--s-2) var(--s-2) var(--s-2) var(--s-4);
+    border-radius: var(--r-card);
+    background: var(--c-ink);
+    color: var(--c-primary-ink);
+    font: var(--t-small);
+    box-shadow: var(--sh-tile-hover);
+  }
+  .pz-cfg-item > a,
+  .pz-cfg-item > span {
+    flex: 1;
+    min-height: 28px;
+    padding: 4px 0;
+    color: var(--c-primary-ink);
+  }
+  .pz-cfg-close {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: transparent;
+    color: var(--c-primary-ink);
+    font: var(--t-h2);
+    cursor: pointer;
+  }
+</style>

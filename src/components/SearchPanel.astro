@@ -1,0 +1,435 @@
+---
+import '../styles/client-tiles.css';
+import { getPublishedCategories } from '../lib/published';
+
+// Search panel (docs/DESIGN.md §V2.8, Poki layout). Slides in from the left, 440px wide (full width on phones), on the
+// page gradient, with the page behind it dimmed. Top to bottom: a white pill search box, one scrolling row of
+// UPPERCASE category chips, "Recently played" and "Popular this week" as 6-per-row grids of small tiles. While the
+// visitor types, matching games replace both lists. The category links are in the HTML (hidden until the panel opens);
+// without JavaScript the search buttons are plain links to /search.
+// The 8 main categories as small wrapping chips (no chip is ever cut off), then "All categories" (owner, 11 Nov).
+const published = (await getPublishedCategories())
+  .filter((c) => c.navOrder !== null)
+  .sort((a, b) => (a.navOrder ?? 99) - (b.navOrder ?? 99) || a.name.localeCompare(b.name))
+  .slice(0, 8);
+---
+<div class="backdrop" data-search-backdrop></div>
+<aside id="search-panel" class="panel" role="dialog" aria-modal="true" aria-label="Search games" aria-hidden="true" data-search-panel>
+  <button class="close" type="button" aria-label="Close search" data-search-close>
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+  </button>
+  <div class="scroll">
+    <form class="box" action="/search" method="get" role="search">
+      <img class="mark" src="/icon.svg" width="24" height="24" alt="" />
+      <label class="sr-only" for="panel-search">Search games</label>
+      <input id="panel-search" class="input" type="search" name="q" placeholder="What do you want to play?" autocomplete="off" data-search-input />
+      <button class="go" type="submit" aria-label="Search">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7" /><path d="M20 20l-4-4" /></svg>
+      </button>
+    </form>
+
+    <ul class="chips" aria-label="Categories">
+      {published.map((c) => (
+        <li><a class="chip" href={`/${c.slug}`}>{c.shortName}</a></li>
+      ))}
+      <li><a class="chip chip-all" href="/categories">All categories ›</a></li>
+    </ul>
+
+    <p class="status" role="status" aria-live="polite" data-search-status hidden></p>
+
+    <section class="block" aria-labelledby="sp-results" hidden data-search-results-block>
+      <h2 id="sp-results" class="sr-only">Search results</h2>
+      <div class="pz-grid6" data-search-results></div>
+    </section>
+
+    <section class="block" aria-labelledby="sp-recent" hidden data-search-recent-block>
+      <h2 id="sp-recent" class="heading">Recently played</h2>
+      <div class="pz-grid6" data-search-recent></div>
+    </section>
+
+    <section class="block" aria-labelledby="sp-popular" data-search-popular-block>
+      <h2 id="sp-popular" class="heading" data-search-popular-heading>Popular this week</h2>
+      <div class="pz-grid6" data-search-popular></div>
+    </section>
+  </div>
+</aside>
+
+<style>
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(14, 36, 64, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 200ms ease-out, visibility 0s linear 200ms;
+  }
+  .backdrop.is-open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 200ms ease-out, visibility 0s linear 0s;
+  }
+  .panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 60;
+    width: 100%;
+    box-sizing: border-box;
+    background: linear-gradient(160deg, var(--c-bg-from) 0%, var(--c-bg-mid) 55%, var(--c-bg-to) 100%);
+    transform: translateX(-100%);
+    visibility: hidden;
+    /* Visibility waits for the slide-out to finish when closing, and changes at once when opening, so the input can take focus. */
+    transition: transform 240ms ease-out, visibility 0s linear 240ms;
+  }
+  .panel.is-open {
+    transform: none;
+    visibility: visible;
+    transition: transform 240ms ease-out, visibility 0s linear 0s;
+  }
+  .scroll {
+    box-sizing: border-box;
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 16px 16px 32px;
+    /* On phones the round close button sits in the top right corner, so the search box leaves room for it. */
+    padding-right: 72px;
+  }
+  @media (min-width: 520px) {
+    .panel {
+      width: 440px;
+    }
+    .scroll {
+      padding-right: 16px;
+    }
+  }
+
+  /* Round close button with a left chevron: outside the panel's right edge on wider screens, inside on phones. */
+  .close {
+    position: absolute;
+    top: 16px;
+    right: 14px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    box-shadow: var(--sh-tile);
+    cursor: pointer;
+  }
+  .close:hover,
+  .close:focus-visible {
+    color: var(--c-primary);
+  }
+  @media (min-width: 520px) {
+    .close {
+      right: -58px;
+    }
+  }
+
+  /* White pill search box: our mark on the left, a magnifier button on the right. */
+  .box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 48px;
+    margin: 0;
+    padding: 0 4px 0 14px;
+    box-sizing: border-box;
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+  }
+  .mark {
+    flex: 0 0 auto;
+    display: block;
+  }
+  /* On phones the round close button takes the right side, so the mark makes way for the full placeholder text. */
+  @media (max-width: 519px) {
+    .mark {
+      display: none;
+    }
+    .box {
+      padding-left: 20px;
+    }
+  }
+  .input {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--c-ink);
+    font: var(--t-body);
+    outline: none;
+  }
+  /* The focus ring goes around the whole pill, not around the text field inside it. */
+  .box:focus-within {
+    outline: 2px solid var(--c-focus);
+    outline-offset: 2px;
+  }
+  .input::placeholder {
+    color: var(--c-ink-2);
+  }
+  .go {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: transparent;
+    color: var(--c-ink);
+    cursor: pointer;
+  }
+  .go:hover,
+  .go:focus-visible {
+    color: var(--c-primary);
+  }
+
+  /* Small UPPERCASE category chips that wrap onto a second line, so no chip is ever cut off at the panel edge.
+     30px tall; the tap area is widened to 44px with ::after. */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 6px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 11px;
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    box-shadow: 0 1px 4px rgba(14, 36, 64, 0.18);
+    color: var(--c-ink);
+    font: 800 11px/14px var(--font-sans);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 120ms ease-out, color 120ms ease-out;
+  }
+  .chip::after {
+    content: '';
+    position: absolute;
+    inset: -7px -3px;
+  }
+  .chip:hover,
+  .chip:focus-visible {
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+    text-decoration: none;
+  }
+  .chip-all {
+    background: var(--c-ink);
+    color: var(--c-primary-ink);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .block {
+    margin-top: 20px;
+  }
+  .block[hidden],
+  .status[hidden] {
+    display: none;
+  }
+  .heading {
+    margin: 0 0 10px;
+    color: var(--c-ink);
+    font: var(--t-h3);
+  }
+  .status {
+    margin: 20px 0 0;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: var(--c-surface);
+    color: var(--c-ink);
+    font: 700 15px/22px var(--font-sans);
+  }
+  /* Six small tiles per row (the tile builder in src/lib/render-tiles.ts makes the links). */
+  .pz-grid6 {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+</style>
+
+<script>
+  // Opens and closes the search panel. Escape, the close button and a click on the dimmed page all close it.
+  // Focus goes into the input on open and back to the button that opened it on close. Any button with
+  // data-search-open opens the panel (nav box, floating bar, top bar). The lists come from /games-index.json.
+  import { getRecentlyPlayed } from '../lib/storage';
+  import { gameTile, loadIndex, pickGames, type IndexGame } from '../lib/render-tiles';
+  import { applyPlayedBadges } from '../lib/played-badge';
+  import { fuzzySearch } from '../lib/fuzzy-search';
+
+  // Lists show 12 tiles, then 12 more each time the visitor scrolls near the bottom of the panel (endless, DESIGN §V2.13).
+  const STEP = 12;
+
+  const openBtns = document.querySelectorAll<HTMLElement>('[data-search-open]');
+  const panel = document.querySelector<HTMLElement>('[data-search-panel]');
+  const backdrop = document.querySelector<HTMLElement>('[data-search-backdrop]');
+  const closeBtn = document.querySelector<HTMLButtonElement>('[data-search-close]');
+  const input = document.querySelector<HTMLInputElement>('[data-search-input]');
+  const status = document.querySelector<HTMLElement>('[data-search-status]');
+  const resultsBlock = document.querySelector<HTMLElement>('[data-search-results-block]');
+  const results = document.querySelector<HTMLElement>('[data-search-results]');
+  const recentBlock = document.querySelector<HTMLElement>('[data-search-recent-block]');
+  const recent = document.querySelector<HTMLElement>('[data-search-recent]');
+  const popularBlock = document.querySelector<HTMLElement>('[data-search-popular-block]');
+  const popular = document.querySelector<HTMLElement>('[data-search-popular]');
+  const popularHeading = document.querySelector<HTMLElement>('[data-search-popular-heading]');
+  const scroller = panel?.querySelector<HTMLElement>('.scroll') ?? null;
+  let opener: HTMLElement | null = null;
+  // What the panel is showing now: the results list and the popular list, and how many of each are drawn.
+  let resultList: IndexGame[] = [];
+  let popularList: IndexGame[] = [];
+  let resultShown = 0;
+  let popularShown = 0;
+
+  function isOpen(): boolean {
+    return panel?.classList.contains('is-open') ?? false;
+  }
+
+  function fill(target: HTMLElement | null, games: IndexGame[]): void {
+    if (!target) return;
+    target.replaceChildren(...games.map((g) => gameTile(g, false)));
+  }
+  function append(target: HTMLElement | null, games: IndexGame[]): void {
+    if (!target || games.length === 0) return;
+    target.append(...games.map((g) => gameTile(g, false)));
+  }
+
+  // Draws the next batch: search results first (when there are any), then the popular list below them.
+  function showMore(): void {
+    if (resultShown < resultList.length) {
+      append(results, resultList.slice(resultShown, resultShown + STEP));
+      resultShown = Math.min(resultList.length, resultShown + STEP);
+    } else if (popularShown < popularList.length) {
+      append(popular, popularList.slice(popularShown, popularShown + STEP));
+      popularShown = Math.min(popularList.length, popularShown + STEP);
+    }
+    if (panel) applyPlayedBadges(panel);
+  }
+
+  async function render(): Promise<void> {
+    const index = await loadIndex();
+    const query = input?.value.trim() ?? '';
+    if (results) results.replaceChildren();
+    if (popular) popular.replaceChildren();
+    resultShown = 0;
+    popularShown = 0;
+
+    if (query === '') {
+      const played = pickGames(index, getRecentlyPlayed()).slice(0, STEP);
+      fill(recent, played);
+      resultList = [];
+      popularList = index;
+      if (recentBlock) recentBlock.hidden = played.length === 0;
+      if (resultsBlock) resultsBlock.hidden = true;
+      if (popularHeading) popularHeading.textContent = 'Popular this week';
+      if (status) status.hidden = true;
+    } else {
+      // Forgiving search: typos and sounds-like spellings still match. Popular games always follow the results,
+      // so a child who types something we cannot match still gets games to play (owner, 11 Nov).
+      resultList = fuzzySearch(index, query).map((r) => r.game);
+      const found = new Set(resultList.map((g) => g.slug));
+      popularList = index.filter((g) => !found.has(g.slug));
+      if (resultsBlock) resultsBlock.hidden = resultList.length === 0;
+      if (recentBlock) recentBlock.hidden = true;
+      if (popularHeading) popularHeading.textContent = resultList.length > 0 ? 'More popular games' : 'Try these popular games';
+      if (status) {
+        status.hidden = resultList.length > 0;
+        status.textContent = `We could not find "${query}", but here are games lots of players love.`;
+      }
+    }
+    if (popularBlock) popularBlock.hidden = popularList.length === 0;
+    showMore();
+    if (resultList.length > 0) {
+      // Show the popular list right away too, even when the results are short.
+      if (resultShown >= resultList.length) showMore();
+    } else {
+      showMore();
+    }
+    if (scroller && query === '') scroller.scrollTop = 0;
+    topUp();
+  }
+
+  // Tall screens: keep adding batches until the panel can scroll (or the lists run out).
+  function topUp(): void {
+    for (let i = 0; i < 10 && scroller; i++) {
+      const more = resultShown < resultList.length || popularShown < popularList.length;
+      if (!more || scroller.scrollHeight > scroller.clientHeight + 300) break;
+      showMore();
+    }
+  }
+
+  // Endless lists: near the bottom of the panel, draw the next batch.
+  scroller?.addEventListener(
+    'scroll',
+    () => {
+      if (scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 400) showMore();
+    },
+    { passive: true },
+  );
+
+  function setOpen(open: boolean): void {
+    panel?.classList.toggle('is-open', open);
+    backdrop?.classList.toggle('is-open', open);
+    panel?.setAttribute('aria-hidden', open ? 'false' : 'true');
+    for (const btn of openBtns) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) {
+      void render();
+      input?.focus();
+    } else {
+      opener?.focus();
+    }
+  }
+
+  for (const btn of openBtns) {
+    btn.addEventListener('click', (event: MouseEvent) => {
+      // Without JS these links go to /search. With JS the panel opens instead.
+      event.preventDefault();
+      opener = btn;
+      setOpen(true);
+    });
+  }
+  closeBtn?.addEventListener('click', () => setOpen(false));
+  backdrop?.addEventListener('click', () => setOpen(false));
+  input?.addEventListener('input', () => void render());
+  // Enter keeps the visitor in the panel (the results are already there); on phones it also hides the keyboard.
+  input?.form?.addEventListener('submit', (event: SubmitEvent) => {
+    event.preventDefault();
+    input.blur();
+    void render();
+  });
+  document.addEventListener('keydown', (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && isOpen()) setOpen(false);
+  });
+</script>

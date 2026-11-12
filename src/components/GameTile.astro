@@ -1,0 +1,176 @@
+---
+// One game tile (docs/DESIGN.md §V2.2). The whole tile is one link to the game page.
+// Size S = 1x1 cell, L = 2x2, XL = 3x3 (the grid sets the span).
+import type { BadgeKind } from '../lib/badges';
+
+interface Props {
+  title: string;
+  slug: string;
+  size: 'S' | 'L' | 'XL';
+  eager?: boolean;
+  priority?: boolean;
+  badge?: BadgeKind;
+  previewVideo?: string;
+  screenshots?: string[];
+}
+
+const { title, slug, size, eager = false, priority = false, badge, previewVideo, screenshots } = Astro.props;
+
+// Picture files: S uses the 150px file (300px on 2x screens); L the 300px file (600px on 2x); XL the 600px file.
+// Phones never download the 600px file at 1x for a small tile.
+const file = size === 'S' ? 's' : size === 'L' ? 'm' : 'l';
+const px = size === 'S' ? 150 : size === 'L' ? 300 : 600;
+const srcset =
+  size === 'S'
+    ? `/thumbs/${slug}/s.webp 1x, /thumbs/${slug}/m.webp 2x`
+    : size === 'L'
+      ? `/thumbs/${slug}/m.webp 1x, /thumbs/${slug}/l.webp 2x`
+      : undefined;
+---
+<a
+  class={`tile tile-${size.toLowerCase()}`}
+  href={`/game/${slug}`}
+  data-slug={slug}
+  data-preview-video={previewVideo}
+  data-screenshots={screenshots && screenshots.length > 0 ? screenshots.join(' ') : undefined}
+>
+  <img
+    src={`/thumbs/${slug}/${file}.webp`}
+    srcset={srcset}
+    width={px}
+    height={px}
+    alt=""
+    loading={eager ? 'eager' : 'lazy'}
+    decoding="async"
+    fetchpriority={priority ? 'high' : undefined}
+  />
+  {badge && (
+    <span class={`badge badge-${badge.toLowerCase()}`} aria-hidden="true">
+      {badge === 'New' && (
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 3l1.9 5.1L17 10l-5.1 1.9L10 17l-1.9-5.1L3 10l5.1-1.9L10 3z" />
+          <path d="M19 15v6M16 18h6" />
+        </svg>
+      )}
+      {badge === 'Hot' && (
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3c.6 3.2 4.5 5.1 4.5 9.6a4.5 4.5 0 0 1-9 0c0-1.7.7-2.9 1.6-3.9.2 1.2.8 1.9 1.7 2.1C10.4 8.6 11.2 5.7 12 3z" />
+          <path d="M12 21a2.2 2.2 0 0 1-2.2-2.2c0-1.1.9-1.9 2.2-3 1.3 1.1 2.2 1.9 2.2 3A2.2 2.2 0 0 1 12 21z" />
+        </svg>
+      )}
+      {badge === 'Played' && (
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 12a8 8 0 1 1-2.4-5.7" />
+          <path d="M20 4v5h-5" />
+        </svg>
+      )}
+    </span>
+  )}
+  <span class="overlay"><span class="overlay-text">{title}</span></span>
+</a>
+
+<style>
+  .tile {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--r-tile);
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    color: var(--c-ink);
+    text-decoration: none;
+    transition: transform 180ms var(--ease-tile), box-shadow 180ms var(--ease-tile);
+  }
+  .tile-l,
+  .tile-xl {
+    border-radius: var(--r-tile-l);
+  }
+  /* Desktop: lift and grow a little; keyboard focus does the same. */
+  @media (hover: hover) and (pointer: fine) {
+    .tile:hover,
+    .tile:focus-visible {
+      transform: translateY(-4px) scale(1.04);
+      box-shadow: var(--sh-tile-hover);
+      color: var(--c-ink);
+      text-decoration: none;
+    }
+  }
+  /* Touch: no hover state, a short press instead. */
+  @media (hover: none) {
+    .tile:active {
+      transform: scale(0.96);
+      transition-duration: 120ms;
+    }
+  }
+  .tile img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    transition: transform 240ms ease-out;
+  }
+  /* Hover preview without a video or screenshots: a slow zoom of the picture, 1 to 1.12 over 3 seconds (DESIGN §V2.8).
+     Games that have preview media get it from src/lib/tile-preview.ts; if that media fails the script adds .zoom. */
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .tile:not([data-preview-video]):not([data-screenshots]):hover > img,
+    .tile:not([data-preview-video]):not([data-screenshots]):focus-visible > img,
+    .tile.zoom:hover > img {
+      transform: scale(1.12);
+      transition: transform 3s linear;
+    }
+  }
+  /* Title overlay: shown on desktop hover and keyboard focus only. Everywhere else it is visually hidden but stays
+     in the page as the link's accessible name (R27), so touch and screen-reader users still get the game's name. */
+  .overlay {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .overlay {
+      display: block;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: auto;
+      height: auto;
+      margin: 0;
+      clip-path: none;
+      white-space: normal;
+      padding: var(--s-6) var(--s-2) var(--s-2);
+      background: linear-gradient(transparent, color-mix(in srgb, var(--c-ink) 85%, transparent));
+      color: var(--c-primary-ink);
+      font: var(--t-tile);
+      transform: translateY(100%);
+      opacity: 0;
+      transition: transform 180ms var(--ease-tile), opacity 180ms var(--ease-tile);
+    }
+    /* The 2-line clamp sits on an inner span: on the padded overlay itself a third line leaked into the padding (owner, 11 Nov). */
+    .overlay-text {
+      display: -webkit-box;
+      overflow: hidden;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow-wrap: anywhere;
+    }
+    .tile:hover .overlay,
+    .tile:focus-visible .overlay {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tile:hover,
+    .tile:focus-visible,
+    .tile:active {
+      transform: none;
+    }
+  }
+</style>

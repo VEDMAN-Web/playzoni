@@ -1,0 +1,45 @@
+---
+import { SITE_NAME, assertDescription, assertTitle, canonicalUrl } from '../lib/seo';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  ogImage?: string;
+  noindex?: boolean;
+}
+
+const { title, description, canonicalPath, ogImage = '/og/default.png', noindex = false } = Astro.props;
+
+// The owner's draft preview: every page is hidden from search engines (docs/TASKS.md T4.6).
+const draftPreview = import.meta.env.PUBLIC_INCLUDE_DRAFTS === 'true';
+// RELAY R1: until launch (PUBLIC_LAUNCH=true) every page also gets a second robots tag; search engines follow the strictest
+// tag, so nothing is indexed. `data-prelaunch` comes first so the build checks (which look for <meta name="robots" ...>)
+// still see each page's own tag and keep checking the page.
+const prelaunch = import.meta.env.PUBLIC_LAUNCH !== 'true';
+// Build fails here if a page breaks the length rules (docs/SEO-PLAN.md §Templates).
+// Draft preview pages are noindex and may still have no text yet (docs/TASKS.md T4.6), so the description rule is not applied there.
+assertTitle(title);
+if (!draftPreview) assertDescription(description);
+
+const canonical = canonicalUrl(canonicalPath);
+const image = new URL(ogImage, 'https://playzoni.com').toString();
+const imageTypes: Record<string, string> = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
+const imageType = imageTypes[ogImage.split('.').pop()?.toLowerCase() ?? ''];
+---
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{draftPreview ? <meta name="robots" content="noindex,nofollow" /> : noindex ? <meta name="robots" content="noindex,follow" /> : null}
+{prelaunch && !draftPreview ? <meta data-prelaunch name="robots" content="noindex, nofollow" /> : null}
+<meta property="og:site_name" content={SITE_NAME} />
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={image} />
+{imageType ? <meta property="og:image:type" content={imageType} /> : null}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={image} />

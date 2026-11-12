@@ -1,0 +1,18 @@
+---
+// Admin screen 11: Ads (docs/ADMIN.md §5.11). Structure only until AdSense is connected.
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Ads" screen="ads" range filters>
+  <p class="adm-intro">Ad slots, viewability, clicks and real earnings. Nothing shows until ads run.</p>
+  <div data-screen-root></div>
+  <div data-ads-extras></div>
+</AdminLayout>
+
+<script>
+  import { analyticsScreen } from '../../admin/analytics';
+  import { startAdsExtras } from '../../admin/ads';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  const extras = document.querySelector<HTMLElement>('[data-ads-extras]');
+  if (root) analyticsScreen('ads', root);
+  if (extras) void startAdsExtras(extras);
+</script>

@@ -1,0 +1,37 @@
+---
+// Loads the anonymous measurement script (docs/ADMIN.md §3) after the page has loaded, and wires the
+// "Do not measure me" switch in the profile panel. BaseLayout renders this only when PUBLIC_TRACKING_ENABLED=true.
+---
+<script>
+  const go = (): void => {
+    void import('../lib/track').then((m) => m.start());
+  };
+  if (document.readyState === 'complete') go();
+  else addEventListener('load', go, { once: true });
+
+  // "Do not measure me" (profile panel). Turning it on also forgets this device's random ids.
+  const box = document.querySelector<HTMLInputElement>('[data-no-track]');
+  if (box) {
+    const gpc = (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true;
+    try {
+      box.checked = gpc || localStorage.getItem('pz_no_track') === '1';
+    } catch {
+      box.checked = true;
+    }
+    box.disabled = gpc;
+    const note = document.querySelector<HTMLElement>('[data-no-track-gpc]');
+    if (note) note.hidden = !gpc;
+    box.addEventListener('change', () => {
+      try {
+        if (box.checked) {
+          localStorage.setItem('pz_no_track', '1');
+          for (const key of ['pz_vid', 'pz_sid', 'pz_sat', 'pz_vnew']) localStorage.removeItem(key);
+        } else {
+          localStorage.removeItem('pz_no_track');
+        }
+      } catch {
+        // Storage blocked: nothing is measured anyway.
+      }
+    });
+  }
+</script>

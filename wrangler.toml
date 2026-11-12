@@ -1,0 +1,23 @@
+# Cloudflare config for playzoni.com Pages Functions (functions/) and the admin database. docs/ADMIN.md §2, docs/ADMIN-SETUP.md.
+# No secrets here: secrets are added in the Cloudflare dashboard only.
+#
+# This file is used by local tools only (wrangler d1 migrations, npm run admin:dev). It has NO `pages_build_output_dir`
+# on purpose: with that line Cloudflare Pages would treat this file as the source of truth and fail the live deploy while
+# the database id below is still a placeholder. The owner adds the bindings in the Cloudflare dashboard instead
+# (Pages project "playzoni" -> Settings -> Bindings: D1 "DB" and R2 "UPLOADS"), see docs/ADMIN-SETUP.md.
+name = "playzoni"
+compatibility_date = "2026-10-01"
+
+# D1 database for the admin panel and visitor counts.
+# PLACEHOLDER id: the owner creates the database "playzoni" in the Cloudflare dashboard (docs/ADMIN-SETUP.md).
+# Its real "Database ID" can be pasted here later (an id is not a secret). Local dev works with this fake id.
+[[d1_databases]]
+binding = "DB"
+database_name = "playzoni"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+# R2 bucket for images uploaded in the admin (banners, replaced thumbnails).
+[[r2_buckets]]
+binding = "UPLOADS"
+bucket_name = "playzoni-uploads"

@@ -1,0 +1,14 @@
+# Cron Worker that builds the admin's daily numbers. docs/ADMIN-SETUP.md explains how it is created (no secrets).
+name = "playzoni-rollup"
+main = "index.ts"
+compatibility_date = "2026-10-01"
+
+[triggers]
+# Hourly at minute 7 (today), and nightly at 00:20 UTC (yesterday + today, retention, 90-day clean-up).
+crons = ["7 * * * *", "20 0 * * *"]
+
+# Same database as the site. PLACEHOLDER id: replace with the real "Database ID" of D1 "playzoni" before deploying.
+[[d1_databases]]
+binding = "DB"
+database_name = "playzoni"
+database_id = "00000000-0000-0000-0000-000000000000"

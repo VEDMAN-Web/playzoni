@@ -1,0 +1,175 @@
+---
+import GameTile from './GameTile.astro';
+import CategoryTile from './CategoryTile.astro';
+import NavBox from './NavBox.astro';
+import type { BadgeKind } from '../lib/badges';
+import { capBadges, placeItems } from '../lib/mosaic';
+
+// Game grid (docs/DESIGN.md §V2.2). Tile sizes: S = 1x1, L = 2x2, XL = 3x3. Two modes:
+// - mosaic (home, category page 1): after the nav box, positions 3 and 16 of every 24 tiles are L, the rest S.
+//   Featured games fill the L slots first. With xlFirst, the first featured game is XL (3x3 from 1024px, 2x2 below).
+// - uniform (rows, related, lists): every tile has the same size (S, or L when uniformSize is 'L').
+// Category tiles are 2x1 and take one slot in order. At most 12 badges are drawn on one grid (see capBadges).
+// The nav box (1x1, desktop only) is the first grid item on pages that use it (DESIGN §V2.3). The optional "lead"
+// slot comes right after it (for example the title tile on category pages).
+
+export interface GridGame {
+  kind: 'game';
+  title: string;
+  slug: string;
+  featured?: boolean;
+  badge?: BadgeKind;
+  previewVideo?: string;
+  screenshots?: string[];
+}
+export interface GridCategory {
+  kind: 'category';
+  slug: string;
+  shortName: string;
+  emoji: string;
+  /** Slug of the category's most popular game; its thumbnail is the tile picture (DESIGN §V2.8). */
+  imageSlug?: string;
+}
+export type GridItem = GridGame | GridCategory;
+
+interface Props {
+  items: GridItem[];
+  mode?: 'mosaic' | 'uniform';
+  uniformSize?: 'S' | 'L';
+  navBox?: boolean;
+  eagerCount?: number;
+  label?: string;
+  xlFirst?: boolean;
+  /** The first tile loads with high priority (the LCP picture on grid pages). False on the game page, where the player cover is the LCP. */
+  priorityFirst?: boolean;
+  /** R39: extra 1x1 games (not part of this list) rendered hidden after the tiles; the fit script shows just enough of
+      them to complete the bottom row. Not part of the page's ItemList. */
+  fillers?: { title: string; slug: string }[];
+  /** For pages made only of 2x1 tiles (the categories page): columns are 2 cells wide and stretch to fill the row, so an odd number of cell columns never leaves a hole. */
+  wide?: boolean;
+}
+
+const { items, mode = 'mosaic', uniformSize = 'S', navBox = false, eagerCount = 6, label = 'Games', xlFirst = false, priorityFirst = true, wide = false, fillers = [] } = Astro.props;
+
+const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
+---
+<div class={`grid grid-${mode}${wide ? ' grid-wide' : ''}`} role="group" aria-label={label}>
+  {navBox && <div class="cell cell-nav"><NavBox /></div>}
+  <slot name="lead" />
+  {placed.map((p, i) => (
+    <div class={`cell cell-${p.size.toLowerCase()}`}>
+      {p.item.kind === 'category' ? (
+        <CategoryTile slug={p.item.slug} shortName={p.item.shortName} emoji={p.item.emoji} imageSlug={p.item.imageSlug} />
+      ) : (
+        <GameTile
+          title={p.item.title}
+          slug={p.item.slug}
+          size={p.size === 'CAT' ? 'S' : p.size}
+          eager={i < eagerCount}
+          priority={priorityFirst && i === 0}
+          badge={p.item.badge}
+          previewVideo={p.item.previewVideo}
+          screenshots={p.item.screenshots}
+        />
+      )}
+    </div>
+  ))}
+  {mode === 'mosaic' && fillers.map((f) => (
+    <div class="cell cell-s cell-fill" hidden data-fill>
+      <GameTile title={f.title} slug={f.slug} size="S" />
+    </div>
+  ))}
+</div>
+{mode === 'mosaic' && <script is:inline src="/mosaic-fit.js"></script>}
+
+<style>
+  /* R47: a mosaic grid is shown only after the fit script has run (public/mosaic-fit.js), so tiles never move after the
+     first paint. Without JavaScript BaseLayout.astro makes it visible again (noscript style). */
+  .grid-mosaic:not([data-fitted]) {
+    visibility: hidden;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, var(--cell));
+    grid-auto-rows: var(--cell);
+    grid-auto-flow: dense;
+    justify-content: center;
+    gap: var(--gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  /* The nav box is a desktop tile; below 1024px the top bar in Header is used and this cell is not drawn. */
+  .cell-nav {
+    display: none;
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+  @media (min-width: 1024px) {
+    .cell-nav {
+      display: block;
+    }
+  }
+  .cell {
+    min-width: 0;
+  }
+  .cell > :global(*) {
+    height: 100%;
+  }
+  .cell-s {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+  .cell-l {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  /* Lists (uniform L, e.g. New Games) on phones that fit only 3 columns: a 2x2 tile leaves an empty column beside every
+     tile, so the tiles are drawn 1x1 there (look-and-feel pass, 12 Nov 2026). */
+  @media (max-width: 443px) {
+    .grid-uniform .cell-l {
+      grid-column: span 1;
+      grid-row: span 1;
+    }
+  }
+  /* XL is 3x3 from 1024px; on smaller screens it is drawn as L so it does not fill the width. */
+  .cell-xl {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  @media (min-width: 1024px) {
+    .cell-xl {
+      grid-column: span 3;
+      grid-row: span 3;
+    }
+  }
+  .cell-cat {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+  /* Wide mode: every column is as wide as a 2x1 tile (204px or more), so the nav box, the title tile and the category
+     tiles each take exactly one column. */
+  .grid-wide {
+    grid-template-columns: repeat(auto-fill, minmax(calc(2 * var(--cell) + var(--gap)), 1fr));
+  }
+  .grid-wide .cell-nav,
+  .grid-wide .cell-cat,
+  .grid-wide :global(.title-tile.span-2) {
+    grid-column: span 1;
+  }
+</style>
+
+<script>
+  // R32 / R47: on mosaic grids the last row must be full (src/lib/mosaic-fit-dom.ts). The first fit happens in the blocking
+  // script right after the grid (public/mosaic-fit.js), before the content below is painted. This one runs it again
+  // on load (harmless) and whenever the window is resized.
+  import { fitAllMosaics } from '../lib/mosaic-fit-dom';
+
+  let frame = 0;
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(fitAllMosaics);
+  });
+  fitAllMosaics();
+</script>
+

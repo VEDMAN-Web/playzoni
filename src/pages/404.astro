@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import GameRow from '../components/GameRow.astro';
+import { getPublishedGames } from '../lib/games';
+
+// Not-found page: a message, a search box and a Popular games row. noindex.
+const title = 'Page Not Found | Playzoni';
+const description =
+  'This page could not be found. Use the search box to look for a game, or pick one from the popular games below and press Play.';
+
+const games = await getPublishedGames();
+const popular = [...games]
+  .sort((a, b) => b.data.popularity - a.data.popularity)
+  .slice(0, 12)
+  .map((g) => ({ title: g.data.title, slug: g.data.slug }));
+---
+<BaseLayout title={title} description={description} canonicalPath="/404" noindex={true}>
+  <Header slot="header" />
+
+  <section class="not-found">
+    <h1>Page not found</h1>
+    <p>We could not find that page. It may have moved, or the address may have a typo. Try searching for a game.</p>
+
+    <form class="search-form" action="/search" method="get" role="search">
+      <label class="sr-only" for="nf-search">Search games</label>
+      <input id="nf-search" class="search-input" type="search" name="q" placeholder="Search games" autocomplete="off" />
+      <button class="search-button" type="submit">Search</button>
+    </form>
+
+    <p class="home-link"><a href="/">Go to the home page</a></p>
+  </section>
+
+  {popular.length > 0 && <GameRow title="Popular games" seeAllHref="/popular-games" games={popular} />}
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .not-found {
+    max-width: 640px;
+    margin: var(--s-4) auto 0;
+    padding: var(--s-5);
+    box-sizing: border-box;
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+    color: var(--c-ink);
+  }
+  .not-found h1 {
+    margin: 0 0 var(--s-2);
+    font: var(--t-h1);
+  }
+  .not-found p {
+    margin: 0 0 var(--s-3);
+    color: var(--c-ink-2);
+  }
+  .search-form {
+    display: flex;
+    gap: var(--s-2);
+    margin: 0 0 var(--s-3);
+  }
+  .search-input {
+    flex: 1;
+    min-width: 0;
+    height: 48px;
+    padding: 0 var(--s-4);
+    box-sizing: border-box;
+    border: 1px solid var(--c-line);
+    border-radius: var(--r-pill);
+    background: var(--c-bg);
+    color: var(--c-ink);
+    font: var(--t-body);
+  }
+  .search-button {
+    height: 48px;
+    padding: 0 var(--s-5);
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+    font: 800 16px/1 var(--font-sans);
+    cursor: pointer;
+  }
+  .search-button:hover {
+    background: var(--c-primary-dark);
+  }
+  .home-link {
+    margin: 0;
+  }
+  .home-link a {
+    color: var(--c-primary);
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+</style>

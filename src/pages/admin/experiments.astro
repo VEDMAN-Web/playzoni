@@ -1,0 +1,14 @@
+---
+// Admin screen 13: Experiments (docs/ADMIN.md §5.13).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Experiments" screen="experiments">
+  <p class="adm-intro">A/B tests: show a change to some visitors and compare plays and revenue per session. One test at a time.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { startExperiments } from '../../admin/experiments';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) void startExperiments(root);
+</script>

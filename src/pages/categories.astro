@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import GameGrid, { type GridItem } from '../components/GameGrid.astro';
+import TitleTile from '../components/TitleTile.astro';
+import SeoCard from '../components/SeoCard.astro';
+import JsonLd from '../components/JsonLd.astro';
+import { getPublishedGames } from '../lib/games';
+import { publishedCategoriesFrom } from '../lib/published';
+import { categoryPictures } from '../lib/category-image';
+import { SITE_URL } from '../lib/seo';
+
+// All categories: one tile per published category, with its game count. Only categories with
+// 12 or more published games are listed (docs/SEO-PLAN.md §Categories).
+const title = 'All Categories | Playzoni';
+const description =
+  'Browse all game categories on Playzoni. Pick action, car, puzzle, sports and more, then press Play on any free browser game, no download needed.';
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name: 'All Categories', path: '/categories' },
+];
+
+const games = await getPublishedGames();
+const published = publishedCategoriesFrom(games);
+const pictures = categoryPictures(games, published);
+// A good-looking picture for the About card: the most popular game on the site.
+const cardPicture = [...games].sort((a, b) => b.data.popularity - a.data.popularity)[0]?.data.slug;
+const items: GridItem[] = published.map((c) => ({
+  kind: 'category',
+  slug: c.slug,
+  shortName: c.shortName,
+  emoji: c.emoji,
+  imageSlug: pictures.get(c.slug),
+}));
+
+const url = (path: string): string => `${SITE_URL}${path}`;
+const jsonLd = [
+  { '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'All Categories', url: url('/categories'), description },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: url(c.path) })),
+  },
+];
+---
+<BaseLayout title={title} description={description} canonicalPath="/categories" mainClass="has-grid">
+  <Header slot="header" box={false} />
+
+  <GameGrid items={items} mode="uniform" navBox={true} wide={true} label="All categories">
+    <Fragment slot="lead">
+      <TitleTile crumbs={crumbs} h1="All Categories" span={2} />
+    </Fragment>
+  </GameGrid>
+
+  {items.length === 0 && <p class="empty">Categories appear here once they have 12 games.</p>}
+
+  <SeoCard label="About the categories" picture={cardPicture}>
+    <h2>About the categories</h2>
+    <p>
+      Pick a category to see its games. Each category shows how many games it has. Every game is free and plays in your browser.
+    </p>
+  </SeoCard>
+
+  <JsonLd data={jsonLd} />
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .empty {
+    color: var(--c-ink-2);
+  }
+</style>

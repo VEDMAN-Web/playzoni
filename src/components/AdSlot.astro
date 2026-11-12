@@ -1,0 +1,52 @@
+---
+// Reserved ad block (docs/DESIGN.md §V2.4, docs/PRD.md §11). Renders nothing unless PUBLIC_ADS_ENABLED is 'true'.
+// "side" fills the 2x2 cells to the right of the player; "strip" fills the 6x1 cells under it. The box keeps its
+// size so the page never jumps when an ad arrives. No ad code is loaded here yet (T6.1).
+interface Props {
+  variant: 'side' | 'strip';
+}
+
+const { variant } = Astro.props;
+const enabled = import.meta.env.PUBLIC_ADS_ENABLED === 'true';
+---
+{enabled && (
+  <div class={`ad-slot ad-${variant}`} role="complementary" aria-label="Advertisement">
+    <div class="ad-box"></div>
+    <span class="ad-label" aria-hidden="true">Advertisement</span>
+  </div>
+)}
+
+<style>
+  /* The label sits under the ad block (10px, wide letter-spacing); beside the wide strip it runs vertically along the right edge. */
+  .ad-slot {
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-height: var(--cell);
+  }
+  .ad-box {
+    flex: 1 1 auto;
+    min-height: 0;
+    border-radius: var(--r-card);
+    background: color-mix(in srgb, var(--c-surface) 55%, transparent);
+  }
+  .ad-label {
+    flex: 0 0 auto;
+    padding-top: 4px;
+    color: var(--c-ink-2);
+    font: 700 10px/12px var(--font-sans);
+    letter-spacing: 0.12em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .ad-strip {
+    flex-direction: row;
+  }
+  .ad-strip .ad-label {
+    padding: 0 0 0 4px;
+    writing-mode: vertical-rl;
+  }
+</style>

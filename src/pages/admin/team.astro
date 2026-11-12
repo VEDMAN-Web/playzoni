@@ -1,0 +1,14 @@
+---
+// Admin screen: Team (docs/ADMIN.md §5).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Team" screen="team">
+  <p class="adm-intro">Who can use the admin and what they can do. Only the Owner sees this screen.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { startTeam } from '../../admin/team';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) void startTeam(root);
+</script>

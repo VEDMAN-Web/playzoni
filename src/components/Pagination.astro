@@ -1,0 +1,64 @@
+---
+// Page links for paged lists (PRD §9). Page 1 is the base path, page N is "<base>/N".
+interface Props {
+  basePath: string;
+  pageNumber: number;
+  pages: number;
+}
+
+const { basePath, pageNumber, pages } = Astro.props;
+const hrefFor = (n: number): string => (n === 1 ? basePath : `${basePath}/${n}`);
+---
+{pages > 1 && (
+  <nav class="pager" aria-label="Pagination">
+    {pageNumber > 1 && <a class="pager-link" href={hrefFor(pageNumber - 1)} rel="prev">‹ Previous</a>}
+    <ol class="pager-pages">
+      {Array.from({ length: pages }, (_, i) => i + 1).map((n) => (
+        <li>
+          {n === pageNumber ? (
+            <span class="pager-link is-current" aria-current="page">{n}</span>
+          ) : (
+            <a class="pager-link" href={hrefFor(n)}>{n}</a>
+          )}
+        </li>
+      ))}
+    </ol>
+    {pageNumber < pages && <a class="pager-link" href={hrefFor(pageNumber + 1)} rel="next">Next ›</a>}
+  </nav>
+)}
+
+<style>
+  .pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-2);
+    margin: var(--s-6) 0;
+  }
+  .pager-pages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .pager-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 var(--s-3);
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    font: var(--t-small);
+    text-decoration: none;
+  }
+  .pager-link.is-current {
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+  }
+</style>

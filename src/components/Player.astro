@@ -1,0 +1,628 @@
+---
+// Game player (docs/DESIGN.md §V2.4, PRD §7). The HTML holds only the cover and the Play button; no iframe.
+// The script below creates the iframe: from 1024px by itself, after the page has loaded and the browser is idle;
+// on phones and tablets (under 1024px) after a tap on Play, in a full-screen overlay.
+// The frame is always wide on desktop, whatever the feed says about orientation (R19).
+interface Props {
+  title: string;
+  slug: string;
+  developer?: string;
+  /** T5.1b: short play-mode words for the bar ("2 players", "Online"), only confirmed modes. */
+  modes?: string[];
+  embedUrl: string;
+  aspect: 'landscape' | 'portrait' | 'square';
+}
+
+const { title, slug, developer, embedUrl, aspect, modes = [] } = Astro.props;
+const barLine = [developer ? `by ${developer}` : '', ...modes].filter(Boolean).join(' · ');
+const reportHref = `mailto:hello@playzoni.com?subject=${encodeURIComponent(`Problem with ${title} (${slug})`)}`;
+---
+<section class="player" aria-label={`Play ${title}`} data-player data-slug={slug} data-title={title} data-embed={embedUrl} data-aspect={aspect}>
+  <div class="player-frame" data-player-frame>
+    <img class="cover-bg" src={`/thumbs/${slug}/l.webp`} alt="" width="600" height="600" aria-hidden="true" loading="eager" fetchpriority="high" decoding="async" data-player-bg />
+    <div class="cover" data-player-cover>
+      <img class="cover-thumb" src={`/thumbs/${slug}/m.webp`} alt={title} width="300" height="300" decoding="async" />
+      <p class="cover-title">{title}</p>
+      <button type="button" class="play-btn" data-play>Play</button>
+    </div>
+    <div class="loading" role="status" aria-label="Loading the game" hidden data-player-loading>
+      <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    </div>
+    <p class="rotate-hint" hidden data-rotate-hint>Turn your phone sideways for the best view</p>
+    <button type="button" class="close-btn" aria-label="Close game" title="Close game" hidden data-player-close>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" /></svg>
+    </button>
+  </div>
+
+  <div class="player-bar">
+    <img class="bar-icon" src={`/thumbs/${slug}/s.webp`} alt="" width="150" height="150" decoding="async" />
+    <div class="bar-text">
+      <p class="bar-title">{title}</p>
+      {barLine && <p class="bar-dev">{barLine}</p>}
+    </div>
+    <div class="bar-actions">
+      <button type="button" class="icon-btn" aria-label="Favourite" title="Favourite" aria-pressed="false" data-fav>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-7.5-10A4 4 0 0 1 12 7.8a4 4 0 0 1 7.5 2.7c0 5.4-7.5 10-7.5 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+        <span class="btn-label">Favourite</span>
+      </button>
+      <button type="button" class="icon-btn" aria-label="Like" title="Like" aria-pressed="false" data-like>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M7 11v9H4v-9h3zm2 9V10.5L12.5 4c1.4 0 2.5 1.1 2.5 2.5V10h4.6a1.5 1.5 0 0 1 1.5 1.8l-1.3 7A2 2 0 0 1 18 20H9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+        <span class="btn-label">Like</span>
+      </button>
+      <button type="button" class="icon-btn flip" aria-label="Dislike" title="Dislike" aria-pressed="false" data-dislike>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M7 11v9H4v-9h3zm2 9V10.5L12.5 4c1.4 0 2.5 1.1 2.5 2.5V10h4.6a1.5 1.5 0 0 1 1.5 1.8l-1.3 7A2 2 0 0 1 18 20H9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" /></svg>
+        <span class="btn-label">Dislike</span>
+      </button>
+      <button type="button" class="icon-btn" aria-label="Fullscreen" title="Fullscreen" data-fullscreen>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <span class="btn-label">Fullscreen</span>
+      </button>
+      <button type="button" class="icon-btn" aria-label="Share" title="Share" data-share>
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="6" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="2" /><circle cx="18" cy="6" r="2.5" fill="none" stroke="currentColor" stroke-width="2" /><circle cx="18" cy="18" r="2.5" fill="none" stroke="currentColor" stroke-width="2" /><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6" stroke="currentColor" stroke-width="2" /></svg>
+        <span class="btn-label">Share</span>
+      </button>
+      <a class="icon-btn" href={reportHref} aria-label="Report a problem" title="Report a problem">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <span class="btn-label">Report</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="toast" role="status" aria-live="polite" hidden data-toast>Link copied</div>
+</section>
+
+<style>
+  /* One block: the frame (16:9 on phones, as tall as its four grid rows on desktop) with the bar attached below. */
+  .player {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin: 0 0 var(--s-3);
+    container-type: inline-size; /* the compact bar below follows the player's width, not the screen's */
+  }
+  .player-frame {
+    position: relative;
+    flex: 0 0 auto;
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--r-card) var(--r-card) 0 0;
+    background: var(--c-player-bg);
+  }
+  /* From 1060px the player sits in the tile grid (src/pages/game/[slug].astro): the frame is exactly 16:9 and
+     fills the 7x4 (9x5 from 1600px) cells; the bar hangs below it in the next grid row (R28, Q17). */
+  @media (min-width: 1060px) {
+    .player {
+      margin: 0;
+    }
+  }
+
+  /* Cover state */
+  .cover-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(18px) brightness(0.5);
+    transform: scale(1.1);
+  }
+  .cover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-3);
+    padding: var(--s-4);
+    text-align: center;
+  }
+  /* Sized from the frame height so the Play button always fits (it does not shrink). */
+  .cover > * {
+    flex-shrink: 0;
+  }
+  .cover-thumb {
+    height: 40%;
+    width: auto;
+    max-width: 60%;
+    aspect-ratio: 1 / 1;
+    border-radius: 20px;
+    object-fit: cover;
+  }
+  .cover-title {
+    margin: 0;
+    color: var(--c-primary-ink);
+    font: var(--t-h2);
+  }
+  .play-btn {
+    min-width: 180px;
+    height: 56px;
+    padding: 0 var(--s-5);
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+    font: 800 20px/1 var(--font-sans);
+    cursor: pointer;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  .play-btn:hover {
+    background: var(--c-primary-dark);
+  }
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.04);
+    }
+  }
+
+  /* Loading state: player background with our spinner, until the game frame has loaded. */
+  .loading {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--c-player-bg);
+  }
+  .loading[hidden] {
+    display: none;
+  }
+  /* Three white dots pulsing left to right (our own loader, DESIGN §V2.8). */
+  .dots {
+    display: flex;
+    gap: 10px;
+  }
+  .dots i {
+    display: block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--c-primary-ink);
+    opacity: 0.3;
+    animation: dot-pulse 1.2s ease-in-out infinite;
+  }
+  .dots i:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .dots i:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  @keyframes dot-pulse {
+    0%,
+    80%,
+    100% {
+      opacity: 0.3;
+      transform: scale(0.8);
+    }
+    40% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .play-btn,
+    .dots i {
+      animation: none;
+      opacity: 1;
+    }
+  }
+
+  /* Phones: a short hint above the game for landscape-only games held upright. */
+  .rotate-hint {
+    position: absolute;
+    left: 50%;
+    bottom: max(var(--s-4), env(safe-area-inset-bottom));
+    z-index: 3;
+    margin: 0;
+    padding: var(--s-2) var(--s-4);
+    transform: translateX(-50%);
+    border-radius: var(--r-pill);
+    background: color-mix(in srgb, var(--c-player-bg) 85%, transparent);
+    color: var(--c-primary-ink);
+    font: var(--t-small);
+    white-space: nowrap;
+  }
+  .rotate-hint[hidden] {
+    display: none;
+  }
+
+  /* The game itself */
+  .player-frame :global(.game-frame) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: var(--c-player-bg);
+  }
+
+  /* Full-screen overlay: used on phones and tablets, and as the iOS fullscreen fallback. */
+  .player-frame.is-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    width: 100%;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0;
+    aspect-ratio: auto;
+    border-radius: 0;
+  }
+  /* An iframe is a replaced element, so it needs explicit sizes (inset alone does not stretch it). */
+  .player-frame.is-overlay :global(.game-frame) {
+    top: env(safe-area-inset-top);
+    left: env(safe-area-inset-left);
+    width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right));
+    height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+  .close-btn {
+    position: absolute;
+    top: max(var(--s-2), env(safe-area-inset-top));
+    right: max(var(--s-2), env(safe-area-inset-right));
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: color-mix(in srgb, var(--c-player-bg) 60%, transparent);
+    color: var(--c-primary-ink);
+    cursor: pointer;
+  }
+  .close-btn[hidden] {
+    display: none;
+  }
+
+  /* Bar under the player: icon, title and developer on the left, labelled buttons on the right (desktop). */
+  .player-bar {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 56px;
+    padding: 0 var(--s-3);
+    box-sizing: border-box;
+    background: var(--c-surface);
+    border-radius: 0 0 var(--r-card) var(--r-card);
+  }
+  @media (min-width: 1024px) {
+    .player-bar {
+      height: 64px;
+      padding: 0 var(--s-4);
+    }
+  }
+  .bar-icon {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+  .bar-text {
+    flex: 1;
+    min-width: 0;
+  }
+  .bar-title {
+    margin: 0;
+    overflow: hidden;
+    color: var(--c-ink);
+    font: 700 16px/20px var(--font-sans);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bar-dev {
+    margin: 0;
+    overflow: hidden;
+    color: var(--c-ink-2);
+    font: var(--t-small);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bar-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--s-1);
+  }
+  /* Narrow phones: the five 44px buttons touch, so the title keeps room and nothing runs past the bar. */
+  @container (max-width: 479px) {
+    .bar-text {
+      display: none;
+    }
+    /* The cover above already shows the game's picture; without it the six 44px buttons fit from 360px (e2e). */
+    .bar-icon {
+      display: none;
+    }
+    .player-bar {
+      gap: var(--s-2);
+      padding: 0 var(--s-2);
+    }
+    .bar-actions {
+      flex: 1;
+      justify-content: space-between;
+      gap: 0;
+    }
+  }
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: none;
+    color: var(--c-ink);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .btn-label {
+    display: none;
+  }
+  /* Desktop: icon with a small label under it (§V2.4). Still a target of at least 44px. */
+  @media (min-width: 1024px) {
+    .icon-btn {
+      flex-direction: column;
+      gap: 2px;
+      width: 56px;
+      height: 52px;
+      border-radius: 12px;
+    }
+    .btn-label {
+      display: block;
+      color: inherit;
+      font: 700 11px/13px var(--font-sans);
+    }
+  }
+  .icon-btn[hidden] {
+    display: none;
+  }
+  .icon-btn:hover {
+    color: var(--c-primary);
+    text-decoration: none;
+  }
+  .icon-btn.flip svg {
+    transform: scaleY(-1);
+  }
+  /* Pressed state for favourite, like and dislike: filled icon in the primary colour. */
+  .icon-btn[aria-pressed="true"] {
+    color: var(--c-primary);
+  }
+  .icon-btn[aria-pressed="true"] path {
+    fill: currentColor;
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: var(--s-6);
+    z-index: 1100;
+    transform: translateX(-50%);
+    padding: var(--s-2) var(--s-4);
+    border-radius: var(--r-pill);
+    background: var(--c-ink);
+    color: var(--c-primary-ink);
+    font: var(--t-small);
+  }
+  .toast[hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  import { addRecentlyPlayed, getReaction, isFavourite, recordPlayStart, recordPlayTime, toggleFavourite, toggleReaction } from '../lib/storage';
+  import { STEP_SECONDS, secondsToAdd } from '../lib/play-time';
+
+  const root = document.querySelector<HTMLElement>('[data-player]');
+  if (root) {
+    const slug = root.dataset.slug ?? '';
+    const title = root.dataset.title ?? '';
+    const embedUrl = root.dataset.embed ?? '';
+    const frame = root.querySelector<HTMLElement>('[data-player-frame]')!;
+    const cover = root.querySelector<HTMLElement>('[data-player-cover]')!;
+    const coverBg = root.querySelector<HTMLElement>('[data-player-bg]')!;
+    const playBtn = root.querySelector<HTMLButtonElement>('[data-play]')!;
+    const closeBtn = root.querySelector<HTMLButtonElement>('[data-player-close]')!;
+    const fullscreenBtn = root.querySelector<HTMLButtonElement>('[data-fullscreen]')!;
+    const shareBtn = root.querySelector<HTMLButtonElement>('[data-share]')!;
+    const toast = root.querySelector<HTMLElement>('[data-toast]')!;
+    const loading = root.querySelector<HTMLElement>('[data-player-loading]')!;
+    const rotateHint = root.querySelector<HTMLElement>('[data-rotate-hint]')!;
+    const favBtn = root.querySelector<HTMLButtonElement>('[data-fav]')!;
+    const likeBtn = root.querySelector<HTMLButtonElement>('[data-like]')!;
+    const dislikeBtn = root.querySelector<HTMLButtonElement>('[data-dislike]')!;
+
+    // Phones and tablets: cover, Play button and full-screen overlay. From 1024px the game loads by itself.
+    const compact = window.matchMedia('(max-width: 1023px)');
+    const canFullscreen = typeof frame.requestFullscreen === 'function' && document.fullscreenEnabled !== false;
+    const isIos =
+      /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    let iframe: HTMLIFrameElement | null = null;
+    let overlayOpen = false;
+    // On phones, closing the overlay ends the game. For the iOS fullscreen fallback it only leaves the overlay.
+    let closeStopsGame = false;
+
+    // Landscape-only games: suggest turning the phone. The feed's orientation is used only here (R19).
+    function showRotateHint(): void {
+      if (root!.dataset.aspect !== 'landscape' || !window.matchMedia('(orientation: portrait)').matches) return;
+      rotateHint.hidden = false;
+      window.setTimeout(() => {
+        rotateHint.hidden = true;
+      }, 6000);
+    }
+
+    function openOverlay(stopsGame: boolean): void {
+      overlayOpen = true;
+      closeStopsGame = stopsGame;
+      frame.classList.add('is-overlay');
+      closeBtn.hidden = false;
+      document.body.style.overflow = 'hidden';
+      showRotateHint();
+    }
+
+    function closeOverlay(): void {
+      if (!overlayOpen) return;
+      overlayOpen = false;
+      frame.classList.remove('is-overlay');
+      closeBtn.hidden = true;
+      rotateHint.hidden = true;
+      document.body.style.overflow = '';
+      if (closeStopsGame) {
+        stopGame();
+      } else {
+        iframe?.focus();
+      }
+    }
+
+    // `focus` is false for the automatic start on desktop, so the page keeps the keyboard focus.
+    function startGame(focus = true): void {
+      if (iframe) return;
+      addRecentlyPlayed(slug);
+      recordPlayStart(slug);
+      iframe = document.createElement('iframe');
+      iframe.className = 'game-frame';
+      iframe.src = embedUrl;
+      iframe.title = `${title} game`;
+      iframe.setAttribute('allow', 'autoplay; fullscreen; gamepad; clipboard-write');
+      iframe.setAttribute('allowfullscreen', '');
+      iframe.addEventListener('load', () => {
+        loading.hidden = true;
+      }, { once: true });
+      frame.appendChild(iframe);
+      loading.hidden = false;
+      cover.hidden = true;
+      coverBg.hidden = true;
+      if (compact.matches) openOverlay(true);
+      if (focus) iframe.focus();
+    }
+
+    // Time played: every 5 seconds, while the game is running and this page is visible, up to 4 hours per visit (DESIGN §V2.9).
+    let visitSeconds = 0;
+    window.setInterval(() => {
+      if (!iframe || document.visibilityState !== 'visible') return;
+      const add = secondsToAdd(visitSeconds);
+      if (add === 0) return;
+      visitSeconds += add;
+      recordPlayTime(slug, add);
+    }, STEP_SECONDS * 1000);
+
+    function stopGame(): void {
+      iframe?.remove();
+      iframe = null;
+      loading.hidden = true;
+      cover.hidden = false;
+      coverBg.hidden = false;
+      playBtn.focus();
+    }
+
+    function showToast(message: string): void {
+      toast.textContent = message;
+      toast.hidden = false;
+      window.setTimeout(() => {
+        toast.hidden = true;
+      }, 2000);
+    }
+
+    async function share(): Promise<void> {
+      const url = `${window.location.origin}${window.location.pathname}`;
+      if (typeof navigator.share === 'function') {
+        try {
+          await navigator.share({ title, text: title, url });
+        } catch {
+          // The player closed the share sheet. Nothing to do.
+        }
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast('Link copied');
+      } catch {
+        try {
+          window.prompt('Copy this link', url);
+        } catch {
+          // No way to show the link here. Nothing more to do.
+        }
+      }
+    }
+
+    playBtn.addEventListener('click', () => startGame());
+
+    // Desktop: start by itself once the page has loaded and the browser is idle (300 ms at the latest).
+    function scheduleAutoStart(): void {
+      let started = false;
+      const go = (): void => {
+        if (started || iframe || compact.matches) return;
+        started = true;
+        startGame(false);
+      };
+      if ('requestIdleCallback' in window) window.requestIdleCallback(go, { timeout: 300 });
+      window.setTimeout(go, 300);
+    }
+    if (!compact.matches) {
+      if (document.readyState === 'complete') scheduleAutoStart();
+      else window.addEventListener('load', scheduleAutoStart, { once: true });
+    }
+    closeBtn.addEventListener('click', closeOverlay);
+    document.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeOverlay();
+    });
+
+    // Fullscreen: the Fullscreen API where it exists, the overlay on iOS, hidden elsewhere.
+    if (canFullscreen || isIos) {
+      fullscreenBtn.addEventListener('click', () => {
+        startGame();
+        // On a phone the game is already full screen in the overlay.
+        if (overlayOpen && closeStopsGame) return;
+        if (canFullscreen) {
+          if (document.fullscreenElement) {
+            void document.exitFullscreen();
+          } else {
+            void frame.requestFullscreen();
+          }
+        } else if (overlayOpen) {
+          closeOverlay();
+        } else {
+          openOverlay(false);
+        }
+      });
+    }
+
+    if (!canFullscreen && !isIos) fullscreenBtn.hidden = true;
+    shareBtn.addEventListener('click', () => {
+      void share();
+    });
+
+    // Favourite, like and dislike: saved in this browser only. No counts are shown.
+    function paintFeedback(): void {
+      favBtn.setAttribute('aria-pressed', String(isFavourite(slug)));
+      const reaction = getReaction(slug);
+      likeBtn.setAttribute('aria-pressed', String(reaction === 'like'));
+      dislikeBtn.setAttribute('aria-pressed', String(reaction === 'dislike'));
+    }
+    paintFeedback();
+    favBtn.addEventListener('click', () => {
+      toggleFavourite(slug);
+      paintFeedback();
+    });
+    likeBtn.addEventListener('click', () => {
+      toggleReaction(slug, 'like');
+      paintFeedback();
+    });
+    dislikeBtn.addEventListener('click', () => {
+      toggleReaction(slug, 'dislike');
+      paintFeedback();
+    });
+  }
+</script>

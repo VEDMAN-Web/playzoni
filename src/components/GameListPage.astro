@@ -1,0 +1,86 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import GameGrid from './GameGrid.astro';
+import TitleTile from './TitleTile.astro';
+import SeoCard from './SeoCard.astro';
+import Pagination from './Pagination.astro';
+import JsonLd from './JsonLd.astro';
+import { buildCategoryPageTitle, buildPagedDescription, SITE_URL } from '../lib/seo';
+
+// A paged list of games in a uniform M grid (new games, popular games). Same layout pattern as
+// category pages: nav spacer, title tile, intro, grid, pager.
+interface Props {
+  basePath: string;
+  name: string;
+  firstTitle: string;
+  firstDescription: string;
+  intro: string;
+  games: { title: string; slug: string }[];
+  pageNumber: number;
+  pages: number;
+  perPage: number;
+}
+
+const { basePath, name, firstTitle, firstDescription, intro, games, pageNumber, pages, perPage } = Astro.props;
+const isFirst = pageNumber === 1;
+const canonicalPath = isFirst ? basePath : `${basePath}/${pageNumber}`;
+const title = isFirst ? firstTitle : buildCategoryPageTitle(name, pageNumber);
+const description = isFirst ? firstDescription : buildPagedDescription(name, pageNumber);
+const h1 = isFirst ? name : `${name}, Page ${pageNumber}`;
+const crumbs = [
+  { name: 'Home', path: '/' },
+  { name, path: basePath },
+];
+
+const items = games.map((g) => ({ kind: 'game' as const, title: g.title, slug: g.slug }));
+const url = (path: string): string => `${SITE_URL}${path}`;
+const jsonLd = [
+  { '@context': 'https://schema.org', '@type': 'CollectionPage', name: h1, url: url(canonicalPath), description },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: games.slice(0, 20).map((g, i) => ({
+      '@type': 'ListItem',
+      position: (pageNumber - 1) * perPage + i + 1,
+      url: url(`/game/${g.slug}`),
+      name: g.title,
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: url(c.path) })),
+  },
+];
+---
+<BaseLayout title={title} description={description} canonicalPath={canonicalPath} mainClass="has-grid">
+  <Header slot="header" box={false} />
+
+  <GameGrid items={items} mode="uniform" uniformSize="L" navBox={true} eagerCount={6} label={`${name} list`}>
+    <Fragment slot="lead">
+      <TitleTile crumbs={crumbs} h1={h1} />
+    </Fragment>
+  </GameGrid>
+
+  {games.length === 0 && <p class="empty">No games here yet.</p>}
+
+  <Pagination basePath={basePath} pageNumber={pageNumber} pages={pages} />
+
+  {isFirst && (
+    <SeoCard label={`About ${name}`}>
+      <h2>About this list</h2>
+      <p>{intro}</p>
+    </SeoCard>
+  )}
+
+  <JsonLd data={jsonLd} />
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .empty {
+    color: var(--c-ink-2);
+  }
+</style>

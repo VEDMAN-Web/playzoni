@@ -1,0 +1,49 @@
+---
+import '../styles/client-tiles.css';
+// "Recently played" row (PRD §6). Built in the browser from localStorage after the page loads.
+// It sits below the mosaic, so adding it never moves anything above the fold (no layout shift).
+// Hidden when the visitor has no history, or when storage is not available.
+---
+<section class="recent" aria-labelledby="recent-heading" hidden data-recent>
+  <div class="recent-head">
+    <h2 id="recent-heading">Recently played</h2>
+  </div>
+  <div class="pz-row" data-recent-track></div>
+</section>
+
+<style>
+  .recent {
+    margin: var(--s-6) 0;
+  }
+  .recent[hidden] {
+    display: none;
+  }
+  .recent-head h2 {
+    margin: 0 0 var(--s-2);
+    color: var(--c-ink);
+    font: var(--t-h3);
+  }
+</style>
+
+<script>
+  import { getRecentlyPlayed } from '../lib/storage';
+  import { gameTile, loadIndex, pickGames } from '../lib/render-tiles';
+  import { applyPlayedBadges } from '../lib/played-badge';
+
+  const section = document.querySelector<HTMLElement>('[data-recent]');
+  const track = document.querySelector<HTMLElement>('[data-recent-track]');
+  const slugs = getRecentlyPlayed();
+
+  if (section && track && slugs.length > 0) {
+    void loadIndex().then((index) => {
+      const games = pickGames(index, slugs);
+      if (games.length === 0) return;
+      // Plain tiles, no names under them (R27); every game here has been played, so each gets the played badge.
+      for (const game of games) track.appendChild(gameTile(game, false));
+      section.hidden = false;
+      applyPlayedBadges(track);
+      // Popular and New rows listen for this and drop the games shown here (GameRow `dedupe`).
+      document.dispatchEvent(new CustomEvent('pz:recent-ready'));
+    });
+  }
+</script>

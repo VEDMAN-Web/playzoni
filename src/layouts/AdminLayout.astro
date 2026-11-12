@@ -1,0 +1,183 @@
+---
+// Admin shell (docs/ADMIN.md §6): sidebar 248px (icons only below 1280px, a bottom sheet on phones), top bar 64px
+// (page title, date range with "compare to previous period", filters, game search, user menu), content max 1440px.
+// Never indexed: noindex,nofollow, not in the sitemap or Pagefind. Cloudflare Access protects /admin*.
+import '../styles/admin.css';
+import nunitoUrl from '@fontsource-variable/nunito/files/nunito-latin-wght-normal.woff2?url';
+import { NAV } from '../admin/nav';
+
+interface Props {
+  /** Screen name, shown in the top bar and the tab title. */
+  title: string;
+  /** Nav item id to highlight. */
+  screen: string;
+  /** Show the date range and compare controls (analytics screens). */
+  range?: boolean;
+  /** Show the country/device/language filters. */
+  filters?: boolean;
+}
+
+const { title, screen, range = false, filters = false } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="referrer" content="same-origin" />
+    <title>{`${title} | Playzoni Admin`}</title>
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="preload" href={nunitoUrl} as="font" type="font/woff2" crossorigin />
+  </head>
+  <body class="adm" data-pagefind-ignore="all" data-screen={screen}>
+    <a class="adm-skip" href="#adm-main">Skip to content</a>
+    <div class="adm-backdrop" data-adm-backdrop hidden></div>
+
+    <aside class="adm-side" id="adm-nav" aria-label="Admin menu" data-adm-nav>
+      <a class="adm-brand" href="/admin" aria-label="Playzoni admin home">
+        <img src="/icon.svg" width="32" height="32" alt="" />
+        <span class="adm-brand-text">playzoni <b>admin</b></span>
+      </a>
+      <nav class="adm-nav">
+        {
+          NAV.map((group) => (
+            <div class="adm-group">
+              <p class="adm-group-label">{group.label}</p>
+              <ul>
+                {group.items.map((item) => (
+                  <li>
+                    <a
+                      class="adm-link"
+                      href={item.href}
+                      aria-current={item.id === screen ? 'page' : undefined}
+                      title={item.label}
+                      data-adm-link
+                      data-role={item.role}
+                    >
+                      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d={item.icon} />
+                      </svg>
+                      <span class="adm-link-text">{item.label}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+      <a class="adm-link adm-site-link" href="/" title="Open the site">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6" /></svg>
+        <span class="adm-link-text">Open the site</span>
+      </a>
+    </aside>
+
+    <div class="adm-wrap">
+      <header class="adm-top">
+        <button class="adm-icon-btn adm-menu-btn" type="button" aria-label="Open the menu" aria-controls="adm-nav" aria-expanded="false" data-adm-menu>
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        </button>
+        <h1 class="adm-title">{title}</h1>
+
+        {
+          (range || filters) && (
+            <button class="adm-btn adm-filters-btn" type="button" aria-controls="adm-controls" aria-expanded="false" data-adm-filters>
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4" /></svg>
+              <span data-adm-range-label>Filters</span>
+            </button>
+          )
+        }
+        {
+          (range || filters) && (
+            <div class="adm-controls" id="adm-controls" data-adm-controls>
+              <p class="adm-sheet-title">Date and filters</p>
+              {range && (
+                <div class="adm-field">
+                  <label for="adm-range">Dates</label>
+                  <select id="adm-range" data-adm-range>
+                    <option value="today">Today</option>
+                    <option value="yesterday">Yesterday</option>
+                    <option value="7" selected>Last 7 days</option>
+                    <option value="28">Last 28 days</option>
+                    <option value="90">Last 90 days</option>
+                    <option value="custom">Custom dates</option>
+                  </select>
+                </div>
+              )}
+              {range && (
+                <div class="adm-field adm-custom" hidden data-adm-custom>
+                  <label for="adm-from">From</label>
+                  <input id="adm-from" type="date" data-adm-from />
+                  <label for="adm-to">To</label>
+                  <input id="adm-to" type="date" data-adm-to />
+                </div>
+              )}
+              {range && (
+                <label class="adm-check">
+                  <input type="checkbox" data-adm-compare />
+                  <span>Compare to previous period</span>
+                </label>
+              )}
+              {filters && (
+                <div class="adm-field">
+                  <label for="adm-country">Country</label>
+                  <input id="adm-country" type="text" inputmode="text" maxlength="2" placeholder="Country" autocomplete="off" data-adm-country />
+                </div>
+              )}
+              {filters && (
+                <div class="adm-field">
+                  <label for="adm-device">Device</label>
+                  <select id="adm-device" data-adm-device>
+                    <option value="">All devices</option>
+                    <option value="mobile">Phone</option>
+                    <option value="tablet">Tablet</option>
+                    <option value="desktop">Desktop</option>
+                  </select>
+                </div>
+              )}
+              {filters && (
+                <div class="adm-field">
+                  <label for="adm-lang">Language</label>
+                  <input id="adm-lang" type="text" maxlength="5" placeholder="Language" autocomplete="off" data-adm-lang />
+                </div>
+              )}
+              <p class="adm-hint">One filter works at a time on daily numbers.</p>
+              <button class="adm-btn adm-btn-primary adm-sheet-done" type="button" data-adm-done>Done</button>
+            </div>
+          )
+        }
+
+        <form class="adm-find" role="search" data-adm-find>
+          <label class="adm-sr" for="adm-find">Find a game</label>
+          <input id="adm-find" type="search" placeholder="Find a game" list="adm-find-list" autocomplete="off" data-adm-find-input />
+          <datalist id="adm-find-list" data-adm-find-list></datalist>
+        </form>
+
+        <div class="adm-user">
+          <button class="adm-avatar" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Your account" data-adm-user-btn>
+            <span data-adm-initial>?</span>
+          </button>
+          <div class="adm-user-menu" hidden data-adm-user-menu>
+            <p class="adm-user-email" data-adm-email>Checking sign-in</p>
+            <p class="adm-user-role" data-adm-role></p>
+            <a class="adm-btn" href="/cdn-cgi/access/logout">Sign out</a>
+          </div>
+        </div>
+      </header>
+
+      <div class="adm-demo" role="status" hidden data-demo>Sample data, not real visitors</div>
+      <div class="adm-alert" role="alert" hidden data-adm-auth-error></div>
+
+      <main id="adm-main" class="adm-main">
+        <noscript><p class="adm-empty">The admin needs JavaScript. Please turn it on.</p></noscript>
+        <slot />
+      </main>
+    </div>
+
+    <script>
+      import { startShell } from '../admin/shell';
+      startShell();
+    </script>
+  </body>
+</html>

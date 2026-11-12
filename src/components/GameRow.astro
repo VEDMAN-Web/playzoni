@@ -1,0 +1,304 @@
+---
+import GameTile from './GameTile.astro';
+import '../styles/client-tiles.css';
+
+// Horizontal game row (DESIGN §Rows, header from §V2.11). Scroll-snap track of plain S tiles; the name shows on hover
+// and focus only (R27). The header holds the title on the left and, on the right, a "See all" pill plus (desktop
+// 1024px+, JS on) two round arrow buttons. The arrows never sit on top of the tiles. They fade out at the start and end
+// of the row. Without JS it is a plain swipe/scroll row (the arrows stay hidden).
+// Endless rows (DESIGN §V2.13): with `more` set, the row loads the next 15 games from /games-index.json each time the
+// visitor scrolls near its end, until every game in that list is shown. `more` = "popular" (most popular first),
+// "new" (newest first) or "cat:<slug>" (that category, most popular first). Games already in the row are skipped.
+interface Props {
+  title: string;
+  seeAllHref?: string;
+  games: { title: string; slug: string }[];
+  eagerCount?: number;
+  more?: string;
+  /** Rows marked `dedupe` (Popular, New) never show a game that is in another such row or in "Recently played". */
+  dedupe?: boolean;
+}
+
+const { title, seeAllHref, games, eagerCount = 0, more, dedupe = false } = Astro.props;
+const headingId = `row-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+---
+<section class="row" aria-labelledby={headingId}>
+  <div class="row-head">
+    <h2 id={headingId} class="row-heading">{title}</h2>
+    <div class="row-tools">
+      {seeAllHref && (
+        <a class="see-all" href={seeAllHref} aria-label={`See all ${title.toLowerCase()}`}>
+          <span>See all</span>
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+        </a>
+      )}
+      <button class="arrow" type="button" aria-label="Scroll left" hidden data-row-prev>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
+      </button>
+      <button class="arrow" type="button" aria-label="Scroll right" hidden data-row-next>
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6" /></svg>
+      </button>
+    </div>
+  </div>
+  <div class="row-track" data-row-track data-more={more} data-dedupe={dedupe ? '' : undefined}>
+    {games.map((g, i) => (
+      <div class="row-item">
+        <GameTile title={g.title} slug={g.slug} size="S" eager={i < eagerCount} />
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .row {
+    margin: var(--s-6) 0;
+  }
+  .row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-bottom: var(--s-2);
+  }
+  .row-heading {
+    margin: 0;
+    color: var(--c-ink);
+    font: var(--t-h3);
+  }
+  .row-tools {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--s-2);
+  }
+  /* White pill like a small tile; 36px tall, tap area widened to 44px with ::after. */
+  .see-all {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    height: 36px;
+    padding: 0 10px 0 16px;
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    color: var(--c-ink);
+    font: 800 14px/1 var(--font-sans);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 120ms ease-out, color 120ms ease-out, transform 120ms ease-out;
+  }
+  .see-all::after {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
+  }
+  .see-all svg {
+    transition: transform 120ms ease-out;
+  }
+  .see-all:hover,
+  .see-all:focus-visible {
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+    text-decoration: none;
+  }
+  .see-all:hover svg,
+  .see-all:focus-visible svg {
+    transform: translateX(2px);
+  }
+  .arrow {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    color: var(--c-ink);
+    cursor: pointer;
+    transition: background-color 120ms ease-out, color 120ms ease-out, opacity 120ms ease-out;
+  }
+  .arrow::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+  }
+  .arrow[hidden] {
+    display: none;
+  }
+  .arrow:hover:not(:disabled),
+  .arrow:focus-visible:not(:disabled) {
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+  }
+  .arrow:disabled {
+    opacity: 0.45;
+    cursor: default;
+    box-shadow: none;
+  }
+  .row-track {
+    display: flex;
+    gap: var(--gap);
+    overflow-x: auto;
+    padding: var(--s-1) 0 var(--s-2);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .row-track::-webkit-scrollbar {
+    display: none;
+  }
+  .row-item {
+    flex: 0 0 auto;
+    /* S tiles on every width (DESIGN §Rows). */
+    width: var(--cell);
+    scroll-snap-align: start;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .see-all,
+    .see-all svg {
+      transition: none;
+    }
+    .see-all:hover svg,
+    .see-all:focus-visible svg {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  import { loadIndex, rowTile, type IndexGame } from '../lib/render-tiles';
+  import { applyPlayedBadges } from '../lib/played-badge';
+
+  const BATCH = 15;
+  let dedupeQueue: Promise<void> = Promise.resolve();
+  // Slugs shown in "Recently played" and in the other dedupe rows (Popular, New), so those rows stay different.
+  const takenElsewhere = (track: HTMLElement): Set<string> => {
+    const taken = new Set<string>();
+    const others = document.querySelectorAll<HTMLElement>('[data-recent-track], [data-row-track][data-dedupe]');
+    for (const other of others) {
+      if (other === track) continue;
+      for (const el of other.querySelectorAll<HTMLElement>('[data-slug]')) taken.add(el.dataset.slug ?? '');
+    }
+    return taken;
+  };
+  // The list a row draws from, in the same order the server used for its first 15 tiles.
+  const listFor = (more: string, index: IndexGame[]): IndexGame[] => {
+    if (more === 'popular') return index;
+    if (more === 'new') {
+      return index
+        .map((g, i) => ({ g, i }))
+        .sort((a, b) => (b.g.added ?? '').localeCompare(a.g.added ?? '') || a.i - b.i)
+        .map((x) => x.g);
+    }
+    if (more.startsWith('cat:')) {
+      const slug = more.slice(4);
+      return index.filter((g) => g.cats?.includes(slug));
+    }
+    return [];
+  };
+
+  // Shows the arrows on desktop (1024px and up), scrolls the row by most of its width, and disables an arrow at the
+  // start or end of the row. Rows that fit on screen get no arrows.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const desktop = window.matchMedia('(min-width: 1024px)');
+
+  document.querySelectorAll<HTMLElement>('.row').forEach((row) => {
+    const track = row.querySelector<HTMLElement>('[data-row-track]');
+    const prev = row.querySelector<HTMLButtonElement>('[data-row-prev]');
+    const next = row.querySelector<HTMLButtonElement>('[data-row-next]');
+    if (!track || !prev || !next) return;
+
+    const sync = (): void => {
+      const overflows = track.scrollWidth > track.clientWidth + 1;
+      const show = desktop.matches && overflows;
+      prev.hidden = !show;
+      next.hidden = !show;
+      prev.disabled = track.scrollLeft <= 1;
+      next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 1;
+    };
+    const scrollBy = (direction: number): void => {
+      track.scrollBy({
+        left: direction * track.clientWidth * 0.8,
+        behavior: reduceMotion.matches ? 'auto' : 'smooth',
+      });
+    };
+
+    // Endless loading: when the visitor is within about three tiles of the end, add the next batch.
+    const more = track.dataset.more;
+    let loading = false;
+    let done = !more;
+    let loop = 0; // position in the repeat pass, after every game has been shown once
+    const isDedupe = track.hasAttribute('data-dedupe');
+    const loadMore = async (force = false): Promise<void> => {
+      if (done || loading || !more) return;
+      if (!force && track.scrollLeft + track.clientWidth < track.scrollWidth - 3 * 110) return;
+      loading = true;
+      const shown = new Set(
+        [...track.querySelectorAll<HTMLElement>('[data-slug]')].map((el) => el.dataset.slug ?? ''),
+      );
+      const taken = isDedupe ? takenElsewhere(track) : new Set<string>();
+      const want = force ? Math.max(0, BATCH - shown.size) : BATCH;
+      const list = listFor(more, await loadIndex()).filter((g) => !taken.has(g.slug));
+      let next = list.filter((g) => !shown.has(g.slug)).slice(0, want);
+      // Endless: once every game in the list is on the row, start again from its first game (owner: rows never end).
+      if (next.length === 0 && !force && list.length > 0) {
+        next = Array.from({ length: BATCH }, (_, i) => list[(loop + i) % list.length]);
+        loop = (loop + BATCH) % list.length;
+      }
+      if (next.length === 0) {
+        if (!force) done = true;
+      } else {
+        const batch = document.createDocumentFragment();
+        next.forEach((g) => batch.appendChild(rowTile(g)));
+        track.appendChild(batch);
+        applyPlayedBadges(track);
+        // For the admin tracking (ADMIN.md §3, row_more).
+        document.dispatchEvent(new CustomEvent('pz:row-more', { detail: { row: more, count: next.length } }));
+      }
+      loading = false;
+      sync();
+    };
+
+    // "Recently played" filled in: drop its games from this row, then top the row back up to 15.
+    // Rows take turns (Popular first, then New), so two rows never grab the same game at the same moment.
+    if (isDedupe) {
+      document.addEventListener('pz:recent-ready', () => {
+        dedupeQueue = dedupeQueue.then(async () => {
+          const taken = takenElsewhere(track);
+          for (const el of [...track.querySelectorAll<HTMLElement>('[data-slug]')]) {
+            if (taken.has(el.dataset.slug ?? '')) (el.closest('.row-item, .pz-row-item') ?? el).remove();
+          }
+          await loadMore(true);
+        });
+      });
+    }
+
+    sync();
+    // On very wide screens the first 15 tiles may all fit: top the row up once it comes into view.
+    if (more && 'IntersectionObserver' in window) {
+      const seen = new IntersectionObserver((entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          seen.disconnect();
+          void loadMore();
+        }
+      });
+      seen.observe(track);
+    }
+    desktop.addEventListener('change', sync);
+    window.addEventListener('resize', sync, { passive: true });
+    track.addEventListener(
+      'scroll',
+      () => {
+        sync();
+        void loadMore();
+      },
+      { passive: true },
+    );
+    prev.addEventListener('click', () => scrollBy(-1));
+    next.addEventListener('click', () => scrollBy(1));
+  });
+</script>

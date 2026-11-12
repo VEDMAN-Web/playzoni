@@ -1,0 +1,101 @@
+/* Design tokens — copied exactly from docs/DESIGN.md. Do not hard-code these values in components. */
+
+:root {
+  /* §Colours */
+  --c-bg: #E3F1FF; /* small surfaces: chips, inputs */
+  /* §V2.1 page background gradient, fixed behind everything */
+  --c-bg-from: #5BBFFF;
+  --c-bg-mid: #8FDCFF;
+  --c-bg-to: #B6F0FF;
+  --c-surface: #FFFFFF;
+  --c-ink: #0E2440;
+  --c-ink-2: #50607A;
+  --c-line: #D2E3F5;
+  --c-primary: #1F7AFF;
+  --c-primary-ink: #FFFFFF;
+  --c-primary-dark: #0F5FD6;
+  --c-accent: #FFC531;
+  --c-accent-2: #FF5A8A;
+  --c-player-bg: #0B1A2E;
+  --c-focus: #0E2440;
+
+  /* §Type — font */
+  --font-sans: 'Nunito Variable', system-ui, sans-serif;
+
+  /* §Type — each type token is a font shorthand: weight size/line-height family.
+     Use as: font: var(--t-h1); */
+
+  /* H1: 28/34 mobile, 36/42 from 768px (override below), weight 800 */
+  --t-h1: 800 28px/34px var(--font-sans);
+
+  /* H2: 22/28, 800 */
+  --t-h2: 800 22px/28px var(--font-sans);
+
+  /* H3 / row titles: 18/24, 700 */
+  --t-h3: 700 18px/24px var(--font-sans);
+
+  /* body: 16/26, 400 */
+  --t-body: 400 16px/26px var(--font-sans);
+
+  /* small (meta, chips, labels): 14/20, 600 */
+  --t-small: 600 14px/20px var(--font-sans);
+
+  /* tile title overlay: 13/16, 700 */
+  --t-tile: 700 13px/16px var(--font-sans);
+
+  /* Admin panel only (docs/ADMIN.md §6): big KPI numbers and small uppercase labels. */
+  --t-kpi: 800 28px/34px var(--font-sans);
+  --t-label: 700 12px/16px var(--font-sans);
+
+  /* §Space (px) */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+
+  /* §Space — page gutter: 12px (<480), 16px (480–1023), 24px (≥1024) */
+  --gutter: 12px;
+
+  /* §Radius */
+  --r-tile: 16px; /* S tiles */
+  --r-tile-l: 20px; /* L and XL tiles */
+  --r-card: 20px;
+  --r-pill: 999px;
+  --r-player: 12px;
+
+  /* §Shadow */
+  --sh-tile: 0 4px 10px rgba(14, 36, 64, 0.18);
+  --sh-tile-hover: 0 10px 22px rgba(14, 36, 64, 0.28);
+  --ease-tile: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* §V2.2 Grid — cell size and gap */
+  --cell: 94px; /* R28 / DESIGN §V2.10: the same cell size at every width */
+  --gap: 12px;
+  --content-max: 1800px;
+}
+
+/* 480px and up */
+@media (min-width: 480px) {
+  :root {
+    --gutter: 16px;
+    --gap: 16px;
+  }
+}
+
+/* 768px and up */
+@media (min-width: 768px) {
+  :root {
+    --t-h1: 800 36px/42px var(--font-sans);
+  }
+}
+
+/* 1024px and up */
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 24px;
+  }
+}

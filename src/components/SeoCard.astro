@@ -1,0 +1,183 @@
+---
+// The text card (docs/DESIGN.md §V2.5, layout from §V2.11): one white card, as wide as the grid, placed directly above
+// the footer on the home, category and list pages, after all tiles and rows. The content column is centred in the
+// card so the white space is even on both sides: 860px for normal reading pages, 1200px with `wide` (the home page,
+// which lays its content out in two columns). Styles for headings, paragraphs, lists, links and the FAQ
+// (<div class="faq"> with <details>) are here, so every page's card looks the same.
+interface Props {
+  label?: string;
+  wide?: boolean;
+  /** Slug of a game: its picture sits at the left of the card text (owner, 12 Nov 2026: "thumbnail missing"). */
+  picture?: string;
+}
+
+const { label = 'About this page', wide = false, picture } = Astro.props;
+---
+<section class="seo-card" aria-label={label}>
+  <div class:list={['seo-inner', { wide }]}>
+    {picture && <img class="seo-pic" src={`/thumbs/${picture}/m.webp`} width="140" height="140" alt="" loading="lazy" decoding="async" />}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .seo-card {
+    box-sizing: border-box;
+    width: 100%;
+    margin: var(--s-7) 0 var(--s-5);
+    padding: var(--s-5) var(--s-4);
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+    color: var(--c-ink);
+  }
+  @media (min-width: 768px) {
+    .seo-card {
+      padding: var(--s-7) var(--s-6);
+    }
+  }
+  .seo-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  /* A game picture at the left of the text; the text wraps beside it. */
+  .seo-pic {
+    float: left;
+    width: 96px;
+    height: 96px;
+    margin: 0 var(--s-4) var(--s-3) 0;
+    border-radius: var(--r-tile-l);
+    box-shadow: var(--sh-tile);
+    object-fit: cover;
+  }
+  @media (min-width: 768px) {
+    .seo-pic {
+      width: 140px;
+      height: 140px;
+    }
+  }
+  .seo-inner.wide {
+    max-width: 1200px;
+  }
+  .seo-inner > :global(:first-child) {
+    margin-top: 0;
+  }
+  .seo-card :global(h1) {
+    margin: 0 0 var(--s-3);
+    color: var(--c-ink);
+    font: var(--t-h1);
+  }
+  .seo-card :global(h2) {
+    margin: var(--s-6) 0 var(--s-3);
+    color: var(--c-ink);
+    font: var(--t-h2);
+  }
+  .seo-card :global(h3) {
+    margin: var(--s-4) 0 var(--s-1);
+    color: var(--c-ink);
+    font: var(--t-h3);
+  }
+  .seo-card :global(p) {
+    margin: 0 0 var(--s-3);
+    color: var(--c-ink-2);
+    font: var(--t-body);
+  }
+  /* Body text is justified (owner, 11 Nov), with hyphenation so lines do not open wide gaps. Phones keep it
+     left-aligned: a narrow column justified leaves big holes between words. */
+  @media (min-width: 600px) {
+    .seo-card :global(p) {
+      text-align: justify;
+      hyphens: auto;
+    }
+  }
+  .seo-card :global(strong) {
+    color: var(--c-ink);
+    font-weight: 800;
+  }
+  .seo-card :global(ul),
+  .seo-card :global(ol) {
+    margin: 0 0 var(--s-3);
+    padding-left: var(--s-5);
+    color: var(--c-ink-2);
+  }
+  .seo-card :global(li) {
+    margin-bottom: var(--s-2);
+  }
+  /* Links are bold and in the darker blue (contrast of at least 4.5 to 1 on white). */
+  .seo-card :global(a) {
+    color: var(--c-primary-dark);
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .seo-card :global(a:hover),
+  .seo-card :global(a:focus-visible) {
+    text-decoration: underline;
+  }
+
+  /* FAQ: soft blue rounded boxes with a +/− mark; two columns from 1024px. No JS (<details>). */
+  .seo-card :global(.faq) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-3);
+    align-items: start;
+  }
+  @media (min-width: 1024px) {
+    .seo-inner.wide :global(.faq) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .seo-card :global(details) {
+    border-radius: 14px;
+    background: var(--c-bg);
+    transition: background-color 120ms ease-out, box-shadow 120ms ease-out;
+  }
+  .seo-card :global(details[open]) {
+    background: var(--c-surface);
+    box-shadow: 0 0 0 2px var(--c-line);
+  }
+  .seo-card :global(summary) {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 52px;
+    padding: var(--s-3) 52px var(--s-3) var(--s-4);
+    box-sizing: border-box;
+    color: var(--c-ink);
+    font: 800 16px/22px var(--font-sans);
+    list-style: none;
+    cursor: pointer;
+  }
+  .seo-card :global(summary::-webkit-details-marker) {
+    display: none;
+  }
+  .seo-card :global(summary::after) {
+    content: '+';
+    position: absolute;
+    top: 50%;
+    right: var(--s-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    margin-top: -14px;
+    border-radius: 50%;
+    background: var(--c-surface);
+    color: var(--c-primary-dark);
+    font: 800 20px/1 var(--font-sans);
+  }
+  .seo-card :global(details[open] summary::after) {
+    content: '−';
+    background: var(--c-bg);
+  }
+  .seo-card :global(details + details) {
+    margin-top: var(--s-3);
+  }
+  .seo-card :global(.faq details + details) {
+    margin-top: 0;
+  }
+  .seo-card :global(details > p) {
+    margin: 0;
+    padding: 0 var(--s-4) var(--s-4);
+  }
+</style>

@@ -1,0 +1,114 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import GameRow from '../components/GameRow.astro';
+import { getPublishedGames } from '../lib/games';
+
+// Search page (PRD §5). Pagefind UI reads the static index built after the site (`npm run build`
+// runs `pagefind` as its postbuild step). The Pagefind script and styles load on this page only.
+// noindex: search results are not meant for Google.
+const title = 'Search | Playzoni';
+const description =
+  'Search Playzoni for free online games by name. Type a game title, pick a result and press Play to start in your browser with no download needed.';
+
+const games = await getPublishedGames();
+const popular = [...games]
+  .sort((a, b) => b.data.popularity - a.data.popularity)
+  .slice(0, 12)
+  .map((g) => ({ title: g.data.title, slug: g.data.slug }));
+---
+<BaseLayout title={title} description={description} canonicalPath="/search" noindex={true}>
+  <Header slot="header" />
+
+  <link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
+
+  <h1 class="page-title">Search</h1>
+
+  <div id="search" class="search-ui" data-search></div>
+  <noscript><p class="note">Search needs JavaScript. You can still browse the categories and the A to Z list.</p></noscript>
+  <p class="note" data-search-unavailable hidden>Search is not available right now. Browse the categories or the A to Z list instead.</p>
+
+  {popular.length > 0 && (
+    <div data-popular hidden>
+      <GameRow title="Popular games" seeAllHref="/popular-games" games={popular} />
+    </div>
+  )}
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<script is:inline src="/pagefind/pagefind-ui.js"></script>
+<script>
+  // Typed view of the global that pagefind-ui.js (loaded just above) defines.
+  type PagefindUIOptions = Record<string, unknown>;
+  type PagefindUIClass = new (options: PagefindUIOptions) => { triggerSearch: (query: string) => void };
+  const PagefindUIGlobal = (window as unknown as { PagefindUI?: PagefindUIClass }).PagefindUI;
+
+  window.addEventListener('DOMContentLoaded', function () {
+    const container = document.getElementById('search');
+    const unavailable = document.querySelector<HTMLElement>('[data-search-unavailable]');
+    if (!container) return;
+    if (!PagefindUIGlobal) {
+      if (unavailable) unavailable.hidden = false;
+      return;
+    }
+    const ui = new PagefindUIGlobal({
+      element: '#search',
+      showImages: true,
+      showSubResults: false,
+      resetStyles: false,
+      // The site uses addresses without .html (the canonical URLs), so strip it from result links.
+      processResult: function (result: { url: string }) {
+        result.url = result.url.replace(/\.html$/, '');
+        return result;
+      },
+      translations: {
+        placeholder: 'Search games',
+        zero_results: 'No games found for "[SEARCH_TERM]".',
+      },
+    });
+    const query = new URLSearchParams(window.location.search).get('q');
+    if (query) ui.triggerSearch(query);
+
+    // "No results": show the message (from Pagefind) and a popular games row under it.
+    const popular = document.querySelector<HTMLElement>('[data-popular]');
+    if (popular) {
+      const update = function () {
+        const message = container.querySelector('.pagefind-ui__message');
+        popular.hidden = !(message && /No games found/.test(message.textContent || ''));
+      };
+      new MutationObserver(update).observe(container, { childList: true, subtree: true, characterData: true });
+    }
+  });
+</script>
+
+<style>
+  .page-title {
+    margin: var(--s-4) 0 var(--s-4);
+    color: var(--c-ink);
+    font: var(--t-h1);
+  }
+  .search-ui {
+    max-width: 720px;
+    min-height: 64px; /* the Pagefind box is drawn after load; reserve its height so the footer does not jump (e2e) */
+    --pagefind-ui-scale: 1;
+    --pagefind-ui-primary: var(--c-primary);
+    --pagefind-ui-text: var(--c-ink);
+    --pagefind-ui-background: var(--c-surface);
+    --pagefind-ui-border: var(--c-line);
+    --pagefind-ui-tag: var(--c-bg);
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: var(--r-card);
+    --pagefind-ui-image-border-radius: var(--r-tile);
+    --pagefind-ui-image-box-ratio: 1;
+    --pagefind-ui-font: var(--font-sans);
+  }
+  .note {
+    margin: var(--s-3) 0;
+    color: var(--c-ink-2);
+  }
+  .note[hidden] {
+    display: none;
+  }
+</style>

@@ -1,0 +1,92 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from './Header.astro';
+import Footer from './Footer.astro';
+import { SITE_NAME, SITE_URL } from '../lib/seo';
+
+// Layout for plain text pages (about, developers, contact, legal): one white text card
+// (DESIGN §Content blocks) with the page's only H1.
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  h1: string;
+  noindex?: boolean;
+}
+
+const { title, description, canonicalPath, h1, noindex = false } = Astro.props;
+
+// Every page carries JSON-LD (CLAUDE.md "Always"); a text page is a WebPage inside the site.
+const webPage = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: h1,
+  description,
+  url: `${SITE_URL}${canonicalPath}`,
+  isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
+};
+---
+<BaseLayout title={title} description={description} canonicalPath={canonicalPath} noindex={noindex}>
+  <Header slot="header" />
+
+  <script type="application/ld+json" set:html={JSON.stringify(webPage)} />
+
+  <article class="text-card">
+    <h1>{h1}</h1>
+    <slot />
+  </article>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<style>
+  .text-card {
+    max-width: 72ch;
+    margin: var(--s-4) auto 0;
+    padding: var(--s-5);
+    box-sizing: border-box;
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+    color: var(--c-ink);
+  }
+  .text-card h1 {
+    margin: 0 0 var(--s-3);
+    font: var(--t-h1);
+  }
+  .text-card :global(h2) {
+    margin: var(--s-5) 0 var(--s-2);
+    font: var(--t-h2);
+  }
+  .text-card :global(p),
+  .text-card :global(li) {
+    color: var(--c-ink-2);
+  }
+  .text-card :global(p) {
+    margin: 0 0 var(--s-3);
+  }
+  .text-card :global(a:not(.button)) {
+    color: var(--c-primary);
+  }
+  .text-card :global(.button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 var(--s-5);
+    border-radius: var(--r-pill);
+    background: var(--c-primary);
+    color: var(--c-primary-ink);
+    font: 800 18px/1 var(--font-sans);
+    text-decoration: none;
+  }
+  .text-card :global(.button:hover) {
+    background: var(--c-primary-dark);
+    color: var(--c-primary-ink);
+    text-decoration: none;
+  }
+  @media (max-width: 479px) {
+    .text-card {
+      padding: var(--s-4);
+    }
+  }
+</style>

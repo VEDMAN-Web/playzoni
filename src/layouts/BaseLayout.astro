@@ -1,0 +1,82 @@
+---
+import '../styles/global.css';
+import brand from '../../data/brand.json';
+import nunitoUrl from '@fontsource-variable/nunito/files/nunito-latin-wght-normal.woff2?url';
+import Seo from '../components/Seo.astro';
+import Tracking from '../components/Tracking.astro';
+import AdminConfig from '../components/AdminConfig.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  ogImage?: string;
+  noindex?: boolean;
+  /** Set "has-grid" on pages whose first grid item is the nav spacer (DESIGN §Header). */
+  mainClass?: string;
+  /** Origin of the game frame (game pages only): opens the connection early so Play starts faster. */
+  preconnect?: string;
+  /** Inline custom properties for <html>, e.g. the game page colours (T5.8). */
+  htmlStyle?: string;
+}
+
+const { title, description, canonicalPath, ogImage, noindex, mainClass, preconnect, htmlStyle } = Astro.props;
+
+// Cloudflare Web Analytics beacon only when a token is set (docs/PRD.md §2).
+const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
+// Phase 10 (docs/ADMIN.md): our own anonymous measurement. Off by default.
+const trackingEnabled = import.meta.env.PUBLIC_TRACKING_ENABLED === 'true';
+// The admin's instant settings (hero order, hidden games, banners). Off by default.
+const adminConfigEnabled = import.meta.env.PUBLIC_ADMIN_CONFIG_ENABLED === 'true';
+---
+<!doctype html>
+<html lang="en" style={htmlStyle}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content={brand.themeColor} />
+    <link rel="manifest" href="/site.webmanifest" />
+    <noscript><style>.grid-mosaic:not([data-fitted]) { visibility: visible; }</style></noscript>
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href={nunitoUrl} as="font" type="font/woff2" crossorigin />
+    {preconnect && <link rel="preconnect" href={preconnect} crossorigin />}
+    <Seo
+      title={title}
+      description={description}
+      canonicalPath={canonicalPath}
+      ogImage={ogImage}
+      noindex={noindex}
+    />
+    {
+      cfToken ? (
+        <script
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: cfToken })}
+        />
+      ) : null
+    }
+  </head>
+  <body>
+    <slot name="header" />
+    <main class={mainClass}>
+      <slot />
+    </main>
+    <slot name="footer" />
+    <script>
+      import { startTileMotion } from '../lib/tile-motion';
+      import { startTilePreview } from '../lib/tile-preview';
+      import { applyPlayedBadges } from '../lib/played-badge';
+      import { applyYourGames } from '../lib/your-games';
+      startTileMotion();
+      startTilePreview();
+      applyPlayedBadges();
+      // T5.10: on the home page, the visitor's played games move to the first small tiles (no JS: nothing moves).
+      if (location.pathname === '/') void applyYourGames();
+    </script>
+    {trackingEnabled && <Tracking />}
+    {adminConfigEnabled && <AdminConfig />}
+  </body>
+</html>

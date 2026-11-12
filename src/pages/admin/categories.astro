@@ -1,0 +1,14 @@
+---
+// Admin screen 5: Categories (docs/ADMIN.md §5.5).
+import AdminLayout from '../../layouts/AdminLayout.astro';
+---
+<AdminLayout title="Categories" screen="categories" range filters>
+  <p class="adm-intro">Names, order, menu, parent, page text and questions. Saving makes a commit on dev and the preview rebuilds in 1 to 3 minutes.</p>
+  <div data-screen-root></div>
+</AdminLayout>
+
+<script>
+  import { startCategories } from '../../admin/categories';
+  const root = document.querySelector<HTMLElement>('[data-screen-root]');
+  if (root) startCategories(root);
+</script>

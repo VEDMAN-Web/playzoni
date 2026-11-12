@@ -1,0 +1,469 @@
+---
+import '../styles/client-tiles.css';
+
+// Profile panel (docs/DESIGN.md §V2.9). "Your games": what this visitor played on this device, kept in localStorage only
+// (no sign-in, nothing leaves the browser). Slides in from the left like the search panel. Top card with a smiley and two
+// numbers, a row of recently played games with "Played today"-style labels, favourites, and a "Clear my history" link
+// with a confirmation inside the panel. The panel is filled by the script below when it opens; without JavaScript the
+// profile buttons are plain links to /favourites.
+// "Do not measure me" (docs/ADMIN.md §3): shown only when our own measurement is turned on. Wired by Tracking.astro.
+const trackingEnabled = import.meta.env.PUBLIC_TRACKING_ENABLED === 'true';
+---
+<div class="backdrop" data-profile-backdrop></div>
+<aside id="profile-panel" class="panel" role="dialog" aria-modal="true" aria-label="Your games" aria-hidden="true" data-profile-panel>
+  <button class="close" type="button" aria-label="Close your games" data-profile-close>
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+  </button>
+  <div class="scroll">
+    <section class="card" aria-labelledby="pp-title">
+      <svg class="avatar" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+        <circle cx="32" cy="32" r="30" fill="#FFC531" />
+        <circle cx="32" cy="32" r="30" fill="none" stroke="#0E2440" stroke-width="3" />
+        <circle cx="23" cy="26" r="3.4" fill="#0E2440" />
+        <circle cx="41" cy="26" r="3.4" fill="#0E2440" />
+        <path d="M19 38c3 7 23 7 26 0" fill="none" stroke="#0E2440" stroke-width="3.4" stroke-linecap="round" />
+      </svg>
+      <div class="card-text">
+        <h2 id="pp-title" class="card-title">Your games</h2>
+        <p class="card-sub">Saved on this device</p>
+      </div>
+      <ul class="stats">
+        <li class="stat" aria-label="Games played">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h10a4 4 0 0 1 4 4v1.5a3 3 0 0 1-5.4 1.8L14.6 14H9.4l-1 1.3A3 3 0 0 1 3 13.5V12a4 4 0 0 1 4-4z" /><path d="M8 10.5v2M7 11.5h2" /><path d="M16 11h.01M17.5 12.5h.01" /></svg>
+          <span data-profile-games>0</span>
+        </li>
+        <li class="stat" aria-label="Time played">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+          <span data-profile-time>0m</span>
+        </li>
+      </ul>
+    </section>
+
+    <p class="empty" data-profile-empty hidden>Play a game and it will show up here.</p>
+
+    <section class="block" aria-labelledby="pp-rounds" hidden data-profile-rounds-block>
+      <h2 id="pp-rounds" class="heading">Ready for another round?</h2>
+      <div class="rounds">
+        <div class="pz-row" data-profile-rounds></div>
+        <button class="next" type="button" aria-label="Show more games" hidden data-profile-next>
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M9.5 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </button>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="pp-fav" hidden data-profile-fav-block>
+      <h2 id="pp-fav" class="heading">Your favourites</h2>
+      <div class="grid6" data-profile-fav></div>
+    </section>
+
+    <div class="clear" hidden data-profile-clear-block>
+      <button class="link" type="button" data-profile-clear>Clear my history</button>
+      <div class="confirm" role="alertdialog" aria-labelledby="pp-confirm" hidden data-profile-confirm>
+        <p id="pp-confirm">Clear your history on this device? Your favourites stay.</p>
+        <div class="confirm-btns">
+          <button class="btn btn-danger" type="button" data-profile-clear-yes>Yes, clear it</button>
+          <button class="btn" type="button" data-profile-clear-no>Keep it</button>
+        </div>
+      </div>
+    </div>
+
+    {trackingEnabled && (
+      <div class="privacy">
+        <label class="switch">
+          <input type="checkbox" role="switch" data-no-track />
+          <span class="switch-text">Do not measure me</span>
+        </label>
+        <p class="privacy-note">We count visits without knowing who you are. Turn this on and this device sends nothing.</p>
+        <p class="privacy-note" hidden data-no-track-gpc>Your browser already asks sites not to track you, so nothing is sent.</p>
+      </div>
+    )}
+  </div>
+</aside>
+
+<style>
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: rgba(14, 36, 64, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 200ms ease-out, visibility 0s linear 200ms;
+  }
+  .backdrop.is-open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 200ms ease-out, visibility 0s linear 0s;
+  }
+  .panel {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 60;
+    width: 100%;
+    box-sizing: border-box;
+    background: linear-gradient(160deg, var(--c-bg-from) 0%, var(--c-bg-mid) 55%, var(--c-bg-to) 100%);
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform 240ms ease-out, visibility 0s linear 240ms;
+  }
+  .panel.is-open {
+    transform: none;
+    visibility: visible;
+    transition: transform 240ms ease-out, visibility 0s linear 0s;
+  }
+  .scroll {
+    box-sizing: border-box;
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 16px 72px 32px 16px;
+  }
+  @media (min-width: 520px) {
+    .panel {
+      width: 440px;
+    }
+    .scroll {
+      padding-right: 16px;
+    }
+  }
+  .close {
+    position: absolute;
+    top: 16px;
+    right: 14px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    box-shadow: var(--sh-tile);
+    cursor: pointer;
+  }
+  .close:hover,
+  .close:focus-visible {
+    color: var(--c-primary);
+  }
+  @media (min-width: 520px) {
+    .close {
+      right: -58px;
+    }
+  }
+
+  /* Top card: white at 70%, radius 20. */
+  .card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 14px;
+    align-items: center;
+    padding: 16px;
+    border-radius: var(--r-card);
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: var(--sh-tile);
+  }
+  .avatar {
+    display: block;
+  }
+  .card-title {
+    margin: 0;
+    color: var(--c-ink);
+    font: var(--t-h2);
+  }
+  .card-sub {
+    margin: 0;
+    color: var(--c-ink-2);
+    font: var(--t-small);
+  }
+  .stats {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 8px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    font: 800 15px/20px var(--font-sans);
+  }
+  .stat svg {
+    color: var(--c-primary);
+  }
+
+  .empty {
+    margin: 20px 0 0;
+    color: var(--c-ink);
+    font: var(--t-body);
+  }
+  .block {
+    margin-top: 20px;
+  }
+  .block[hidden],
+  .empty[hidden],
+  .clear[hidden],
+  .confirm[hidden],
+  .next[hidden] {
+    display: none;
+  }
+  .heading {
+    margin: 0 0 10px;
+    color: var(--c-ink);
+    font: var(--t-h3);
+  }
+
+  /* Row of large tiles with a round next button on its right edge. */
+  .rounds {
+    position: relative;
+    margin: 0 -16px;
+  }
+  .rounds :global(.pz-row) {
+    padding-inline: 16px;
+    scroll-padding-inline: 16px;
+  }
+  .rounds :global(.pz-row > .pz-tile-l) {
+    width: 168px;
+  }
+  .next {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    box-shadow: var(--sh-tile);
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+  .grid6 {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .clear {
+    margin-top: 28px;
+  }
+  .link {
+    padding: 8px 0;
+    border: 0;
+    background: none;
+    color: var(--c-ink);
+    font: var(--t-small);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .link:hover,
+  .link:focus-visible {
+    color: var(--c-primary-dark);
+  }
+  .confirm {
+    margin-top: 8px;
+    padding: 14px;
+    border-radius: var(--r-card);
+    background: var(--c-surface);
+    box-shadow: var(--sh-tile);
+  }
+  .confirm p {
+    margin: 0 0 12px;
+    color: var(--c-ink);
+    font: var(--t-small);
+  }
+  .confirm-btns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .btn {
+    min-height: 44px;
+    padding: 0 16px;
+    border: 2px solid var(--c-line);
+    border-radius: var(--r-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    font: 800 14px/20px var(--font-sans);
+    cursor: pointer;
+  }
+  .privacy {
+    margin-top: 28px;
+  }
+  .switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    color: var(--c-ink);
+    font: var(--t-small);
+    cursor: pointer;
+  }
+  .switch input {
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    accent-color: var(--c-primary);
+  }
+  .privacy-note {
+    margin: 4px 0 0;
+    color: var(--c-ink-2);
+    font: var(--t-small);
+  }
+  .privacy-note[hidden] {
+    display: none;
+  }
+  .btn-danger {
+    border-color: var(--c-ink);
+    background: var(--c-ink);
+    color: var(--c-primary-ink);
+  }
+</style>
+
+<script>
+  // Opens and closes the profile panel and fills it from this device's play history (localStorage). Escape, the close
+  // button and a click on the dimmed page close it. Any button with data-profile-open opens it.
+  import { clearHistory, getFavourites, getRecentlyPlayed, getStats } from '../lib/storage';
+  import { formatPlayTime, playedLabel } from '../lib/play-time';
+  import { gameTile, largeTile, loadIndex, pickGames, type IndexGame } from '../lib/render-tiles';
+  import { applyPlayedBadges } from '../lib/played-badge';
+
+  const MAX_ROUNDS = 12;
+  const MAX_FAVOURITES = 24;
+
+  const q = <T extends HTMLElement>(selector: string): T | null => document.querySelector<T>(selector);
+  const openBtns = document.querySelectorAll<HTMLElement>('[data-profile-open]');
+  const panel = q('[data-profile-panel]');
+  const backdrop = q('[data-profile-backdrop]');
+  const closeBtn = q<HTMLButtonElement>('[data-profile-close]');
+  const gamesEl = q('[data-profile-games]');
+  const timeEl = q('[data-profile-time]');
+  const emptyEl = q('[data-profile-empty]');
+  const roundsBlock = q('[data-profile-rounds-block]');
+  const rounds = q('[data-profile-rounds]');
+  const nextBtn = q<HTMLButtonElement>('[data-profile-next]');
+  const favBlock = q('[data-profile-fav-block]');
+  const fav = q('[data-profile-fav]');
+  const clearBlock = q('[data-profile-clear-block]');
+  const clearBtn = q<HTMLButtonElement>('[data-profile-clear]');
+  const confirmBox = q('[data-profile-confirm]');
+  const clearYes = q<HTMLButtonElement>('[data-profile-clear-yes]');
+  const clearNo = q<HTMLButtonElement>('[data-profile-clear-no]');
+  let opener: HTMLElement | null = null;
+
+  function isOpen(): boolean {
+    return panel?.classList.contains('is-open') ?? false;
+  }
+
+  async function render(): Promise<void> {
+    const index = await loadIndex();
+    const bySlug = new Map(index.map((g) => [g.slug, g]));
+    const stats = getStats();
+    const now = Date.now();
+
+    // Most recently played first: games with a history entry, then older "recently played" slugs without one.
+    const withStats = Object.values(stats)
+      .filter((s) => bySlug.has(s.slug))
+      .sort((a, b) => b.lastPlayed - a.lastPlayed)
+      .map((s) => s.slug);
+    const seen = new Set(withStats);
+    const extra = getRecentlyPlayed().filter((s) => bySlug.has(s) && !seen.has(s));
+    const slugs = [...withStats, ...extra];
+
+    const seconds = withStats.reduce((sum, slug) => sum + stats[slug].seconds, 0);
+    if (gamesEl) gamesEl.textContent = String(slugs.length);
+    if (timeEl) timeEl.textContent = formatPlayTime(seconds);
+
+    const hasHistory = slugs.length > 0;
+    if (emptyEl) emptyEl.hidden = hasHistory;
+    if (roundsBlock) roundsBlock.hidden = !hasHistory;
+    if (clearBlock) clearBlock.hidden = !hasHistory;
+    if (confirmBox) confirmBox.hidden = true;
+
+    if (rounds) {
+      const tiles = slugs.slice(0, MAX_ROUNDS).map((slug) => {
+        const game = bySlug.get(slug) as IndexGame;
+        const stat = stats[slug];
+        return largeTile(game, stat ? playedLabel(stat.lastPlayed, now) : '');
+      });
+      rounds.replaceChildren(...tiles);
+      rounds.scrollLeft = 0;
+    }
+
+    const favourites = pickGames(index, getFavourites()).slice(0, MAX_FAVOURITES);
+    if (fav) fav.replaceChildren(...favourites.map((g) => gameTile(g, false)));
+    if (favBlock) favBlock.hidden = favourites.length === 0;
+
+    if (panel) applyPlayedBadges(panel);
+    syncNext();
+  }
+
+  // The round "next" button only shows while there is more of the row to the right.
+  function syncNext(): void {
+    if (!rounds || !nextBtn) return;
+    nextBtn.hidden = rounds.scrollWidth - rounds.clientWidth - rounds.scrollLeft < 8;
+  }
+
+  function setOpen(open: boolean): void {
+    panel?.classList.toggle('is-open', open);
+    backdrop?.classList.toggle('is-open', open);
+    panel?.setAttribute('aria-hidden', open ? 'false' : 'true');
+    for (const btn of openBtns) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) {
+      void render();
+      closeBtn?.focus();
+    } else {
+      opener?.focus();
+    }
+  }
+
+  for (const btn of openBtns) {
+    btn.addEventListener('click', (event: MouseEvent) => {
+      // Without JS these links go to /favourites. With JS the panel opens instead.
+      event.preventDefault();
+      opener = btn;
+      setOpen(true);
+    });
+  }
+  closeBtn?.addEventListener('click', () => setOpen(false));
+  backdrop?.addEventListener('click', () => setOpen(false));
+  document.addEventListener('keydown', (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && isOpen()) setOpen(false);
+  });
+
+  nextBtn?.addEventListener('click', () => {
+    rounds?.scrollBy({ left: (rounds.clientWidth || 300) * 0.8, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  });
+  rounds?.addEventListener('scroll', syncNext, { passive: true });
+
+  // "Clear my history" asks inside the panel, never with a browser dialog.
+  clearBtn?.addEventListener('click', () => {
+    if (confirmBox) confirmBox.hidden = false;
+    clearYes?.focus();
+  });
+  clearNo?.addEventListener('click', () => {
+    if (confirmBox) confirmBox.hidden = true;
+    clearBtn?.focus();
+  });
+  clearYes?.addEventListener('click', () => {
+    clearHistory();
+    void render().then(() => closeBtn?.focus());
+  });
+</script>

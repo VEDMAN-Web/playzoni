@@ -1,0 +1,202 @@
+@import '@fontsource-variable/nunito';
+@import 'tailwindcss';
+@import './tokens.css';
+
+/* Map design tokens into the Tailwind theme (Tailwind v4 uses CSS for config). */
+@theme inline {
+  --color-bg: var(--c-bg);
+  --color-bg-from: var(--c-bg-from);
+  --color-bg-mid: var(--c-bg-mid);
+  --color-bg-to: var(--c-bg-to);
+  --color-surface: var(--c-surface);
+  --color-ink: var(--c-ink);
+  --color-ink-2: var(--c-ink-2);
+  --color-line: var(--c-line);
+  --color-primary: var(--c-primary);
+  --color-primary-ink: var(--c-primary-ink);
+  --color-primary-dark: var(--c-primary-dark);
+  --color-accent: var(--c-accent);
+  --color-accent-2: var(--c-accent-2);
+  --color-player-bg: var(--c-player-bg);
+  --color-focus: var(--c-focus);
+
+  --spacing-s1: var(--s-1);
+  --spacing-s2: var(--s-2);
+  --spacing-s3: var(--s-3);
+  --spacing-s4: var(--s-4);
+  --spacing-s5: var(--s-5);
+  --spacing-s6: var(--s-6);
+  --spacing-s7: var(--s-7);
+  --spacing-s8: var(--s-8);
+
+  --radius-tile: var(--r-tile);
+  --radius-card: var(--r-card);
+  --radius-pill: var(--r-pill);
+  --radius-player: var(--r-player);
+
+  --shadow-tile: var(--sh-tile);
+  --shadow-tile-hover: var(--sh-tile-hover);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* §V2.1: fixed gradient on the page, our own triangle pattern on top (body::before), content above both. */
+  html {
+    min-height: 100%;
+    /* T5.8: on a game page --page-from / --page-to hold the colours of that game's picture (data/game-colors.json). */
+    background-color: color-mix(in srgb, var(--page-from, var(--c-bg-mid)) 50%, var(--page-to, var(--c-bg-mid)));
+    background-image: linear-gradient(160deg, var(--page-from, var(--c-bg-from)) 0%, color-mix(in srgb, var(--page-from, var(--c-bg-mid)) 50%, var(--page-to, var(--c-bg-mid))) 55%, var(--page-to, var(--c-bg-to)) 100%);
+    background-attachment: fixed;
+  }
+
+  body > main {
+    flex: 1 0 auto;
+    width: 100%;
+    min-width: 0; /* a flex item may not grow wider than the screen because of its grid */
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: url('../assets/bg-pattern.svg') center / cover no-repeat;
+  }
+
+  body {
+    /* Short pages (search, favourites): the footer stays at the bottom of the screen (look-and-feel pass). */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    background-color: transparent;
+    color: var(--c-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 26px;
+    font-weight: 400;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--c-focus);
+    outline-offset: 2px;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  a:hover {
+    color: var(--c-primary);
+    text-decoration: underline;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Page space under the top bar (§V2.3): 56px bar plus 12px. */
+main {
+  padding-top: 68px;
+  padding-inline: var(--gutter);
+  box-sizing: border-box;
+}
+
+/* One shared column (DESIGN §V2.12): on grid pages every block in main (grid, rows, headings, text card) is exactly as
+   wide as the tile grid's whole columns, so all left and right edges line up. Browsers without CSS round() keep the
+   old full-width layout. */
+@supports (width: round(down, 10px, 3px)) {
+  main.has-grid.has-grid > * {
+    box-sizing: border-box;
+    max-width: calc(round(down, 100% + var(--gap), var(--cell) + var(--gap)) - var(--gap));
+    margin-inline: auto;
+  }
+}
+
+/* Tile reveal (§V2.2): tiles below the fold start hidden and rise in when they scroll into view. */
+.reveal-pre {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.reveal-pre.reveal-go {
+  opacity: 1;
+  transform: none;
+  transition: opacity 220ms ease-out, transform 220ms ease-out;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+@media (min-width: 1024px) {
+  /* The grid fills the window width, up to 1800px (§V2.10). */
+  main {
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding-top: calc(var(--cell) + 2 * var(--gap));
+  }
+
+  /* Pages with a grid start with the nav box as the first grid item instead. */
+  main.has-grid {
+    padding-top: var(--gap);
+  }
+}
+
+/* Badge on a game tile (DESIGN §V2.2, §V2.8): a 26px white rounded square (22px below 480px) with one line icon (new, hot or played).
+   Global because the played badge is added in the browser (src/lib/played-badge.ts), also on tiles built there. */
+.badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--c-surface);
+  color: var(--c-primary);
+  box-shadow: 0 1px 4px rgba(14, 36, 64, 0.25);
+}
+.badge svg {
+  display: block;
+}
+/* Phones: a smaller badge (22px square, 14px icon) so it does not cover the picture (R23). */
+@media (max-width: 479px) {
+  .badge {
+    top: 5px;
+    left: 5px;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+  }
+  .badge svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Hover preview media inside a tile (src/lib/tile-preview.ts). */
+.tile .pv {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+  pointer-events: none;
+}
+.tile .pv.is-on {
+  opacity: 1;
+}
