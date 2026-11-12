@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "Playzoni | Play Free Online Games Instantly",
   "short_name": "Playzoni",
   "description": "Play free online games instantly. No download needed.",
@@ -20,6 +21,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

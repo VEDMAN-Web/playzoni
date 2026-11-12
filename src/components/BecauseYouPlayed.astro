@@ -1,0 +1,60 @@
+---
+import '../styles/client-tiles.css';
+// T9.6 "Because you played X": built in the browser from the visitor's own history (localStorage) and the static
+// /games-index.json. Nothing is sent anywhere. It sits below the mosaic after "Recently played", so it never moves
+// anything above the fold. Absent with JavaScript off, for new visitors and when fewer than 6 similar games are left.
+---
+<section class="because" aria-labelledby="because-heading" hidden data-because>
+  <h2 id="because-heading">Because you played <a href="/" data-because-link></a></h2>
+  <div class="pz-row" data-because-track></div>
+</section>
+
+<style>
+  .because {
+    margin: var(--s-6) 0;
+  }
+  .because[hidden] {
+    display: none;
+  }
+  .because h2 {
+    margin: 0 0 var(--s-2);
+    color: var(--c-ink);
+    font: var(--t-h3);
+  }
+  .because h2 a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--c-primary);
+    text-decoration: none;
+  }
+  .because h2 a:hover {
+    text-decoration: underline;
+  }
+  .because h2 a:focus-visible {
+    outline: 3px solid var(--c-focus);
+    outline-offset: 2px;
+  }
+</style>
+
+<script>
+  import { getRecentlyPlayed } from '../lib/storage';
+  import { gameTile, loadIndex } from '../lib/render-tiles';
+  import { becauseYouPlayed } from '../lib/because-played';
+
+  const section = document.querySelector<HTMLElement>('[data-because]');
+  const track = document.querySelector<HTMLElement>('[data-because-track]');
+  const link = document.querySelector<HTMLAnchorElement>('[data-because-link]');
+  const played = getRecentlyPlayed();
+
+  if (section && track && link && played.length > 0) {
+    void loadIndex().then((index) => {
+      const row = becauseYouPlayed(index, played);
+      if (!row) return;
+      link.href = `/game/${row.source.slug}`;
+      link.textContent = row.source.title;
+      for (const game of row.games) track.appendChild(gameTile(game, false));
+      section.hidden = false;
+    });
+  }
+</script>

@@ -9,6 +9,8 @@ export interface IndexGame {
   added?: string;
   /** Category slugs, primary first. */
   cats?: string[];
+  /** Up to 5 tag slugs (T9.6). */
+  t?: string[];
 }
 
 let cached: Promise<IndexGame[]> | null = null;

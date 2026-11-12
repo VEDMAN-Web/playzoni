@@ -21,6 +21,8 @@ export interface GridGame {
   badge?: BadgeKind;
   previewVideo?: string;
   screenshots?: string[];
+  /** T9.5: small white label on the tile, e.g. "Game of the day". */
+  pill?: string;
 }
 export interface GridCategory {
   kind: 'category';
@@ -70,6 +72,7 @@ const placed = placeItems(capBadges(items), { mode, uniformSize, xlFirst });
           badge={p.item.badge}
           previewVideo={p.item.previewVideo}
           screenshots={p.item.screenshots}
+          pill={p.item.pill}
         />
       )}
     </div>

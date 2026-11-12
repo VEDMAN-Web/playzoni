@@ -7,12 +7,18 @@ Updated by the build agent after every task. The reviewer reads this first.
 - Preview URL: https://dev.playzoni.pages.dev (Cloudflare Pages project `playzoni`, branch `dev`, drafts on, every page noindex). Production branch `main` (not deployed yet).
 - Next task: TS.1 (owner types the /plugin installs), R38 (/graphify .), then T5.2 (test the 32 easy games from R29 first) when games are published. Planner: Q17 (player bar vs exact 7x4 / 9x5 block), Lighthouse on the new game page.
 
+## SPRINT 2 READY (12 Nov 2026, 20:15 IST, planner)
+- RELAY 2 done by the planner (the build chat did not start it): T9.5 Game of the day, T9.1 Installable app, T9.6 "Because you played X".
+- Tests: `npm run check` passes; `npm run e2e` against a local drafts preview: 1,249 checks, 0 failed.
+- Production-style build (samples off, no drafts, no PUBLIC_LAUNCH): 95 game pages, 166 pages all noindex, robots.txt Disallow: /.
+- Open: R43 (owner). Waiting on the owner: full pages for the 95 quick games, domain, PUBLIC_LAUNCH.
+
 ## READY FOR MERGE (12 Nov 2026, 04:30 IST, planner)
 - dev at 4bb7aba. RELAY R1 to R7 done (R2, R3 by the build chat; R1, R4, R5, R6, R50, R51 by the planner after the build chat stopped).
 - Tests: `npm run check` passes; `npm run e2e` 1,205 checks with samples off (only failure R51, now fixed) and 1,249 checks with samples on, 0 failures.
 - Production build (samples off): 95 game pages, all quick (the 24 sample games appear only in local builds where .env turns samples on), no drafts, every page noindex until `PUBLIC_LAUNCH=true`, robots.txt Disallow: /.
 - Open: R43 only (needs the owner: Cloudflare Access login before launch, separate Production D1).
-- The planner merges dev into main at the 08:30 check after re-testing the live preview.
+- Merged into main at 08:45 (42ccc58); production https://playzoni.pages.dev verified, still hidden from search engines.
 
 ## Current task
 (none — Phase P finished)
@@ -20,6 +26,11 @@ Updated by the build agent after every task. The reviewer reads this first.
 ## Log (newest first)
 | Date | Task | What changed (files) | How verified | Left open |
 |---|---|---|---|---|
+| 12 Nov 2026 19:50 | T9.6 "Because you played X" (planner) | src/lib/because-played.ts (same order as related.ts: X's primary category, then shared tags, then popularity; skips X and every played game; 6 to 12 games or no row), scripts/test-because-played.ts (in validate), src/components/BecauseYouPlayed.astro (row after Recently played, title links to X), index.astro (one line), games-index.json gets `t` (up to 5 tags); `cats` was already there. Index size, 119-game build: 20,375 B (3,670 B gzipped) before, 27,433 B (4,956 B gzipped) after | test-because-played ok; Playwright at 360/390/768/1280: no row for a new visitor, after a played game 12 similar unplayed tiles right after Recently played, link 44px tall, no overflow, CLS <= 0.002, no console errors; JS off: row absent; home entry JS 10.4 KB gzipped; screenshots docs/screens/T9.6/; npm run check passes | none |
+| 12 Nov 2026 19:30 | T9.1 Installable app (planner) | public/site.webmanifest (`id: "/"`, maskable 512 icon entry), public/icon-maskable-512.png (icon at 80% on #E3F1FF, made with sharp), src/lib/install.ts (startInstall, canInstall, isIos, isInstalled, promptInstall; no UI), BaseLayout loads startInstall | Chromium `Page.getInstallabilityErrors`: [] and manifest errors [] without a service worker, so no sw.js was added (nothing is cached); npm run check passes | Real-device check on Chrome Android when the domain is live |
+| 12 Nov 2026 19:25 | T9.5 Game of the day (planner; build chat did not start RELAY 2) | src/lib/game-of-day.ts, scripts/test-game-of-day.ts (in validate), GameGrid/GameTile `pill`, index.astro (L tile after the featured games, 14-day picks JSON + inline swap script) | test-game-of-day ok (same UTC day same pick, next day different, time zone ignored); Playwright at 360/390/768/1280 today and +3 days: 6th big tile, pill inside, swaps to the right pick, 0 duplicates, CLS <= 0.001, JS off shows the build-day pick; screenshots docs/screens/T9.5/ | none |
+| 12 Nov 2026 17:48 | Planner sprint 2 check (wave 1) | none | No build-chat commits since a0ec36b (RELAY 2 not started yet) | T9.5, T9.1, T9.6; planner reviews again at 19:15 |
+| 12 Nov 2026 08:45 | Merge dev into main (planner, owner go-ahead 12 Nov 02:03) | main 42ccc58 (merge of dev 1a06cad) | Before: npm run check passes; production-style build (samples off, no drafts, no PUBLIC_LAUNCH): 95 game pages, 0 sample/draft pages, every page noindex (149 via the prelaunch tag, 17 admin pages via their own tag), robots.txt Disallow: /; live preview pass at 390/1280 0 failures. After: https://playzoni.pages.dev loads (200) at 390 and 1280, robots noindex, robots.txt Disallow: /, sample pages 404, no page errors | R43 (owner); domain; PUBLIC_LAUNCH at launch |
 | 12 Nov 2026 06:50 | Planner overnight check 3 | docs/seo-reports/2026-11-12-e2e.md now holds the live run | `npm run e2e https://dev.playzoni.pages.dev` (live Cloudflare preview): 1,205 checks, 0 failures (31 pages x 6 widths, interactions, JS off, internal links). Admin dashboard loads data with no errors on the preview and on https://playzoni.vercel.app. No new build-chat commits | R43 (owner) |
 | 12 Nov 2026 05:00 | Planner overnight check 2 | none (no new build-chat commits since b7e77e8) | Category texts: 6 files, 0 shared sentences, no long dashes. Live on https://dev.playzoni.pages.dev and https://playzoni.vercel.app at 390 and 1280: robots.txt Disallow: /, llms.txt 200, game player not covered by tiles, no overflow, no page errors, category text present, New Games 3 per row on phones | R43 (owner) |
 | 12 Nov 2026 04:40 | RELAY R6 (planner) | GameGrid.astro (uniform L lists 1x1 under 444px), global.css (body flex column, main fills, min-width 0: footer at the bottom of short pages), about.astro + index.astro + Footer.astro (honest wording: no claim that every game was played before going live), docs/screens/final/ (every page type at 390 and 1280) | Playwright at 390/768/1280/1920: no overflow, CLS <= 0.005, footer gap 0; e2e run: 1,205 checks, 1 failure (R51, admin 768 CLS 0.052); npm run check passes. Note: with samples off there is no fully written game page: all 95 live games are quick pages | R51 (minor), R7 |

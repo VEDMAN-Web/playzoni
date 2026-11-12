@@ -265,18 +265,18 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: validate passes; each text is original (no shared sentences between categories).
 
 ### T5.2c — Quick-publish the planner's top 100 (owner, 11 Nov 2026: "without checking, directly to the live site")
-- status: todo · deps: — · model: haiku · docs: this task
+- status: done · deps: — · model: haiku · docs: this task
 - The planner chose 100 games from the Playgama catalog that are not on the site yet: `data/launch-list-quick.csv` (catalog rank order, mixed categories, brand copies and horror/romance left out). The code is ready: `publish --quick true` writes them as published with `quick: true` and a short generated text; quick pages are live for players and `noindex` (search engines skip them) until real text replaces it.
 - Do: `npm run publish -- --file data/launch-list-quick.csv --quick true`. A slug "not in staging" is fine (log it in STATUS); for "images missing", run `npm run import:pg` again and repeat the command (it never overwrites). Then `npm run check`.
 - Done when: about 100 quick pages exist, `npm run check` passes, commit `T5.2c: quick-publish top 100` pushed to dev, counts in STATUS.
 
 ### T5.2b — Import ~300 more popular games (owner, 11 Nov 2026)
-- status: todo · deps: — · model: haiku · docs: PRD §Sources, QUESTIONS Q17
+- status: done · deps: — · model: haiku · docs: PRD §Sources, QUESTIONS Q17
 - Do: run `npm run import:gm -- --limit 0` and `npm run import:pg` (if a feed rate-limits, wait and run again; record counts in STATUS). From the games not yet on the site, add **about 300 new drafts**: most played first when the feed gives a play/popularity number, otherwise the feed's own order; skip duplicates of games we already have, games without a phone version, and anything not suitable for children. Include an **open-world / city set** (about 20): city driving, police chase, gangster or sandbox car games, found by title/tags (city, open world, police, gangster, sandbox, car simulator). Never import or link anything using GTA, Rockstar or other brand names we have no licence for. List the open-world set's slugs in STATUS.
 - Done when: about 300 new drafts with thumbnails exist, `npm run check` passes, counts and the open-world list are in STATUS. Do not publish them: the planner's play-test agents write their QA files first.
 
 ### T5.3 — Game pages (repeat in batches of 20)
-- status: todo · deps: T5.1 · model: haiku · docs: SEO-PLAN §Content
+- status: replaced (owner chose quick pages without play tests, 11 Nov 2026; full pages wait for an owner decision) · deps: T5.1 · model: haiku · docs: SEO-PLAN §Content
 - QA files now come from the planner's automated play-test agents (`tester: "Claude QA (automated play-test)"`), pushed to `data/qa/` on dev in batches. Publish only games whose verdict is `publish`; skip `pending` and `reject`. Work in order of `popularity` (highest first). Batches of 20 per commit, as many batches per session as you can.
 - Do: for 20 draft games that have a QA file and are not rejected: fill frontmatter text fields and body from the QA notes + feed facts (rewritten), set `status: published`, `addedDate`/`updatedDate` = today. Commit message `T5.3: batch <n> (<first-slug>…)`.
 - Done when: validate passes for the batch. Repeat until 300.
@@ -287,7 +287,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: production build has 0 sample pages.
 
 ### T5.5 — Deploy
-- status: todo · deps: T3.5 · model: haiku
+- status: done (Cloudflare Pages preview + production, Vercel copy; domain still owner) · deps: T3.5 · model: haiku
 - Do: add `public/ads.txt` with the GameMonetize ads.txt lines (owner copies them from GameMonetize → Publisher → My Websites → View, into `data/ads-gamemonetize.txt`; the build copies that file to `public/ads.txt`). Write `docs/DEPLOY.md` (simple steps for Vedant: connect repo in Cloudflare Pages, build command `npm run build`, output `dist`, env vars, production branch `main`, preview branch `dev`; add domain playzoni.com; www → apex redirect rule). Put the steps in QUESTIONS as "Owner action needed". Also generate `public/icon-256.png` (256×256 from `icon.svg`, for the OneSignal default icon, T9.9) and add a DEPLOY.md owner step: "OneSignal → Settings → Web → Default icon URL = https://playzoni.com/icon-256.png". After owner confirms, verify preview URL works and record it in STATUS.
 - Done when: preview URL from `dev` loads; production waits for Vedant's merge; the planner has re-run Lighthouse mobile on the preview (home, a category, a game page) and every number in SEO-PLAN §Performance is met, or a QUESTIONS entry explains the gap.
 
@@ -297,7 +297,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: report saved, owner steps written.
 
 ### T5.7 — End-to-end test of the whole site (planner runs it)
-- status: todo · deps: T5.3, T5.5 · model: planner (Opus) · docs: —
+- status: done (planner, `npm run e2e`, 12 Nov 2026) · deps: T5.3, T5.5 · model: planner (Opus) · docs: —
 - Do (planner, with Playwright in the cloud on the preview URL): every page type (home, each category incl. paged, every game page, new/popular/all-games/categories, search panel + search page, favourites, profile panel, about/contact/developers/privacy/terms/cookies, 404) at 360, 390, 768, 1280, 1536, 1920: no horizontal scroll, no console errors, no broken links/images, Play loads the game iframe (desktop) and the overlay (phone), endless rows load, fuzzy search returns results + popular fallback, played badges after a play, favourites and profile work, JS-off pages readable, noindex/canonical/hreflang/JSON-LD present. Report `docs/seo-reports/<date>-e2e.md`; fixes go to REVIEW.
 - Done when: report saved and every failure is a REVIEW row.
 
@@ -374,7 +374,7 @@ All tasks: follow DESIGN §Poki parity v2. After each task, take screenshots at 
 - Done when: a test deploy logs a 200/202 from IndexNow for changed URLs; verification pages pass in Bing and Yandex (owner confirms).
 
 ### T8.8 — AI crawlers and llms.txt
-- status: todo · deps: Q20 · model: haiku · docs: SEO-INTL §4, §5
+- status: done (planner, RELAY R4) · deps: Q20 · model: haiku · docs: SEO-INTL §4, §5
 - Do: update `public/robots.txt` per the Q20 answer (search/answer bots allowed; training bots per answer); add `public/llms.txt` (site name, one-line description, links to home, categories, new, popular, about, per language once live).
 - Done when: robots.txt validates (no blocked Googlebot/Bingbot/YandexBot/OAI-SearchBot/Claude-SearchBot/PerplexityBot); llms.txt reachable.
 
@@ -403,7 +403,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - No new npm dependency (PRD §2). `npm run check` passes before every commit. At the end of the phase run `/graphify .`.
 
 ### T9.1 — Installable app (PWA check, service worker only if needed)
-- status: todo · deps: T5.6 · model: **sonnet** · docs: DESIGN §Brand, GROWTH tactic 6
+- status: done (planner) · deps: — (planner, 12 Nov: launch not needed) · model: **sonnet** · docs: DESIGN §Brand, GROWTH tactic 6
 - Do:
   1. `public/site.webmanifest` already exists. Add only what is missing for installability: `id: "/"`, and a 512px icon entry with `purpose: "maskable"` (make `public/icon-maskable-512.png` from `icon.svg` with sharp: icon centred at 80% on `--c-bg` colour). Do not change name, colours or the other icons.
   2. On the preview URL (Chrome desktop and Chrome Android), check installability (DevTools → Application → Manifest, "Installability"). Record the result in STATUS.
@@ -446,7 +446,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Done when: with the endpoint unreachable the build still passes and uses the fallback (`source: "fallback"`); with a fake response of 12+ qualifying games the row follows it; no duplicate games between the two popular rows; screenshots at 390 and 1280 in `docs/screens/T9.4/`.
 
 ### T9.5 — "Game of the day" tile
-- status: todo · deps: T5.6 · model: haiku · docs: DESIGN §V2.2 §V2.9 (pill style), GROWTH tactic 9
+- status: done (planner) · deps: — (planner, 12 Nov: launch not needed) · model: haiku · docs: DESIGN §V2.2 §V2.9 (pill style), GROWTH tactic 9
 - Do:
   1. `src/lib/game-of-day.ts`: eligible = published games with `mobile: true`, sorted by slug A–Z. Day number `d` = whole days from 2026-01-01 00:00 UTC to the current UTC day. Pick = `eligible[(d × 7919) mod N]`. Same game for everyone in the world at the same moment (UTC), no randomness, no visitor data.
   2. Home mosaic: one **L tile (2×2)** placed directly after the 5 featured games from R29, with a small white pill "Game of the day" in the bottom-left (same pill style as "Played today" in §V2.9, no clock icon). The played badge still applies. The same game is not repeated elsewhere in the mosaic.
@@ -456,7 +456,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Done when: a unit test (in validate) gives the same pick for the same date and a different pick on the next day; changing the computer's time zone does not change the pick; tile matches the pill style at 390 and 1280 (screenshots in `docs/screens/T9.5/`); CLS on home unchanged.
 
 ### T9.6 — "Because you played X" row (local history only)
-- status: todo · deps: T5.6, TP.7 · model: haiku · docs: PRD §6, DESIGN §Rows, `src/lib/related.ts`
+- status: done · deps: T9.5 (same file index.astro; run after it) · model: haiku · docs: PRD §6, DESIGN §Rows, `src/lib/related.ts`
 - Do:
   1. If `/games-index.json` lacks them, add two short fields per game: primary category slug `c` and up to 5 tag slugs `t`. Keep the file as small as possible (record its size before/after in STATUS).
   2. Home page: client-side row "Because you played {title}" directly **after** the "Recently played" row (below the mosaic, like PRD §6.3 — no layout shift). X = the most recently played game in `storage.ts`. Candidates: same primary category as X, then shared tags, then popularity — the same order as `related.ts`, written as a small client function (do not import build-time code). Exclude X and every game already played. Max 12 S tiles; show the row only if there are at least 6, otherwise hide it. Title links to X's game page.
