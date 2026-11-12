@@ -456,7 +456,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Done when: a unit test (in validate) gives the same pick for the same date and a different pick on the next day; changing the computer's time zone does not change the pick; tile matches the pill style at 390 and 1280 (screenshots in `docs/screens/T9.5/`); CLS on home unchanged.
 
 ### T9.6 — "Because you played X" row (local history only)
-- status: todo · deps: T9.5 (same file index.astro; run after it) · model: haiku · docs: PRD §6, DESIGN §Rows, `src/lib/related.ts`
+- status: done · deps: T9.5 (same file index.astro; run after it) · model: haiku · docs: PRD §6, DESIGN §Rows, `src/lib/related.ts`
 - Do:
   1. If `/games-index.json` lacks them, add two short fields per game: primary category slug `c` and up to 5 tag slugs `t`. Keep the file as small as possible (record its size before/after in STATUS).
   2. Home page: client-side row "Because you played {title}" directly **after** the "Recently played" row (below the mosaic, like PRD §6.3 — no layout shift). X = the most recently played game in `storage.ts`. Candidates: same primary category as X, then shared tags, then popularity — the same order as `related.ts`, written as a small client function (do not import build-time code). Exclude X and every game already played. Max 12 S tiles; show the row only if there are at least 6, otherwise hide it. Title links to X's game page.

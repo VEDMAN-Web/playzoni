@@ -13,7 +13,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "lint": "eslint .",
-    "validate": "tsx scripts/validate.ts && tsx scripts/test-validate.ts && tsx scripts/test-import.ts && tsx scripts/test-publish.ts && tsx scripts/test-adapters.ts && tsx scripts/test-adapter-pg.ts && tsx scripts/test-qa.ts && tsx scripts/test-drafts.ts && tsx scripts/test-mosaic.ts && tsx scripts/test-tp6.ts && tsx scripts/test-tp7.ts && tsx scripts/test-mosaic-fit.ts && tsx scripts/test-your-games.ts && tsx scripts/test-home-pins.ts && tsx scripts/test-theme-colors.ts && tsx scripts/test-seo.ts && tsx scripts/test-game-of-day.ts && npm run test:admin",
+    "validate": "tsx scripts/validate.ts && tsx scripts/test-validate.ts && tsx scripts/test-import.ts && tsx scripts/test-publish.ts && tsx scripts/test-adapters.ts && tsx scripts/test-adapter-pg.ts && tsx scripts/test-qa.ts && tsx scripts/test-drafts.ts && tsx scripts/test-mosaic.ts && tsx scripts/test-tp6.ts && tsx scripts/test-tp7.ts && tsx scripts/test-mosaic-fit.ts && tsx scripts/test-your-games.ts && tsx scripts/test-home-pins.ts && tsx scripts/test-theme-colors.ts && tsx scripts/test-seo.ts && tsx scripts/test-game-of-day.ts && tsx scripts/test-because-played.ts && npm run test:admin",
     "check": "astro check && npm run lint && npm run validate && npm run headers:check && npm run functions:check && npm run fit:check && npm run build",
     "placeholders": "tsx scripts/make-placeholders.ts",
     "import:sample": "tsx --env-file-if-exists=.env scripts/import/sample.ts",
