@@ -403,7 +403,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - No new npm dependency (PRD §2). `npm run check` passes before every commit. At the end of the phase run `/graphify .`.
 
 ### T9.1 — Installable app (PWA check, service worker only if needed)
-- status: todo · deps: — (planner, 12 Nov: launch not needed) · model: **sonnet** · docs: DESIGN §Brand, GROWTH tactic 6
+- status: done (planner) · deps: — (planner, 12 Nov: launch not needed) · model: **sonnet** · docs: DESIGN §Brand, GROWTH tactic 6
 - Do:
   1. `public/site.webmanifest` already exists. Add only what is missing for installability: `id: "/"`, and a 512px icon entry with `purpose: "maskable"` (make `public/icon-maskable-512.png` from `icon.svg` with sharp: icon centred at 80% on `--c-bg` colour). Do not change name, colours or the other icons.
   2. On the preview URL (Chrome desktop and Chrome Android), check installability (DevTools → Application → Manifest, "Installability"). Record the result in STATUS.

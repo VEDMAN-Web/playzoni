@@ -70,9 +70,11 @@ const adminConfigEnabled = import.meta.env.PUBLIC_ADMIN_CONFIG_ENABLED === 'true
       import { startTilePreview } from '../lib/tile-preview';
       import { applyPlayedBadges } from '../lib/played-badge';
       import { applyYourGames } from '../lib/your-games';
+      import { startInstall } from '../lib/install';
       startTileMotion();
       startTilePreview();
       applyPlayedBadges();
+      startInstall(); // T9.1: keeps the browser's install offer for a later "Add to home screen" button
       // T5.10: on the home page, the visitor's played games move to the first small tiles (no JS: nothing moves).
       if (location.pathname === '/') void applyYourGames();
     </script>
