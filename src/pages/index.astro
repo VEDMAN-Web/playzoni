@@ -4,7 +4,7 @@ import { previewFields } from '../lib/preview';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import GameGrid, { type GridItem } from '../components/GameGrid.astro';
+import GameGrid, { type GridGame, type GridItem } from '../components/GameGrid.astro';
 import ShowMore from '../components/ShowMore.astro';
 import MoreRows from '../components/MoreRows.astro';
 import RecentlyPlayed from '../components/RecentlyPlayed.astro';
@@ -36,7 +36,7 @@ const badges = pickBadges(
   Date.now(),
 );
 
-const gameItem = (g: (typeof games)[number]): GridItem => ({
+const gameItem = (g: (typeof games)[number]): GridGame => ({
   kind: 'game',
   title: g.data.title,
   slug: g.data.slug,
@@ -155,32 +155,32 @@ const faqPage = {
     // elsewhere in the mosaic, the two tiles trade games, so nothing is shown twice and nothing moves.
     (function () {
       try {
-        var data = document.getElementById('pz-god');
-        var tile = document.querySelector('main .grid-mosaic a.tile[data-pill]');
+        const data = document.getElementById('pz-god');
+        const tile = document.querySelector('main .grid-mosaic a.tile[data-pill]');
         if (!data || !tile) return;
-        var d = Math.floor((Date.now() - Date.UTC(2026, 0, 1)) / 86400000);
-        var pick = JSON.parse(data.textContent).find(function (p) { return p.d === d; });
+        const d = Math.floor((Date.now() - Date.UTC(2026, 0, 1)) / 86400000);
+        const pick = JSON.parse(data.textContent).find(function (p) { return p.d === d; });
         if (!pick || pick.slug === tile.dataset.slug) return;
-        var other = document.querySelector('main .grid-mosaic a.tile[data-slug="' + pick.slug + '"]');
-        var put = function (a, slug, title) {
-          var old = a.dataset.slug;
+        const other = document.querySelector('main .grid-mosaic a.tile[data-slug="' + pick.slug + '"]');
+        const put = function (a, slug, title) {
+          const old = a.dataset.slug;
           a.href = '/game/' + slug;
           a.dataset.slug = slug;
-          var img = a.querySelector('img');
+          const img = a.querySelector('img');
           ['src', 'srcset'].forEach(function (k) {
-            var v = img.getAttribute(k);
+            const v = img.getAttribute(k);
             if (v) img.setAttribute(k, v.split('/thumbs/' + old + '/').join('/thumbs/' + slug + '/'));
           });
-          var name = a.querySelector('.overlay-text');
+          const name = a.querySelector('.overlay-text');
           if (name) name.textContent = title;
-          var badge = a.querySelector('.badge');
+          const badge = a.querySelector('.badge');
           if (badge) badge.remove();
         };
-        var oldSlug = tile.dataset.slug;
-        var oldTitle = (tile.querySelector('.overlay-text') || {}).textContent || '';
+        const oldSlug = tile.dataset.slug;
+        const oldTitle = (tile.querySelector('.overlay-text') || {}).textContent || '';
         put(tile, pick.slug, pick.title);
         if (other) put(other, oldSlug, oldTitle);
-      } catch (e) {
+      } catch {
         /* keep the build-day pick */
       }
     })();
