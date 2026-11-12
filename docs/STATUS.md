@@ -12,7 +12,7 @@ Updated by the build agent after every task. The reviewer reads this first.
 - Tests: `npm run check` passes; `npm run e2e` 1,205 checks with samples off (only failure R51, now fixed) and 1,249 checks with samples on, 0 failures.
 - Production build (samples off): 95 game pages, all quick (the 24 sample games appear only in local builds where .env turns samples on), no drafts, every page noindex until `PUBLIC_LAUNCH=true`, robots.txt Disallow: /.
 - Open: R43 only (needs the owner: Cloudflare Access login before launch, separate Production D1).
-- The planner merges dev into main at the 08:30 check after re-testing the live preview.
+- Merged into main at 08:45 (42ccc58); production https://playzoni.pages.dev verified, still hidden from search engines.
 
 ## Current task
 (none — Phase P finished)
@@ -20,6 +20,7 @@ Updated by the build agent after every task. The reviewer reads this first.
 ## Log (newest first)
 | Date | Task | What changed (files) | How verified | Left open |
 |---|---|---|---|---|
+| 12 Nov 2026 08:45 | Merge dev into main (planner, owner go-ahead 12 Nov 02:03) | main 42ccc58 (merge of dev 1a06cad) | Before: npm run check passes; production-style build (samples off, no drafts, no PUBLIC_LAUNCH): 95 game pages, 0 sample/draft pages, every page noindex (149 via the prelaunch tag, 17 admin pages via their own tag), robots.txt Disallow: /; live preview pass at 390/1280 0 failures. After: https://playzoni.pages.dev loads (200) at 390 and 1280, robots noindex, robots.txt Disallow: /, sample pages 404, no page errors | R43 (owner); domain; PUBLIC_LAUNCH at launch |
 | 12 Nov 2026 06:50 | Planner overnight check 3 | docs/seo-reports/2026-11-12-e2e.md now holds the live run | `npm run e2e https://dev.playzoni.pages.dev` (live Cloudflare preview): 1,205 checks, 0 failures (31 pages x 6 widths, interactions, JS off, internal links). Admin dashboard loads data with no errors on the preview and on https://playzoni.vercel.app. No new build-chat commits | R43 (owner) |
 | 12 Nov 2026 05:00 | Planner overnight check 2 | none (no new build-chat commits since b7e77e8) | Category texts: 6 files, 0 shared sentences, no long dashes. Live on https://dev.playzoni.pages.dev and https://playzoni.vercel.app at 390 and 1280: robots.txt Disallow: /, llms.txt 200, game player not covered by tiles, no overflow, no page errors, category text present, New Games 3 per row on phones | R43 (owner) |
 | 12 Nov 2026 04:40 | RELAY R6 (planner) | GameGrid.astro (uniform L lists 1x1 under 444px), global.css (body flex column, main fills, min-width 0: footer at the bottom of short pages), about.astro + index.astro + Footer.astro (honest wording: no claim that every game was played before going live), docs/screens/final/ (every page type at 390 and 1280) | Playwright at 390/768/1280/1920: no overflow, CLS <= 0.005, footer gap 0; e2e run: 1,205 checks, 1 failure (R51, admin 768 CLS 0.052); npm run check passes. Note: with samples off there is no fully written game page: all 95 live games are quick pages | R51 (minor), R7 |
