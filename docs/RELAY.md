@@ -1,5 +1,7 @@
 # RELAY 2: afternoon sprint with parallel Haiku agents (12 Nov 2026, written by the planner)
 
+**STATUS: DONE (12 Nov 2026, 20:15 IST).** The planner did T9.5, T9.1 and T9.6 and merged `dev` into `main`. Nothing for the build chat to do here. Wait for the next RELAY.
+
 The overnight plan (RELAY 1: R1 to R7, R50, R51) is finished and merged into `main`. This sprint adds three features that need nothing from Vedant. All times are India time (IST).
 
 ## How to run it (build chat)

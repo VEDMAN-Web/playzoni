@@ -7,6 +7,12 @@ Updated by the build agent after every task. The reviewer reads this first.
 - Preview URL: https://dev.playzoni.pages.dev (Cloudflare Pages project `playzoni`, branch `dev`, drafts on, every page noindex). Production branch `main` (not deployed yet).
 - Next task: TS.1 (owner types the /plugin installs), R38 (/graphify .), then T5.2 (test the 32 easy games from R29 first) when games are published. Planner: Q17 (player bar vs exact 7x4 / 9x5 block), Lighthouse on the new game page.
 
+## SPRINT 2 READY (12 Nov 2026, 20:15 IST, planner)
+- RELAY 2 done by the planner (the build chat did not start it): T9.5 Game of the day, T9.1 Installable app, T9.6 "Because you played X".
+- Tests: `npm run check` passes; `npm run e2e` against a local drafts preview: 1,249 checks, 0 failed.
+- Production-style build (samples off, no drafts, no PUBLIC_LAUNCH): 95 game pages, 166 pages all noindex, robots.txt Disallow: /.
+- Open: R43 (owner). Waiting on the owner: full pages for the 95 quick games, domain, PUBLIC_LAUNCH.
+
 ## READY FOR MERGE (12 Nov 2026, 04:30 IST, planner)
 - dev at 4bb7aba. RELAY R1 to R7 done (R2, R3 by the build chat; R1, R4, R5, R6, R50, R51 by the planner after the build chat stopped).
 - Tests: `npm run check` passes; `npm run e2e` 1,205 checks with samples off (only failure R51, now fixed) and 1,249 checks with samples on, 0 failures.
