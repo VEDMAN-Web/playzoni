@@ -12,6 +12,7 @@ import SeoCard from '../components/SeoCard.astro';
 import JsonLd from '../components/JsonLd.astro';
 import { pickBadges } from '../lib/badges';
 import { getPublishedGames } from '../lib/games';
+import { dayNumber, upcomingPicks } from '../lib/game-of-day';
 import { publishedCategoriesFrom } from '../lib/published';
 
 // Home page in the order of docs/PRD.md §6. Recently played (T2.6) goes between the mosaic and the rows.
@@ -44,8 +45,26 @@ const gameItem = (g: (typeof games)[number]): GridItem => ({
   ...previewFields(g.data),
 });
 
+// T9.5 Game of the day: today's pick (UTC) at build time, plus the next 13 days for the swap script below.
+const dayPicks = upcomingPicks(
+  games.filter((g) => g.data.mobile).map((g) => ({ slug: g.data.slug, title: g.data.title })),
+  dayNumber(Date.now()),
+);
+const godSlug = dayPicks[0]?.slug;
+
 // Mosaic: up to 90 popular games. The nav categories go in after tile 36 (DESIGN §Category tile).
-const mosaicGames: GridItem[] = byPopularity.slice(0, 90).map(gameItem);
+// The Game of the day is an L tile right after the featured games (it is marked featured so the mosaic gives it the
+// next L slot), and it is not repeated elsewhere in the mosaic.
+const popularItems: GridItem[] = byPopularity.filter((g) => g.data.slug !== godSlug).slice(0, godSlug ? 89 : 90).map(gameItem);
+const godGame = games.find((g) => g.data.slug === godSlug);
+const lastFeatured = popularItems.reduce((last, item, i) => (item.kind === 'game' && item.featured ? i : last), -1);
+const mosaicGames: GridItem[] = godGame
+  ? [
+      ...popularItems.slice(0, lastFeatured + 1),
+      { ...gameItem(godGame), featured: true, badge: undefined, pill: 'Game of the day' },
+      ...popularItems.slice(lastFeatured + 1),
+    ]
+  : popularItems;
 const navCategoryItems: GridItem[] = published
   .filter((c) => c.navOrder !== null)
   .sort((a, b) => (a.navOrder ?? 0) - (b.navOrder ?? 0))
@@ -130,6 +149,42 @@ const faqPage = {
   <Header slot="header" box={false} />
 
   <GameGrid items={mosaicItems} mode="mosaic" navBox={true} xlFirst={true} eagerCount={1} label="Popular and featured games" />
+  {dayPicks.length > 0 && <script type="application/json" id="pz-god" set:html={JSON.stringify(dayPicks)} />}
+  <script is:inline>
+    // T9.5: the page was built on one day; show today's Game of the day (UTC) in the same tile. If today's game is
+    // elsewhere in the mosaic, the two tiles trade games, so nothing is shown twice and nothing moves.
+    (function () {
+      try {
+        var data = document.getElementById('pz-god');
+        var tile = document.querySelector('main .grid-mosaic a.tile[data-pill]');
+        if (!data || !tile) return;
+        var d = Math.floor((Date.now() - Date.UTC(2026, 0, 1)) / 86400000);
+        var pick = JSON.parse(data.textContent).find(function (p) { return p.d === d; });
+        if (!pick || pick.slug === tile.dataset.slug) return;
+        var other = document.querySelector('main .grid-mosaic a.tile[data-slug="' + pick.slug + '"]');
+        var put = function (a, slug, title) {
+          var old = a.dataset.slug;
+          a.href = '/game/' + slug;
+          a.dataset.slug = slug;
+          var img = a.querySelector('img');
+          ['src', 'srcset'].forEach(function (k) {
+            var v = img.getAttribute(k);
+            if (v) img.setAttribute(k, v.split('/thumbs/' + old + '/').join('/thumbs/' + slug + '/'));
+          });
+          var name = a.querySelector('.overlay-text');
+          if (name) name.textContent = title;
+          var badge = a.querySelector('.badge');
+          if (badge) badge.remove();
+        };
+        var oldSlug = tile.dataset.slug;
+        var oldTitle = (tile.querySelector('.overlay-text') || {}).textContent || '';
+        put(tile, pick.slug, pick.title);
+        if (other) put(other, oldSlug, oldTitle);
+      } catch (e) {
+        /* keep the build-day pick */
+      }
+    })();
+  </script>
   <ShowMore />
 
   <RecentlyPlayed />

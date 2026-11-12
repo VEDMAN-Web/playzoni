@@ -446,7 +446,7 @@ Rules for every Phase 9 task (each task repeats them in its "Always" line):
 - Done when: with the endpoint unreachable the build still passes and uses the fallback (`source: "fallback"`); with a fake response of 12+ qualifying games the row follows it; no duplicate games between the two popular rows; screenshots at 390 and 1280 in `docs/screens/T9.4/`.
 
 ### T9.5 — "Game of the day" tile
-- status: todo · deps: — (planner, 12 Nov: launch not needed) · model: haiku · docs: DESIGN §V2.2 §V2.9 (pill style), GROWTH tactic 9
+- status: done (planner) · deps: — (planner, 12 Nov: launch not needed) · model: haiku · docs: DESIGN §V2.2 §V2.9 (pill style), GROWTH tactic 9
 - Do:
   1. `src/lib/game-of-day.ts`: eligible = published games with `mobile: true`, sorted by slug A–Z. Day number `d` = whole days from 2026-01-01 00:00 UTC to the current UTC day. Pick = `eligible[(d × 7919) mod N]`. Same game for everyone in the world at the same moment (UTC), no randomness, no visitor data.
   2. Home mosaic: one **L tile (2×2)** placed directly after the 5 featured games from R29, with a small white pill "Game of the day" in the bottom-left (same pill style as "Played today" in §V2.9, no clock icon). The played badge still applies. The same game is not repeated elsewhere in the mosaic.
