@@ -87,6 +87,13 @@ for (const file of pages) {
 
   for (const word of bannedWordsIn(visibleText(html))) add('banned-word', `"${word}" must not appear on the page`);
 
+  // The CSP (public/_headers) blocks inline scripts on Cloudflare, but the local preview does not, so catch them here.
+  for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
+    const attrs = m[1];
+    if (/\bsrc=/.test(attrs) || /type="application\/(ld\+)?json"/.test(attrs) || m[2].trim() === '') continue;
+    add('inline-script', `inline <script> is blocked by the CSP; load it from a file instead: ${m[2].trim().slice(0, 60)}`);
+  }
+
   const seen = new Set<string>();
   for (const m of html.matchAll(/<a\s[^>]*href="([^"]*)"/g)) {
     const href = decode(m[1]);
